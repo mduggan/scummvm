@@ -24,6 +24,11 @@
 
 #include "ultima/ultima8/graphics/shape_frame.h"
 #include "ultima/ultima8/graphics/raw_shape_frame.h"
+#include "ultima/ultima8/graphics/palette.h"
+#include "ultima/ultima8/graphics/palette_manager.h"
+
+#include "graphics/managed_surface.h"
+#include "image/png.h"
 
 namespace Ultima {
 namespace Ultima8 {
@@ -104,6 +109,34 @@ uint8 ShapeFrame::getPixelAtPoint(int32 x, int32 y) const {
 
 	return _pixels[y * _width + x];
 }
+
+bool ShapeFrame::dumpFramePNG(Common::WriteStream &ws) const {
+	if (_width == 0 || _height == 0)
+		return false;
+
+	Graphics::ManagedSurface surf(_width, _height, Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0));
+
+	surf.setTransparentColor(0xff);
+
+	uint32 *pix = static_cast<uint32 *>(surf.getPixels());
+	uint8 *gamepal = PaletteManager::get_instance()->getPalette(PaletteManager::Pal_Game)->_palette;
+	for (int y = 0; y < surf.h; y++) {
+		for (int x = 0; x < surf.w; x++) {
+			uint32 col = 0x00ff0000; /// Pure green.
+			if (_mask[y * _width + x]) {
+				uint8 rawcol = _pixels[y * _width + x];
+				uint8 r = gamepal[rawcol * 3];
+				uint8 g = gamepal[rawcol * 3 + 1];
+				uint8 b = gamepal[rawcol * 3 + 2];
+				col = r << 24 | g << 16 | b << 8 | 0xff;
+			}
+			pix[(surf.pitch / surf.format.bytesPerPixel) * y + x] = col;
+		}
+	}
+
+	return Image::writePNG(ws, surf);
+}
+
 
 } // End of namespace Ultima8
 } // End of namespace Ultima

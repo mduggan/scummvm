@@ -44,6 +44,8 @@ public:
 	bool hasPoint(int32 x, int32 y) const;  // Check to see if a point is in the frame
 
 	uint8 getPixelAtPoint(int32 x, int32 y) const;  // Get the pixel at the point
+
+	bool dumpFramePNG(Common::WriteStream &ws) const;
 };
 
 } // End of namespace Ultima8

@@ -23,9 +23,12 @@
 #include "ultima/ultima8/misc/pent_include.h"
 
 #include "ultima/ultima8/graphics/shape_archive.h"
+#include "ultima/ultima8/graphics/shape_frame.h"
 #include "ultima/ultima8/graphics/shape.h"
 #include "ultima/ultima8/graphics/palette.h"
 #include "ultima/ultima8/convert/convert_shape.h"
+
+#include "common/file.h"
 
 namespace Ultima {
 namespace Ultima8 {
@@ -69,6 +72,17 @@ void ShapeArchive::cache(uint32 shapenum) {
 	if (_palette) shape->setPalette(_palette);
 
 	_shapes[shapenum] = shape;
+
+#ifdef DUMP_SHAPES
+	for (unsigned int i = 0; i < shape->frameCount(); i++) {
+		Common::DumpFile file;
+		Common::String fname = Common::String::format("u8_shape_%04d_%04d.png", shapenum, i);
+		file.open(fname);
+		shape->getFrame(i)->dumpFramePNG(file);
+		file.close();
+	}
+#endif
+
 }
 
 void ShapeArchive::uncache(uint32 shapenum) {

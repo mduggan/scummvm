@@ -36,6 +36,7 @@
 #include "ultima/ultima8/world/actors/combat_dat.h"
 #include "ultima/ultima8/graphics/palette_manager.h"
 #include "ultima/ultima8/graphics/shape.h"
+#include "ultima/ultima8/graphics/shape_frame.h"
 #include "ultima/ultima8/graphics/wpn_ovlay_dat.h"
 #include "ultima/ultima8/kernel/core_app.h"
 #include "ultima/ultima8/conf/config_file_manager.h"
@@ -338,6 +339,16 @@ void GameData::loadU8Data() {
 	_mouse = new Shape(msds, 0);
 	_mouse->setPalette(PaletteManager::get_instance()->getPalette(PaletteManager::Pal_Game));
 	delete msds;
+
+#ifdef DUMP_MOUSE_CURSORS
+	for (unsigned int i = 0; i < _mouse->frameCount(); i++) {
+		Common::DumpFile file;
+		Common::String fname = Common::String::format("u8_mouse_%02d.png", i);
+		file.open(fname);
+		_mouse->getFrame(i)->dumpFramePNG(file);
+		file.close();
+	}
+#endif
 
 	Common::SeekableReadStream *gumpds = filesystem->ReadFile("@game/static/u8gumps.flx");
 	if (!gumpds)
