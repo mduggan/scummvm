@@ -47,7 +47,7 @@ void CruAvatarMoverProcess::run() {
 	// Even when we are not doing anything (because we're waiting for an anim)
 	// we check if the combat angle needs updating - this keeps it smooth.
 
-	const MainActor *avatar = getMainActor();
+	const Actor *avatar = getControlledActor();
 	assert(avatar);
 
 	// When not in combat the angle is kept as -1
@@ -89,8 +89,19 @@ void CruAvatarMoverProcess::handleHangingMode() {
 	assert(false);
 }
 
+static bool _isAnimRunningJumping(Animation::Sequence anim) {
+	return (anim == Animation::run || anim == Animation::combatRunSmallWeapon ||
+			anim == Animation::combatRunLargeWeapon || anim == Animation::jumpForward);
+}
+
+static bool _isAnimStartRunning(Animation::Sequence anim) {
+	return (anim == Animation::startRun || anim == Animation::startRunSmallWeapon ||
+			anim == Animation::startRunLargeWeapon);
+}
+
 void CruAvatarMoverProcess::handleCombatMode() {
-	MainActor *avatar = getMainActor();
+	Actor *avatar = getControlledActor();
+	MainActor *mainactor = dynamic_cast<MainActor *>(avatar);
 	const Animation::Sequence lastanim = avatar->getLastAnim();
 	Direction direction = (_avatarAngle >= 0 ? Direction_FromCentidegrees(_avatarAngle) : avatar->getDir());
 	const Direction curdir = avatar->getDir();
@@ -99,24 +110,22 @@ void CruAvatarMoverProcess::handleCombatMode() {
 	// never idle when in combat
 	_idleTime = 0;
 
-	// If Avatar has fallen down, stand up
-	if (standUpIfNeeded(direction)) {
+	if (stasis)
 		return;
-	} else if (stasis) {
-		return;
-	} else if (hasMovementFlags(MOVE_FORWARD)) {
+	
+	if (hasMovementFlags(MOVE_FORWARD)) {
 		Animation::Sequence nextanim;
 		if (hasMovementFlags(MOVE_STEP)) {
 			nextanim = avatar->isKneeling() ?
 							Animation::kneelingAdvance : Animation::advance;
 		} else if (hasMovementFlags(MOVE_RUN)) {
 			// Take a step before running
-			if (lastanim != Animation::startRunWithLargeWeapon && lastanim != Animation::run)
-				nextanim = Animation::startRunWithLargeWeapon;
+			if (lastanim != Animation::startRunSmallWeapon && lastanim != Animation::run && lastanim != Animation::combatRunSmallWeapon)
+				nextanim = Animation::startRunSmallWeapon;
 			else
-				nextanim = Animation::run;
+				nextanim = Animation::combatRunSmallWeapon;
 		} else if (hasMovementFlags(MOVE_JUMP)) {
-			if (lastanim == Animation::walk || lastanim == Animation::run)
+			if (lastanim == Animation::walk || lastanim == Animation::run || lastanim == Animation::combatRunSmallWeapon)
 				nextanim = Animation::jumpForward;
 			else
 				nextanim = Animation::jump;
@@ -128,7 +137,8 @@ void CruAvatarMoverProcess::handleCombatMode() {
 		} else {
 			// moving forward from combat stows weapon
 			nextanim = Animation::walk;
-			avatar->toggleInCombat();
+			if (mainactor)
+				mainactor->toggleInCombat();
 		}
 
 		// don't check weapon here, Avatar can go straight from drawn-weapon to
@@ -188,18 +198,16 @@ void CruAvatarMoverProcess::handleCombatMode() {
 			return;
 
 		Animation::Sequence nextanim = Animation::combatStand;
-		if (lastanim == Animation::run && !hasMovementFlags(MOVE_RUN)) {
-			// want to go back to combat mode from run
-			nextanim = Animation::stopRunningAndDrawWeapon;
+		if ((lastanim == Animation::run || lastanim == Animation::combatRunSmallWeapon) && !hasMovementFlags(MOVE_RUN)) {
+			// want to go back to combat mode  from run
+			nextanim = Animation::stopRunningAndDrawSmallWeapon;
 		} else if (hasMovementFlags(MOVE_BACK)) {
 			nextanim = Animation::retreat;
 			nextdir = Direction_Invert(direction);
 		}
 
 		if (hasMovementFlags(MOVE_RUN)) {
-			// Take a step before running.  Don't clear combat mode in Cruasder
-			// - running always finishes with drawing weapon
-			nextanim = Animation::run;
+			nextanim = Animation::combatRunSmallWeapon;
 		}
 
 		nextanim = Animation::checkWeapon(nextanim, lastanim);
@@ -217,6 +225,10 @@ void CruAvatarMoverProcess::handleCombatMode() {
 		avatar->doAnim(idleanim, direction);
 		return;
 	}
+	
+	if (!_isAnimRunningJumping(lastanim) && !_isAnimStartRunning(idleanim)) {
+		idleanim = Animation::stopRunningAndDrawSmallWeapon;
+	}
 
 	// not doing anything in particular? stand
 	if (lastanim != idleanim) {
@@ -226,7 +238,8 @@ void CruAvatarMoverProcess::handleCombatMode() {
 }
 
 void CruAvatarMoverProcess::handleNormalMode() {
-	MainActor *avatar = getMainActor();
+	Actor *avatar = getControlledActor();
+	MainActor *mainactor = dynamic_cast<MainActor *>(avatar);
 	const Animation::Sequence lastanim = avatar->getLastAnim();
 	Direction direction = avatar->getDir();
 	const bool stasis = Ultima8Engine::get_instance()->isAvatarInStasis();
@@ -246,17 +259,14 @@ void CruAvatarMoverProcess::handleNormalMode() {
 	// User toggled combat while in combatRun
 	if (avatar->isInCombat()) {
 		avatar->clearActorFlag(Actor::ACT_COMBATRUN);
-		avatar->toggleInCombat();
+		if (mainactor)
+			mainactor->toggleInCombat();
 	}
-
-	// If Avatar has fallen down and not dead, get up!
-	if (standUpIfNeeded(direction))
-		return;
 
 	if (!hasMovementFlags(MOVE_ANY_DIRECTION) && lastanim == Animation::run) {
 		// if we were running, slow to a walk before stopping
 		// (even in stasis)
-		waitFor(avatar->doAnim(Animation::stopRunningAndDrawWeapon, direction));
+		waitFor(avatar->doAnim(Animation::stopRunningAndDrawSmallWeapon, direction));
 		avatar->setInCombat(0);
 		avatar->clearActorFlag(Actor::ACT_COMBATRUN);
 		return;
@@ -280,7 +290,8 @@ void CruAvatarMoverProcess::handleNormalMode() {
 	if (hasMovementFlags(MOVE_RUN)) {
 		if (lastanim == Animation::run
 			|| lastanim == Animation::startRun
-			|| lastanim == Animation::startRunWithLargeWeapon
+			|| lastanim == Animation::startRunSmallWeapon
+			|| lastanim == Animation::combatRunSmallWeapon
 			|| lastanim == Animation::walk) {
 			// keep running
 			nextanim = Animation::run;
@@ -298,7 +309,8 @@ void CruAvatarMoverProcess::handleNormalMode() {
 	}
 
 	if (hasMovementFlags(MOVE_BACK)) {
-		avatar->toggleInCombat();
+		if (mainactor)
+			mainactor->toggleInCombat();
 		step(Animation::retreat, direction);
 		return;
 	}
@@ -331,7 +343,7 @@ void CruAvatarMoverProcess::handleNormalMode() {
 
 void CruAvatarMoverProcess::step(Animation::Sequence action, Direction direction,
                               bool adjusted) {
-	MainActor *avatar = getMainActor();
+	Actor *avatar = getControlledActor();
 
 	Animation::Result res = avatar->tryAnim(action, direction);
 	Animation::Result initialres = res;
@@ -380,7 +392,8 @@ void CruAvatarMoverProcess::step(Animation::Sequence action, Direction direction
 
 	if ((action == Animation::step || action == Animation::advance ||
 		 action == Animation::retreat || action == Animation::run ||
-		 action == Animation::startRunWithLargeWeapon ||
+		 action == Animation::combatRunSmallWeapon ||
+		 action == Animation::startRunSmallWeapon ||
 		 action == Animation::startRun || action == Animation::walk)
 		&& res == Animation::FAILURE) {
 		action = Animation::stand;
@@ -396,7 +409,7 @@ void CruAvatarMoverProcess::step(Animation::Sequence action, Direction direction
 }
 
 void CruAvatarMoverProcess::tryAttack() {
-	MainActor *avatar = getMainActor();
+	Actor *avatar = getControlledActor();
 	Direction dir = avatar->getDir();
 	if (!avatar->isInCombat()) {
 		avatar->setInCombat(0);

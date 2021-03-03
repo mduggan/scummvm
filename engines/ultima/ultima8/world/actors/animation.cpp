@@ -63,15 +63,15 @@ bool isCombatAnimCru(const Sequence anim) {
 	case startKneeling:
 	case stopKneeling:
 	case kneelAndFire:
-	case fire2:
+	case brightFireLargeWpn:
 	case combatRollLeft:
 	case combatRollRight:
 	case slideLeft:
 	case slideRight:
 	case startRun:
-	case startRunWithLargeWeapon:
+	case startRunLargeWeapon:
 	case run:
-	case stopRunningAndDrawWeapon:
+	case stopRunningAndDrawSmallWeapon:
 		return true;
 	default:
 		return false;
