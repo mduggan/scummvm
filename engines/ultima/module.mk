@@ -507,6 +507,7 @@ MODULE_OBJS := \
 	ultima8/misc/util.o \
 	ultima8/usecode/bit_set.o \
 	ultima8/usecode/byte_set.o \
+	ultima8/usecode/ls_debug.o \
 	ultima8/usecode/uc_list.o \
 	ultima8/usecode/uc_machine.o \
 	ultima8/usecode/uc_process.o \

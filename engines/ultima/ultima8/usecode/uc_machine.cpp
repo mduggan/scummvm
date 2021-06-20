@@ -34,6 +34,7 @@
 #include "ultima/ultima8/usecode/bit_set.h"
 #include "ultima/ultima8/usecode/byte_set.h"
 #include "ultima/ultima8/usecode/uc_list.h"
+#include "ultima/ultima8/usecode/ls_debug.h"
 #include "ultima/ultima8/misc/id_man.h"
 #include "ultima/ultima8/world/get_object.h"
 
@@ -50,7 +51,9 @@ namespace Ultima8 {
 #define LOGPF(X)
 #endif
 
-#ifdef DEBUG
+#define LOOP_DEBUG
+
+#if defined(DEBUG) || defined(LOOP_DEBUG)
 static const char *print_bp(const int16 offset) {
 	static char str[32];
 	snprintf(str, 32, "[BP%c%02Xh]", offset < 0 ? '-' : '+',
@@ -65,7 +68,6 @@ static const char *print_sp(const int16 offset) {
 	return str;
 }
 #endif
-
 
 //#define DUMPHEAP
 
@@ -520,7 +522,7 @@ void UCMachine::execProcess(UCProcess *p) {
 				} else {
 					listB->appendList(*listA);
 				}
-				// CHECKME: do we allow appending a list to itself?
+				// don't allow appending a list to itself.
 				assert(ui16a != ui16b);
 				freeList(ui16a);
 				p->_stack.push2(ui16b);
@@ -1189,9 +1191,7 @@ void UCMachine::execProcess(UCProcess *p) {
 			ui32a = p->_stack.pop4();
 
 			p->_stack.addSP(-ui16a);
-			if (!dereferencePointer(ui32a,
-			                        p->_stack.access(),
-			                        ui16a))
+			if (!dereferencePointer(ui32a, p->_stack.access(), ui16a))
 				error = true;
 
 			LOGPF(("push indirect\t%02Xh bytes", ui16a));
@@ -1826,14 +1826,24 @@ void UCMachine::execProcess(UCProcess *p) {
 				p->_stack.push(script, scriptsize);
 				p->_stack.push2(scriptsize);
 				p->_stack.push2(static_cast<uint16>(si16a));
-				p->_stack.push2(0);
+				p->_stack.push2(itemlist->getSize());
 				uint16 itemlistID = assignList(itemlist);
 				p->_stack.push2(itemlistID);
 
+				LOGPF(("loop\t\t%s %02X %02X %s(%04X, %04X) -> %d\n", print_bp(si16a),
+					   scriptsize, searchtype, LoopScript::searchTypeStr(searchtype),
+					   ui16a, ui16b, itemlist->getSize()));
+
+#ifdef LOOP_DEBUG
+				pout.Print("pid = %04X sp = %02X; %04X:%04X: loop\t%s %02X %02X %s(%04X, %04X)\n",
+						   p->_pid, p->_stack.stacksize(), p->_classId, p->_ip,
+						   print_bp(si16a), scriptsize, searchtype,
+						   LoopScript::searchTypeStr(searchtype), ui16a, ui16b);
+				pout.Print("                             : %s -> %d found\n",
+						   LoopScript::formatScript(script).c_str(), itemlist->getSize());
+#endif
 				delete[] script;
 
-				LOGPF(("loop\t\t%s %02X %02X\n", print_bp(si16a),
-					   scriptsize, searchtype));
 			}
 		}
 		// Intentional fall-through
@@ -1859,33 +1869,53 @@ void UCMachine::execProcess(UCProcess *p) {
 			// see if there are still valid items left
 			bool valid = false;
 			do {
-				if (index >= itemlist->getSize()) {
+				if (index == 0) {
 					break;
 				}
 
-				p->_stack.assign(p->_bp + si16a, (*itemlist)[index], 2);
+				p->_stack.assign(p->_bp + si16a, (*itemlist)[index - 1], 2);
 				uint16 objid = p->_stack.access2(p->_bp + si16a);
 				Item *item = getItem(objid);
 				if (item) {
 					valid = true;
 				}
 
-				if (!valid) index++;
+				if (!valid) index--;
 
 			} while (!valid);
 
 			if (!valid) {
 				p->_stack.push2(0); // end of loop
+				// clear loop var (needed?)
+				p->_stack.assign2(p->_bp + si16a, 0);
 				freeList(itemlistID);
 			} else {
 				p->_stack.push2(1);
 				// increment index
-				p->_stack.assign2(sp + 2, index + 1);
+				p->_stack.assign2(sp + 2, index - 1);
 			}
 
 			if (opcode == 0x73) { // because of the fall-through
-				LOGPF(("loopnext\n"));
+				LOGPF(("loopnext (idx %d%s)\n", index, valid ? "" : " end"));
 			}
+
+#ifdef LOOP_DEBUG
+			pout.Print("pid = %04X sp = %02X; %04X:%04X: loopnext %04X [",
+					   p->_pid, p->_stack.stacksize(), p->_classId, p->_ip, itemlistID);
+			for (uint32 i = 0; valid && i < itemlist->getSize(); i++) {
+				if (i == index - 1)
+					pout.Print("*");
+				pout.Print("%04X", itemlist->getuint16(i));
+				if (i == index - 1)
+					pout.Print("*");
+				if (i < itemlist->getSize() - 1)
+					pout.Print(", ");
+			}
+			if (!valid)
+				pout.Print("finished");
+			pout.Print("]\n");
+#endif
+
 			break;
 		}
 
@@ -1894,7 +1924,8 @@ void UCMachine::execProcess(UCProcess *p) {
 			// add xx to the current 'loopscript'
 			ui8a = cs->readByte();
 			p->_stack.push1(ui8a);
-			LOGPF(("loopscr\t\t%02X \"%c\"\n", ui8a, static_cast<char>(ui8a)));
+			LOGPF(("loopscr\t\t%02X \"%c\" \"%s\"\n", ui8a, static_cast<char>(ui8a),
+				   LoopScript::opcodeStr(ui8a)));
 			break;
 
 		case 0x75:
@@ -1936,11 +1967,32 @@ void UCMachine::execProcess(UCProcess *p) {
 				       print_bp(si8a), ui32a, si16a));
 			}
 
-			// Increment the counter
-			if (ui16a == 0xFFFF) ui16a = 0;
-			else ui16a++;
+			// decrement the counter
+			if (ui16a == 0xFFFF)
+				ui16a = getList(ui16b)->getSize();
+			ui16a--;
 
-			if (ui16a >= getList(ui16b)->getSize()) {
+#ifdef LOOP_DEBUG
+			pout.Print("pid = %04X sp = %02X; %04X:%04X: foreach  %04X [",
+					   p->_pid, p->_stack.stacksize(), p->_classId, p->_ip, ui16b);
+			if (ui16a != 0xFFFF){
+				UCList *itemlist = getList(ui16b);
+				for (uint32 i = 0; i < itemlist->getSize(); i++) {
+					if (i == ui16a)
+						pout.Print("*");
+					pout.Print("%04X", itemlist->getuint16(i));
+					if (i == ui16a)
+						pout.Print("*");
+					if (i < itemlist->getSize() - 1)
+						pout.Print(", ");
+				}
+			} else {
+				pout.Print("finished");
+			}
+			pout.Print("]\n");
+#endif
+
+			if (ui16a == 0xFFFF) {
 				// loop done
 
 				// free loop list

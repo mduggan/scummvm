@@ -581,8 +581,8 @@ void CurrentMap::areaSearch(UCList *itemlist, const uint8 *loopscript,
 	// We need to return in the correct order or it triggers
 	// the wrong one and breaks the game.
 	//
-	for (int cy = miny; cy <= maxy; cy++) {
-		for (int cx = minx; cx <= maxx; cx++) {
+	for (int cx = minx; cx <= maxx; cx++) {
+		for (int cy = miny; cy <= maxy; cy++) {
 			item_list::const_iterator iter;
 			for (iter = _items[cx][cy].begin();
 			        iter != _items[cx][cy].end(); ++iter) {
@@ -646,8 +646,8 @@ void CurrentMap::surfaceSearch(UCList *itemlist, const uint8 *loopscript,
 	int maxy = ((origin[1]) / _mapChunkSize) + 1;
 	clipMapChunks(minx, maxx, miny, maxy);
 
-	for (int cy = miny; cy <= maxy; cy++) {
-		for (int cx = minx; cx <= maxx; cx++) {
+	for (int cx = minx; cx <= maxx; cx++) {
+		for (int cy = miny; cy <= maxy; cy++) {
 			item_list::const_iterator iter;
 			for (iter = _items[cx][cy].begin();
 			        iter != _items[cx][cy].end(); ++iter) {
