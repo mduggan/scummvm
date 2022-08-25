@@ -39,7 +39,7 @@ public:
 		Common::String path() const;
 	};
 
-	void enter() override;
+	void enter(const Common::String &scriptName);
 	void leave() override;
 
 	void loadGame(Common::String &name) {

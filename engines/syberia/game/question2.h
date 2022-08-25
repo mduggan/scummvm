@@ -23,10 +23,12 @@
 #define SYBERIA_GAME_QUESTION2_H
 
 #include "engines/syberia/te/te_lua_gui.h"
+#include "engines/syberia/te/te_layout.h"
+
 
 namespace Syberia {
 
-class Question2 {
+class Question2 : TeLayout {
 public:
 	Question2();
 
@@ -37,10 +39,15 @@ public:
 		bool onButtonValidated();
 	};
 
-	// TODO add public members
+	void enter();
+	void leave();
+	void load();
+	bool onAnswerValidated(Answer &answer);
+	void pushAnswer(const Common::String &name, const Common::String &unk, const Common::String &path);
+	void unload();
 
 private:
-	// TODO add private members
+	TeLuaGUI _gui;
 
 };
 

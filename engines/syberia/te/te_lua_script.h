@@ -22,11 +22,19 @@
 #ifndef SYBERIA_TE_TE_LUA_SCRIPT_H
 #define SYBERIA_TE_TE_LUA_SCRIPT_H
 
+#include "common/str.h"
+#include "syberia/te/te_variant.h"
+
 namespace Syberia {
 
 class TeLuaScript {
 public:
 	TeLuaScript();
+	
+	void execute();
+	void execute(const Common::String &fname);
+	void execute(const Common::String &fname, const TeVariant &param1);
+	void execute(const Common::String &fname, const TeVariant &param1, const TeVariant &param2);
 
 	// TODO add public members
 

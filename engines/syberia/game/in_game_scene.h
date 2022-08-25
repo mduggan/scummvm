@@ -22,24 +22,51 @@
 #ifndef SYBERIA_GAME_IN_GAME_SCENE_H
 #define SYBERIA_GAME_IN_GAME_SCENE_H
 
+#include "common/array.h"
 #include "common/str.h"
+
+#include "syberia/te/te_scene.h"
+#include "syberia/te/te_lua_gui.h"
 
 namespace Syberia {
 
-class InGameScene {
+class Character;
+class TeLayout;
+
+class InGameScene : TeScene {
 public:
 	InGameScene();
 	
 	class AnimObject {
 		void onFinished();
 	};
+	
+	class AnchorZone {
+	};
 
+	void activateAnchorZone(const Common::String &name, bool param_2);
+	void addAnchorZone(const Common::String &param_1, const Common::String &param_2, float param_3);
+	void addBlockingObject(const Common::String &obj) {
+		_blockingObjects.push_back(obj);
+	}
+	void addCallbackAnimation2D(const Common::String &param_1, const Common::String &param_2, float param_3);
+	void addMarker(const Common::String &name, const Common::String &param_2, float param_3, float param_4, const Common::String &param_5, const Common::String &param_6);
+	static float angularDistance(float a1, float a2);
+	bool aroundAnchorZone(const AnchorZone *zone);
+	TeLayout *background();
+	
 	void draw();
+	Character *character(const Common::String &name);
+	void close();
+	bool loadCharacter(const Common::String &name);
+	bool loadPlayerCharacter(const Common::String &name);
 	bool changeBackground(const Common::String &name);
 	void unloadPlayerCharacter(const Common::String &character);
 	// TODO add public members
 
 private:
+	Common::Array<Common::String> _blockingObjects;
+	TeLuaGUI _gui;
 	// TODO add private members
 
 };

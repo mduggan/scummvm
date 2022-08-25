@@ -23,7 +23,13 @@
 
 namespace Syberia {
 
-TeVariant::TeVariant() {
+TeVariant::TeVariant() : _type(TypeNone), _data(0) {
+}
+
+TeVariant::TeVariant(const Common::String &val) : _type(TypeString), _data(0), _strVal(val) {	
+}
+
+TeVariant::TeVariant(const char *val) : _type(TypeString), _data(0), _strVal(val) {
 }
 
 // TODO: Add more functions here.

@@ -43,6 +43,8 @@ public:
 	bool onQuitButton();
 
 private:
+	bool onSomeButtonValidated(const Common::String &script);
+
 	bool _entered;
 
 };

@@ -19,12 +19,45 @@
  *
  */
 
+#include "syberia/game/application.h"
 #include "syberia/game/question2.h"
+#include "syberia/game/game.h"
+#include "syberia/syberia.h"
 
 namespace Syberia {
 
 Question2::Question2() {
 }
+
+void Question2::enter() {
+	error("TODO: implement me");
+}
+
+void Question2::leave() {
+	error("TODO: implement me");
+}
+
+void Question2::load() {
+	error("TODO: implement me");
+}
+
+bool Question2::onAnswerValidated(Answer &answer) {
+	Game *game = g_engine->getGame();
+	error("TODO: TeSignal1Param<TeString_const&>::call here");
+	game->showMarkers(false);
+	leave();
+	return false;
+}
+
+void Question2::pushAnswer(const Common::String &name, const Common::String &unk, const Common::String &path) {
+	error("TODO: implement me");
+}
+
+void Question2::unload() {
+	leave();
+	_gui.unload();
+}
+
 
 // TODO: Add more functions here.
 

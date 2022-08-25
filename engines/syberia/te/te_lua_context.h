@@ -22,12 +22,15 @@
 #ifndef SYBERIA_TE_TE_LUA_CONTEXT_H
 #define SYBERIA_TE_TE_LUA_CONTEXT_H
 
+#include "common/str.h"
+
 namespace Syberia {
 
 class TeLuaContext {
 public:
 	TeLuaContext();
 
+	Common::String global(const Common::String &path);
 	// TODO add public members
 
 private:

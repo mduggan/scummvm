@@ -24,7 +24,7 @@
 
 namespace Syberia {
 
-Application::Application() {
+Application::Application() : _finishedGame(false), _finishedFremium(false) {
 }
 
 void Application::create() {

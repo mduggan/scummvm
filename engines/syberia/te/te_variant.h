@@ -22,17 +22,35 @@
 #ifndef SYBERIA_TE_TE_VARIANT_H
 #define SYBERIA_TE_TE_VARIANT_H
 
+#include "common/str.h"
+#include "common/types.h"
+
 namespace Syberia {
 
 class TeVariant {
 public:
 	TeVariant();
+	TeVariant(const Common::String &val);
+	TeVariant(const char *val);
 
+	enum VariantType {
+		TypeNone,
+		TypeBoolean,
+		TypeInt32,
+		TypeUInt32,
+		TypeInt64,
+		TypeUint64,
+		TypeFloat32,
+		TypeFloat64,
+		TypeString
+	};
+	
 	// TODO add public members
 
 private:
-	// TODO add private members
-
+	uint64 _data;
+	VariantType _type;
+	const Common::String _strVal;
 };
 
 } // end namespace Syberia

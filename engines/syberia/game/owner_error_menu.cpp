@@ -19,6 +19,9 @@
  *
  */
 
+#include "common/path.h"
+#include "syberia/syberia.h"
+#include "syberia/game/application.h"
 #include "syberia/game/owner_error_menu.h"
 
 namespace Syberia {
@@ -26,14 +29,26 @@ namespace Syberia {
 OwnerErrorMenu::OwnerErrorMenu() : _entered(false) {
 }
 
-void OwnerErrorMenu::enter()	{
-	
+void OwnerErrorMenu::enter() {
+	_entered = true;
+	static const Common::Path scriptPath("menus/ownerError/ownerError.lua");
+	load(scriptPath.toString());
+	error("TODO: Finish implementation of OwnerErrorMenu::enter");
+	/*
+	Application *app = g_engine->getApplication();
+	static const Common::String layoutName("menu");
+	TeLayout *menuLayout = TeLuaGUI::layout(layoutName);
+	 ...
+	 */
 }
 
-void OwnerErrorMenu::leave()	{
-	
+void OwnerErrorMenu::leave() {
+	Application *app = g_engine->getApplication();
+	app->captureFade();
+	TeLuaGUI::unload();
+	_entered = false;
+	app->mainMenu().enter();
+	app->fade();
 }
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

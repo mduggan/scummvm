@@ -19,6 +19,10 @@
  *
  */
 
+#include "common/file.h"
+#include "common/path.h"
+#include "syberia/syberia.h"
+#include "syberia/game/application.h"
 #include "syberia/game/splash_screens.h"
 
 namespace Syberia {
@@ -27,9 +31,40 @@ SplashScreens::SplashScreens() {
 }
 
 void SplashScreens::enter()	{
-	
+	if (!_entered) {
+		_entered = true;
+		static const Common::Path scriptPath("menus/splashes/splash0.lua");
+		if (Common::File::exists(scriptPath)) {
+			TeLuaGUI::load(scriptPath.toString());
+			Application *app = g_engine->getApplication();
+			TeLayout *splash = layout(Common::String("splash"));
+			TeI3DObject2 *child = nullptr;
+			error("TODO: Implement the rest of SplashScreens::enter");
+			if (splash) {
+				// call something
+				//child = something
+			}
+			//app->something->addChild(child);
+			app->performRender();
+		}
+		onAlarm();
+	}
 }
 
-// TODO: Add more functions here.
+bool SplashScreens::onAlarm() {
+	error("TODO: Implement me");
+	return false;
+}
+
+bool SplashScreens::onQuitSplash() {
+	_timer.stop();
+	Application *app = g_engine->getApplication();
+	app->captureFade();
+	TeLuaGUI::unload();
+	_entered = false;
+	app->mainMenu().enter();
+	app->fade();
+	return false;
+}
 
 } // end namespace Syberia

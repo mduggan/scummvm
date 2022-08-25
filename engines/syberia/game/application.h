@@ -23,6 +23,8 @@
 #define SYBERIA_GAME_APPLICATION_H
 
 #include "common/str.h"
+#include "syberia/game/bonus_menu.h"
+#include "syberia/game/credits.h"
 #include "syberia/game/global_bonus_menu.h"
 #include "syberia/game/main_menu.h"
 #include "syberia/te/te_visual_fade.h"
@@ -70,15 +72,24 @@ public:
 
 	const char *inAppUnlockFullVersionID();
 	
+	BonusMenu &bonusMenu() { return _bonusMenu; }
 	GlobalBonusMenu &globalBonusMenu() { return _globalBonusMenu; }
 	MainMenu &mainMenu() { return _mainMenu; }
 	TeMusic &music() { return _music; }
+	Credits &credits() { return _credits; }
+
+	bool _finishedGame;
+	bool _finishedFremium;
+
 private:
 	TeVisualFade _visFade;
 	TeMusic _music;
 
 	GlobalBonusMenu _globalBonusMenu;
+	BonusMenu _bonusMenu;
 	MainMenu _mainMenu;
+	Credits _credits;
+
 };
 
 } // end namespace Syberia

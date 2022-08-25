@@ -23,7 +23,12 @@
 #include "common/path.h"
 #include "common/str-array.h"
 #include "common/system.h"
+
+#include "syberia/syberia.h"
+#include "syberia/game/application.h"
+#include "syberia/game/in_game_scene.h"
 #include "syberia/game/game.h"
+#include "syberia/te/te_variant.h"
 
 namespace Syberia {
 
@@ -75,6 +80,30 @@ bool Game::addAnimToSet(const Common::String &anim) {
 	return retval;
 }
 
+void Game::addArtworkUnlocked(const Common::String &name, bool bonus) {
+	error("TODO: Implemet me");
+}
+
+void Game::addNoScale2Child(TeILayout *layout) { // FIXME: check return type
+	error("TODO: Implemet me");
+}
+
+void Game::addNoScale2Children() {
+	error("TODO: Implemet me");
+}
+
+void Game::addNoScaleChildren() {
+	error("TODO: Implemet me");
+}
+
+void Game::addRandomSound(const Common::String &s1, const Common::String &s2, float f1, float f2) {
+	error("TODO: Implemet me");
+}
+
+void Game::addToBag(const Common::String &objname) {
+	error("TODO: Implemet me");
+}
+
 void Game::addToHand(const Common::String &objname) {
 	_inventory.addObject(objname);
 	_inventory.selectedObject(objname);
@@ -84,6 +113,28 @@ void Game::addToScore(enum EGameScoreID score) {
 	_score = static_cast<enum EGameScoreID>(_score + score);
 }
 
+bool Game::changeWarp(const Common::String &zone, const Common::String &scene, bool fadeFlag) {
+	Application *app = g_engine->getApplication();
+	if (fadeFlag) {
+		app->blackFade();
+	} else {
+		app->captureFade();
+	}
+	_warpZone = zone;
+	_warpScene = scene;
+	_warpFlag = fadeFlag;
+	_warped = true;
+	return true;
+}
+
+bool Game::changeWarp2(const Common::String &zone, const Common::String &scene, bool fadeFlag) {
+	error("TODO: Implemet me");
+}
+
+void Game::deleteNoScale() {
+	
+}
+
 void Game::draw() {
 	if (_running) {
 	  _frameCounter++;
@@ -91,12 +142,232 @@ void Game::draw() {
 	}
 }
 
+void Game::enter() {
+	error("TODO: Implemet me");
+}
+
+/*static*/ TeI3DObject2 *Game::findLayoutByName(TeILayout *ilayout, const Common::String &name) {
+	error("TODO: Implemet me");
+}
+
+/*static*/ TeSpriteLayout *Game::findSpriteLayoutByName(TeILayout *ilayout, const Common::String &name) {
+	error("TODO: Implemet me");
+}
+
+void Game::finishFreemium() {
+	Application *app = g_engine->getApplication();
+	app->_finishedGame = true;
+	app->_finishedFremium = true;
+}
+
+void Game::finishGame() {
+	Application *app = g_engine->getApplication();
+	app->_finishedGame = true;
+	_playedTimer.stop();
+	/* Game does this but does nothing with result?
+	if (app->difficulty() == 2) {
+	  _playedTimer.getTimeFromStart();
+	} */
+	app->credits().enter(false);
+}
+
+void Game::initLoadedBackupData() {
+	error("TODO: Implemet me");
+}
+
+void Game::initNoScale() {
+	error("TODO: Implemet me");
+}
+
+void Game::initScene(bool param_1, const Common::String &param_2) {
+	error("TODO: Implemet me");
+}
+
+void Game::initWarp(const Common::String &zone, const Common::String &scene, bool fadeFlag) {
+	error("TODO: Implemet me");
+}
+
+bool Game::isDocumentOpened() {
+	error("TODO: Implemet me");
+}
+
+bool Game::isMoviePlaying() {
+	error("TODO: Implemet me");
+}
+
+bool Game::launchDialog(const Common::String &param_1, uint param_2, const Common::String &param_3,
+				  const Common::String &param_4, float param_5)  {
+	error("TODO: Implemet me");
+}
+
+void Game::leave(bool flag) {
+	error("TODO: Implemet me");
+}
+
+bool Game::loadBackup(const Common::String &path) {
+	error("TODO: Implemet me");
+}
+
+bool Game::loadCharacter(const Common::String &name) {
+	bool result = true;
+	Character *character = _scene.character(name);
+	if (!character) {
+		result = false;
+		bool loaded = _scene.loadCharacter(name);
+		if (loaded) {
+			character = _scene.character(name);
+			error("TODO: Implement the signal setup here.");
+		}
+	}
+	return result;
+}
+
+bool Game::loadPlayerCharacter(const Common::String &name) {
+	bool result = _scene.loadPlayerCharacter(name);
+	if (result) {
+		error("TODO: Implement the signal setup here.");
+	}
+	return result;
+}
+
+bool Game::loadScene(const Common::String &name) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onAnswered(const Common::String &val) {
+	static const Common::String funcName("OnAnswered");
+	_luaScript.execute(funcName, TeVariant(val));
+	return false;
+}
+
+bool Game::onCallNumber(const Common::String &val) {
+	static const Common::String funcName("OnCallNumber");
+	_luaScript.execute(funcName, TeVariant(val));
+	return false;
+}
+
+bool Game::onCharacterAnimationFinished(const Common::String &val) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onCharacterAnimationPlayerFinished(const Common::String &val) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onDialogFinished(const Common::String &val) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onDisplacementFinished() {
+	error("TODO: Implemet me");
+}
+
+bool Game::onFinishedCheckBackup(bool result) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onFinishedLoadingBackup(const Common::String &val) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onFinishedSavingBackup(int something) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onInventoryButtonValidated() {
+	error("TODO: Implemet me");
+}
+
+bool Game::onLockVideoButtonValidated() {
+	error("TODO: Implemet me");
+}
+
+bool Game::onMarkersVisible(TeCheckboxLayout::State state) {
+	error("TODO: Implemet me");
+}
+
+bool Game::onMouseClick(uint flags)  {
+	error("TODO: Implemet me");
+}
+
+bool Game::onMouseMove() {
+	error("TODO: Implemet me");
+}
+
+bool Game::onSkipVideoButtonValidated() {
+	error("TODO: Implemet me");
+}
+
+bool Game::onVideoFinished() {
+	error("TODO: Implemet me");
+}
+
+void Game::pauseMovie() {
+	error("TODO: Implemet me");
+}
+
+void Game::playMovie(const Common::String &s1, const Common::String &s2) {
+	error("TODO: Implemet me");
+}
+
+void Game::playRandomSound(const Common::String &name) {
+	error("TODO: Implemet me");
+}
+
+void Game::playSound(const Common::String &name, int param_2, float param_3) {
+	error("TODO: Implemet me");
+}
+
+void Game::removeNoScale2Child(TeILayout *layout) {
+	error("TODO: Implement me.");
+}
+
+void Game::removeNoScale2Children() {
+	error("TODO: Implemet me");
+}
+
+void Game::removeNoScaleChildren() {
+	error("TODO: Implemet me");
+}
+
 void Game::resetPreviousMousePos() {
 	_previousMousePos = TeVector2s32(-1, -1);
 }
 
+void Game::resumeMovie() {
+	error("TODO: Implemet me");
+}
+
+void Game::saveBackup(const Common::String &saveName) {
+	error("TODO: Implemet me");
+}
+
 void Game::setBackground(const Common::String &name) {
 	_scene.changeBackground(name);
+}
+
+void Game::setCurrentObjectSprite(const Common::String &spritePath) {
+	error("TODO: Implemet me");
+}
+
+bool Game::showMarkers(bool val) {
+	error("TODO: Implemet me");
+}
+
+bool Game::startAnimation(const Common::String &animName, int param_2, bool param_3) {
+	error("TODO: Implemet me");
+}
+
+void Game::stopSound(const Common::String &name) {
+	error("TODO: Implemet me");
+}
+
+bool Game::unloadCharacter(const Common::String &character) {
+	error("TODO: Implemet me");
+}
+
+bool Game::unloadCharacters() {
+	error("TODO: Implemet me");
 }
 
 bool Game::unloadPlayerCharacter(const Common::String &character) {
@@ -104,6 +375,8 @@ bool Game::unloadPlayerCharacter(const Common::String &character) {
 	return true;
 }
 
-// TODO: Add more functions here.
+void Game::update() {
+	error("TODO: Implemet me");
+}
 
 } // end namespace Syberia

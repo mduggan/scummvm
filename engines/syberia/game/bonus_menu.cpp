@@ -31,7 +31,7 @@ namespace Syberia {
 BonusMenu::BonusMenu() {
 }
 
-void BonusMenu::enter() {
+void BonusMenu::enter(const Common::String &scriptName) {
 	error("TODO: implement me.");
 }
 

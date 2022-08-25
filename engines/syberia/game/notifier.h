@@ -22,15 +22,30 @@
 #ifndef SYBERIA_GAME_NOTIFIER_H
 #define SYBERIA_GAME_NOTIFIER_H
 
+#include "common/str.h"
+
 namespace Syberia {
 
 class Notifier {
 public:
 	Notifier();
-
-	// TODO add public members
+	
+	void launchNextnotifier();
+	void load();
+	bool onFadeInFinished();
+	bool onFadeOutFinished();
+	bool onVisibleFinished();
+	
+	void push(const Common::String &s1, const Common::String &s2);
+	void unload();
 
 private:
+	struct notifierData {
+		Common::String s1;
+		Common::String s2;
+	};
+	Common::Array<notifierData> _notifierDataArray;
+	TeLuaGUI _gui;
 	// TODO add private members
 
 };
