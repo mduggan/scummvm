@@ -19,12 +19,30 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "syberia/te/te_lua_script.h"
 
 namespace Syberia {
 
 TeLuaScript::TeLuaScript() {
 }
+
+void TeLuaScript::execute() {
+	error("TODO: Implement me.");
+}
+
+void TeLuaScript::execute(const Common::String &fname) {
+	error("TODO: Implement me.");
+}
+
+void TeLuaScript::execute(const Common::String &fname, const TeVariant &param1) {
+	error("TODO: Implement me.");
+}
+
+void TeLuaScript::execute(const Common::String &fname, const TeVariant &param1, const TeVariant &param2) {
+	error("TODO: Implement me.");
+}
+
 
 // TODO: Add more functions here.
 

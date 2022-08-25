@@ -27,17 +27,23 @@ TeLuaGUI::TeLuaGUI() {
 }
 
 TeButtonLayout *TeLuaGUI::buttonLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeButtonLayout *>::iterator iter = _buttonLayouts.find(name);
+	if (iter != _buttonLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
 TeCheckboxLayout *TeLuaGUI::checkboxLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeCheckboxLayout *>::iterator iter = _checkboxLayouts.find(name);
+	if (iter != _checkboxLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
 TeClipLayout *TeLuaGUI::clipLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeClipLayout *>::iterator iter = _clipLayouts.find(name);
+	if (iter != _clipLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
@@ -47,12 +53,16 @@ TeCurveAnim2<TeI3DObject2,TeColor> *TeLuaGUI::colorLinearAnimation(const Common:
 }
 
 TeExtendedTextLayout *TeLuaGUI::extendedTextLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeExtendedTextLayout *>::iterator iter = _extendedTextLayouts.find(name);
+	if (iter != _extendedTextLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
 TeLayout *TeLuaGUI::layout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeLayout *>::iterator iter = _layouts.find(name);
+	if (iter != _layouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
@@ -67,7 +77,9 @@ TeCurveAnim2<TeI3DObject2, TeVector3f32> *TeLuaGUI::layoutPositionLinearAnimatio
 }
 
 TeListLayout *TeLuaGUI::listLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeListLayout *>::iterator iter = _listLayouts.find(name);
+	if (iter != _listLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
@@ -77,17 +89,23 @@ TeCurveAnim2<TeI3DObject2,TeQuaternion> *TeLuaGUI::rotationLinearAnimation(const
 }
 
 TeScrollingLayout *TeLuaGUI::scrollingLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeScrollingLayout *>::iterator iter = _scrollingLayouts.find(name);
+	if (iter != _scrollingLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
 TeSpriteLayout *TeLuaGUI::spriteLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeSpriteLayout *>::iterator iter = _spriteLayouts.find(name);
+	if (iter != _spriteLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
 TeTextLayout *TeLuaGUI::textLayout(const Common::String &name) {
-	error("TODO: Implement me.");
+	Common::HashMap<Common::String, TeTextLayout *>::iterator iter = _textLayouts.find(name);
+	if (iter != _textLayouts.end())
+		return iter->_value;
 	return nullptr;
 }
 
@@ -100,9 +118,8 @@ void TeLuaGUI::unload() {
 	error("TODO: Implement me.");
 }
 
-/*static*/ Common::String TeLuaGUI::value(const Common::String &path) {
-	error("TODO: Implement me.");
-	return nullptr;
+Common::String TeLuaGUI::value(const Common::String &path) {
+	return _luaContext.global(path);
 }
 
 } // end namespace Syberia

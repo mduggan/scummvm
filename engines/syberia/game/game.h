@@ -44,6 +44,10 @@ public:
 		//byte OnVisible(); empty never used?
 	};
 	
+	class RandomSound {
+		byte onSoundFinished();
+	};
+	
 	enum EGameScoreID {};
 	
 	bool addAnimToSet(const Common::String &path);
@@ -65,7 +69,7 @@ public:
 	void deleteNoScale();
 	void draw();
 	void enter();
-	static TeI3DObject2 *findLayoutByName(TeILayout *param_1, const Common::String &name);
+	static TeI3DObject2 *findLayoutByName(TeILayout *ilayout, const Common::String &name);
 	static TeSpriteLayout *findSpriteLayoutByName(TeILayout *ilayout, const Common::String &name);
 
 	void finishFreemium();
@@ -97,7 +101,7 @@ public:
 	bool onInventoryButtonValidated();
 	bool onLockVideoButtonValidated();
 	bool onMarkersVisible(TeCheckboxLayout::State state);
-	bool onMouseClick(uint param_1);
+	bool onMouseClick(uint flags);
 	bool onMouseMove();
 	bool onSkipVideoButtonValidated();
 	bool onVideoFinished();
@@ -107,7 +111,7 @@ public:
 	void playMovie(const Common::String &s1, const Common::String &s2);
 	void playRandomSound(const Common::String &name);
 	void playSound(const Common::String &name, int param_2, float param_3);
-	void removeNoScale2Child(TeILayout *param_1);
+	void removeNoScale2Child(TeILayout *layout);
 	void removeNoScale2Children();
 	void removeNoScaleChildren();
 	void resetPreviousMousePos();
@@ -124,7 +128,6 @@ public:
 	bool unloadCharacters();
 	bool unloadPlayerCharacter(const Common::String &character);
 	void update();
-	
 	
 private:
 	TeLuaGUI _gui1;
@@ -143,8 +146,14 @@ private:
 	static char **_objectsTakenIDs;
 	
 	TeVector2s32 _previousMousePos;
-	// TODO add private members
 
+	Common::String _warpZone;
+	Common::String _warpScene;
+	bool _warpFlag;
+	bool _warped;
+	
+	TeTimer _playedTimer;
+	TeLuaScript _luaScript;
 };
 
 } // end namespace Syberia

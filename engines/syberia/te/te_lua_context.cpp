@@ -19,11 +19,17 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "syberia/te/te_lua_context.h"
 
 namespace Syberia {
 
 TeLuaContext::TeLuaContext() {
+}
+
+Common::String TeLuaContext::global(const Common::String &path) {
+	error("TODO: implement me TeLuaContext::global");
+	return Common::String();//_luaContextImpl(path);
 }
 
 // TODO: Add more functions here.

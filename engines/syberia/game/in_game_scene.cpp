@@ -40,6 +40,35 @@ void InGameScene::unloadPlayerCharacter(const Common::String &character) {
 }
 
 
+/*static*/ float InGameScene::angularDistance(float a1, float a2) {
+	float result;
+
+	result = a2 - a1;
+	if (result >= -3.141593 && result > 3.141593) {
+		result = result + -6.283185;
+	} else {
+		result = result + 6.283185;
+	}
+	return result;
+}
+
+TeLayout *InGameScene::background() {
+	static const Common::String layoutName("background");
+	return _gui.layout(layoutName);
+}
+
+Character *InGameScene::character(const Common::String &name) {
+	error("TODO: Implement me");
+}
+
+bool InGameScene::loadCharacter(const Common::String &name) {
+	error("TODO: Implement me");
+}
+
+bool InGameScene::loadPlayerCharacter(const Common::String &name) {
+	error("TODO: Implement me");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

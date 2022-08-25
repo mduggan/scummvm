@@ -19,13 +19,49 @@
  *
  */
 
+#include "syberia/syberia.h"
+#include "syberia/game/game.h"
 #include "syberia/game/notifier.h"
+#include "syberia/te/te_layout.h"
 
 namespace Syberia {
 
 Notifier::Notifier() {
 }
 
-// TODO: Add more functions here.
+void Notifier::launchNextnotifier() {
+	error("TODO: Implement me.");
+}
+
+void Notifier::load() {
+	error("TODO: Implement me.");
+}
+
+bool Notifier::onFadeInFinished() {
+	error("TODO: Implement me.");
+}
+
+bool Notifier::onFadeOutFinished() {
+	error("TODO: Implement me.");
+}
+
+bool Notifier::onVisibleFinished() {
+	error("TODO: Implement me.");
+}
+
+void Notifier::push(const Common::String &s1, const Common::String &s2) {
+	notifierData n = {s1, s2};
+	_notifierDataArray.push_back(n);
+	launchNextnotifier();
+}
+
+void Notifier::unload() {
+	static const Common::String layoutName("notifier");
+	TeLayout *layout = _gui.layout(layoutName);
+	g_engine->getGame()->removeNoScale2Child(layout);
+	_gui.unload();
+}
+
+
 
 } // end namespace Syberia

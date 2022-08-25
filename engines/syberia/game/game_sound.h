@@ -22,6 +22,7 @@
 #ifndef SYBERIA_GAME_GAME_SOUND_H
 #define SYBERIA_GAME_GAME_SOUND_H
 
+#include "common/str.h"
 #include "syberia/te/te_music.h"
 
 namespace Syberia {
@@ -33,7 +34,7 @@ public:
 	void onSoundStopped();
 
 private:
-	// TODO add private members
+	Common::String _name;
 
 };
 

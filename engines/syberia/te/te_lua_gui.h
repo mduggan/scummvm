@@ -23,7 +23,8 @@
 #define SYBERIA_TE_TE_LUA_GUI_H
 
 #include "common/str.h"
-#include "syberia/te/te_layout.h"
+#include "common/hashmap.h"
+#include "common/hash-str.h"
 #include "syberia/te/te_button_layout.h"
 #include "syberia/te/te_checkbox_layout.h"
 #include "syberia/te/te_clip_layout.h"
@@ -32,7 +33,10 @@
 #include "syberia/te/te_extended_text_layout.h"
 #include "syberia/te/te_i_3d_object2.h"
 #include "syberia/te/te_i_layout.h"
+#include "syberia/te/te_layout.h"
 #include "syberia/te/te_list_layout.h"
+#include "syberia/te/te_lua_context.h"
+#include "syberia/te/te_lua_script.h"
 #include "syberia/te/te_object.h"
 #include "syberia/te/te_quaternion.h"
 #include "syberia/te/te_scrolling_layout.h"
@@ -67,10 +71,20 @@ public:
 	bool load(const Common::String &path);
 	void unload();
 
-	static Common::String value(const Common::String &path);
+	Common::String value(const Common::String &path);
 
 private:
-	// TODO add private members
+	TeLuaContext _luaContext;
+	TeLuaScript _luaScript;
+	Common::HashMap<Common::String, TeLayout *> _layouts;
+	Common::HashMap<Common::String, TeButtonLayout *> _buttonLayouts;
+	Common::HashMap<Common::String, TeCheckboxLayout *> _checkboxLayouts;
+	Common::HashMap<Common::String, TeListLayout *> _listLayouts;
+	Common::HashMap<Common::String, TeSpriteLayout *> _spriteLayouts;
+	Common::HashMap<Common::String, TeTextLayout *> _textLayouts;
+	Common::HashMap<Common::String, TeScrollingLayout *> _scrollingLayouts;
+	Common::HashMap<Common::String, TeClipLayout *> _clipLayouts;
+	Common::HashMap<Common::String, TeExtendedTextLayout *> _extendedTextLayouts;
 
 };
 
