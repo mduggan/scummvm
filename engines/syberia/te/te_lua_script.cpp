@@ -43,7 +43,8 @@ void TeLuaScript::execute(const Common::String &fname, const TeVariant &param1, 
 	error("TODO: Implement me.");
 }
 
-
-// TODO: Add more functions here.
+void TeLuaScript::load(const Common::String &fname) {
+	error("TODO: Implement me.");
+}
 
 } // end namespace Syberia

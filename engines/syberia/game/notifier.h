@@ -36,13 +36,13 @@ public:
 	bool onFadeOutFinished();
 	bool onVisibleFinished();
 	
-	void push(const Common::String &s1, const Common::String &s2);
+	void push(const Common::String &name, const Common::String &imgpath);
 	void unload();
 
 private:
 	struct notifierData {
-		Common::String s1;
-		Common::String s2;
+		Common::String name;
+		Common::String imgpath;
 	};
 	Common::Array<notifierData> _notifierDataArray;
 	TeLuaGUI _gui;

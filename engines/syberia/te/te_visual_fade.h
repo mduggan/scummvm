@@ -30,6 +30,7 @@ public:
 
 	void animateBlackFade();
 	void animateFade();
+	void init();
 	// TODO add public members
 
 private:

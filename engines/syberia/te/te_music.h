@@ -22,6 +22,9 @@
 #ifndef SYBERIA_TE_TE_MUSIC_H
 #define SYBERIA_TE_TE_MUSIC_H
 
+#include "audio/mixer.h"
+#include "common/mutex.h"
+#include "common/path.h"
 #include "common/str.h"
 #include "syberia/te/te_resource.h"
 
@@ -34,7 +37,7 @@ public:
 	void close() {
 		stop();
 	}
-	bool pause();
+	void pause();
 	bool play();
 	bool repeat();
 	void repeat(bool val);
@@ -44,7 +47,7 @@ public:
 	byte currentData();
 	void entry();
 	const Common::String &filePath() const {
-		return _path1;
+		return _rawPath;
 	}
 	bool isPlaying();
 	bool load(const Common::String &path);
@@ -55,13 +58,25 @@ public:
 	}
 	void setFilePath(const Common::String &name);
 	void update();
-
+	void volume(float vol);
+	float volume();
 
 private:
-	Common::String _path1;
+	Common::String _rawPath; // Plain name of file requested
+	Common::Path _actualPath; // actual path after finding it
 	Common::String _channelName;
 
 	bool _repeat;
+	byte _currentData;
+	bool _isPlaying;
+	bool _isPaused;
+	bool _isStopped;
+	float _volume;
+	
+	Audio::SoundHandle _sndHandle;
+	bool _sndHandleValid;
+	
+	Common::Mutex _mutex;
 };
 
 } // end namespace Syberia

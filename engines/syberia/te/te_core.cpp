@@ -23,7 +23,7 @@
 
 namespace Syberia {
 
-TeCore::TeCore() : _loc(nullptr) {
+TeCore::TeCore() : _loc(nullptr), _coreNotReady(true) {
 }
 
 void TeCore::addLoc(TeILoc *loc) {
@@ -31,6 +31,11 @@ void TeCore::addLoc(TeILoc *loc) {
 		warning("TeCore::addLoc: There is already a loc");
 	}
 	_loc = loc;
+}
+
+void TeCore::create() {
+	_coreNotReady = false;
+	error("TeCore::create: Implement me.");
 }
 
 const Common::String &TeCore::fileFlagSystemFlag(const Common::String &name) const {

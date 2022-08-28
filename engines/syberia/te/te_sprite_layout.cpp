@@ -26,6 +26,14 @@ namespace Syberia {
 TeSpriteLayout::TeSpriteLayout() {
 }
 
+void TeSpriteLayout::load(const Common::String &path) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::play() {
+	error("TODO: Implement me.");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

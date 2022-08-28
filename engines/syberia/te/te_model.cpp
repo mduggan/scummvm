@@ -26,6 +26,9 @@ namespace Syberia {
 TeModel::TeModel() {
 }
 
+bool TeModel::visible() {
+	error("TODO: Implement me.");
+}
 // TODO: Add more functions here.
 
 } // end namespace Syberia

@@ -22,6 +22,7 @@
 #ifndef SYBERIA_TE_TE_LAYOUT_H
 #define SYBERIA_TE_TE_LAYOUT_H
 
+#include "syberia/te/te_3d_object2.h"
 #include "syberia/te/te_i_layout.h"
 #include "syberia/te/te_i_3d_object2.h"
 #include "syberia/te/te_matrix4x4.h"
@@ -31,7 +32,7 @@
 
 namespace Syberia {
 
-class TeLayout : public TeILayout {
+class TeLayout : public TeILayout, public Te3DObject2 {
 public:
 	TeLayout();
 

@@ -22,13 +22,26 @@
 #ifndef SYBERIA_GAME_INVENTORY_MENU_H
 #define SYBERIA_GAME_INVENTORY_MENU_H
 
+#include "syberia/te/te_layout.h"
+
 namespace Syberia {
 
-class InventoryMenu {
+class InventoryMenu : TeLuaGUI {
 public:
 	InventoryMenu();
 
-	// TODO add public members
+	void enter();
+	void leave();
+	void load();
+	void unload();
+
+	bool isVisible();
+
+	bool onDocumentsButton();
+	bool onInventoryButton();
+	bool onMainMenuButton();
+	bool onQuitButton();
+	bool onSaveButton();
 
 private:
 	// TODO add private members

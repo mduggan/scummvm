@@ -30,6 +30,9 @@ class TeSpriteLayout : public TeLayout {
 public:
 	TeSpriteLayout();
 
+	void load(const Common::String &path);
+	
+	void play();
 	// TODO add public members
 
 private:

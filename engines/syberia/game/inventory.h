@@ -23,20 +23,58 @@
 #define SYBERIA_GAME_INVENTORY_H
 
 #include "common/str.h"
+#include "syberia/game/inventory_object.h"
+#include "syberia/te/te_layout.h"
 
 namespace Syberia {
 
-class Inventory {
+class Cellphone;
+
+class Inventory : public TeLayout {
 public:
 	Inventory();
 
+	void enter();
+	void leave();
+	void load();
+	void unload();
+	void loadCellphone();
+	
+	//void loadFromBackup(TiXmlNode *node);
+	//void saveToBackup(TiXmlNode *node);
+
 	void addObject(const Common::String &objname);
+	void addObject(InventoryObject &obj);
+	bool isDocument(const Common::String &objname);
+
+	int objectCount(const Common::String &objname);
+	Common::String objectDescription(const Common::String &objname);
+	Common::String objectName(const Common::String &objname);
+	
+	bool onMainMenuButton();
+	bool onObjectSelected(InventoryObject &obj);
+	bool onQuitButton();
+	bool onTakeObjectSelected();
+	bool onVisibleCellphone();
+	bool onZoomed();
+	
+	void pauseAnims();
+	void unPauseAnims();
+	
+	void removeObject(const Common::String &objname);
+	void removeSelectedObject();
+
+	InventoryObject *selectedInventoryObject();
 	void selectedObject(const Common::String &objname);
-	// TODO add public members
+	void selectedObject(InventoryObject &obj);
+	const Common::String &selectedObject();
+
+	bool updateLayout();
 
 private:
-	// TODO add private members
-
+	
+	Common::Array<InventoryObject *> _invObjects;
+	Cellphone *_cellphone;
 };
 
 } // end namespace Syberia
