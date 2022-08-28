@@ -49,8 +49,8 @@ bool Notifier::onVisibleFinished() {
 	error("TODO: Implement me.");
 }
 
-void Notifier::push(const Common::String &s1, const Common::String &s2) {
-	notifierData n = {s1, s2};
+void Notifier::push(const Common::String &name, const Common::String &imgpath) {
+	notifierData n = {name, imgpath};
 	_notifierDataArray.push_back(n);
 	launchNextnotifier();
 }

@@ -24,10 +24,11 @@
 
 #include "common/str.h"
 #include "syberia/game/document.h"
+#include "syberia/te/te_lua_gui.h"
 
 namespace Syberia {
 
-class DocumentsBrowser {
+class DocumentsBrowser : public TeLuaGUI {
 public:
 	DocumentsBrowser();
 

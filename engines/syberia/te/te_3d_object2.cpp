@@ -19,11 +19,55 @@
  *
  */
 
-#include "syberia/te/te3_d_object2.h"
+#include "syberia/te/te_3d_object2.h"
 
 namespace Syberia {
 
-Te3DObject2::Te3DObject2() {
+Te3DObject2::Te3DObject2() : _childListChanged(false), _parent(nullptr), _colorInheritance(true) {
+}
+
+
+void Te3DObject2::setParent(TeI3DObject2 *newparent) {
+	error("TODO: Implement me");
+}
+
+void Te3DObject2::setPosition(const TeVector3f32 &pos) {
+	if (_position == pos)
+		return;
+
+	error("TODO: Implement me");
+}
+
+void Te3DObject2::setRotation(const TeQuaternion &rot) {
+	if (_rotation == rot)
+		return;
+
+	error("TODO: Implement me");
+}
+
+void Te3DObject2::setScale(const TeVector3f32 &scale) {
+	if (_scale == scale)
+		return;
+
+	error("TODO: Implement me");
+}
+
+void Te3DObject2::setSize(const TeVector3f32 &size) {
+	if (_size == size)
+		return;
+
+	error("TODO: Implement me");
+}
+
+void Te3DObject2::setVisible(bool visible) {
+	if (_visible == visible)
+		return;
+
+	error("TODO: Implement me");
+}
+
+void Te3DObject2::setZPosition(float zpos) {
+	error("TODO: Implement me");
 }
 
 // TODO: Add more functions here.

@@ -27,7 +27,7 @@
 
 namespace Syberia {
 
-SplashScreens::SplashScreens() {
+SplashScreens::SplashScreens() : _splashNo(0), _entered(false) {
 }
 
 void SplashScreens::enter()	{
@@ -38,8 +38,8 @@ void SplashScreens::enter()	{
 			TeLuaGUI::load(scriptPath.toString());
 			Application *app = g_engine->getApplication();
 			TeLayout *splash = layout(Common::String("splash"));
-			TeI3DObject2 *child = nullptr;
 			error("TODO: Implement the rest of SplashScreens::enter");
+			//TeI3DObject2 *child = nullptr;
 			if (splash) {
 				// call something
 				//child = something
@@ -52,8 +52,38 @@ void SplashScreens::enter()	{
 }
 
 bool SplashScreens::onAlarm() {
-	error("TODO: Implement me");
-	return false;
+	Application *app = g_engine->getApplication();
+	app->visualFade().init();
+	app->captureFade();
+	TeLuaGUI::unload();
+	Common::String scriptName = Common::String::format("menus/splashes/splash%d.lua", _splashNo);
+	_splashNo++;
+
+	if (!Common::File::exists(scriptName)) {
+		onQuitSplash();
+	} else {
+		static const Common::String layoutName("splash");
+		load(scriptName);
+		error("TODO: Finish implementation of splash.");
+
+		//TeButtonLayout *btnLayout = buttonLayout(layoutName);
+
+		/*
+		TeSignal0Param::add<SplashScreens>
+				((SplashScreens *)&(pTVar2->super).field_0xc0,(FuncDef13 *)this,0.0);
+		TeLayout *pTVar3 = layout(layoutName);
+		TeI3DObject2 *child = nullptr;
+		if (pTVar3) {
+			child = (TeI3DObject2 *)((long)&pTVar3->vptr + (long)pTVar3->vptr[-0x33]);
+		}
+		TeLayout::addChild(&app->field_0xa6a8,child);*/
+		
+		_timer.start();
+		_timer.setAlarmIn(1500000);
+	}
+
+	app->fade();
+	return true;
 }
 
 bool SplashScreens::onQuitSplash() {

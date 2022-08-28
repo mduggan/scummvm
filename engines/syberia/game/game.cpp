@@ -26,14 +26,23 @@
 
 #include "syberia/syberia.h"
 #include "syberia/game/application.h"
+#include "syberia/game/character.h"
 #include "syberia/game/in_game_scene.h"
 #include "syberia/game/game.h"
 #include "syberia/te/te_variant.h"
 
 namespace Syberia {
 
-Game::Game() {
+Game::Game() : _objectsTakenVal(0), _objectsTakenBits{false, false, false, false, false}, _score(0) {
 }
+
+/*static*/ const char *Game::OBJECTS_TAKEN_IDS[5] = {
+	"BCylindreBarr",
+	"VCylindreMusique",
+	"VCylindreVal",
+	"CCylindreCite",
+	"VPoupeeMammouth"
+};
 
 static Common::StringArray split(const Common::String &text, char c) {
 	Common::StringArray values;
@@ -101,7 +110,23 @@ void Game::addRandomSound(const Common::String &s1, const Common::String &s2, fl
 }
 
 void Game::addToBag(const Common::String &objname) {
-	error("TODO: Implemet me");
+	if (_inventory.objectCount(objname) != 0)
+		return;
+	_inventory.addObject(objname);
+	Common::String imgpath("Inventory/Objects/");
+	imgpath += _inventory.objectName(objname);
+	imgpath += ".png";
+	_notifier.push(objname, imgpath);
+	for (int i = 0; i < NUM_OBJECTS_TAKEN_IDS; i++) {
+		if (objname == OBJECTS_TAKEN_IDS[i] && !_objectsTakenBits[i]) {
+			_objectsTakenBits[i] = true;
+			_objectsTakenVal++;
+		}
+	}
+	// Seeems strange as we're already in Game, but that's what original does?
+	Game *game = g_engine->getGame();
+	game->_score += 10;
+	debug("Updated score: %d", game->_score);
 }
 
 void Game::addToHand(const Common::String &objname) {
@@ -109,8 +134,8 @@ void Game::addToHand(const Common::String &objname) {
 	_inventory.selectedObject(objname);
 }
 
-void Game::addToScore(enum EGameScoreID score) {
-	_score = static_cast<enum EGameScoreID>(_score + score);
+void Game::addToScore(int score) {
+	_score += score;
 }
 
 bool Game::changeWarp(const Common::String &zone, const Common::String &scene, bool fadeFlag) {
@@ -132,7 +157,7 @@ bool Game::changeWarp2(const Common::String &zone, const Common::String &scene, 
 }
 
 void Game::deleteNoScale() {
-	
+	error("TODO: Implemet me");
 }
 
 void Game::draw() {
@@ -179,7 +204,7 @@ void Game::initNoScale() {
 	error("TODO: Implemet me");
 }
 
-void Game::initScene(bool param_1, const Common::String &param_2) {
+void Game::initScene(bool param_1, const Common::String &scenePath) {
 	error("TODO: Implemet me");
 }
 
@@ -188,11 +213,17 @@ void Game::initWarp(const Common::String &zone, const Common::String &scene, boo
 }
 
 bool Game::isDocumentOpened() {
-	error("TODO: Implemet me");
+	static const Common::String layoutName("zoomed");
+	TeLayout *layout = _documentsBrowser.layout(layoutName);
+	return layout->visible(); 
 }
 
 bool Game::isMoviePlaying() {
-	error("TODO: Implemet me");
+	static const Common::String layoutName("videoBackgroundButton");
+	TeButtonLayout *vidButton = _gui4.buttonLayout(layoutName);
+	if (vidButton)
+		return vidButton->visible();
+	return false;
 }
 
 bool Game::launchDialog(const Common::String &param_1, uint param_2, const Common::String &param_3,
@@ -231,7 +262,14 @@ bool Game::loadPlayerCharacter(const Common::String &name) {
 }
 
 bool Game::loadScene(const Common::String &name) {
-	error("TODO: Implemet me");
+	static const Common::String scriptName("scenes/OnGameEnter.lua");
+	_luaScript.load(scriptName);
+	_luaScript.execute();
+	Character *character = _scene._character;
+	if (character && character->_model->visible()) {
+		_sceneCharacterVisibleFromLoad = true;
+	}
+	return false;
 }
 
 bool Game::onAnswered(const Common::String &val) {
@@ -275,7 +313,7 @@ bool Game::onFinishedSavingBackup(int something) {
 }
 
 bool Game::onInventoryButtonValidated() {
-	error("TODO: Implemet me");
+	_inventoryMenu.enter();
 }
 
 bool Game::onLockVideoButtonValidated() {
@@ -283,7 +321,8 @@ bool Game::onLockVideoButtonValidated() {
 }
 
 bool Game::onMarkersVisible(TeCheckboxLayout::State state) {
-	error("TODO: Implemet me");
+	_markersVisible = (state == 0);
+	showMarkers(state == 0);
 }
 
 bool Game::onMouseClick(uint flags)  {
@@ -303,11 +342,40 @@ bool Game::onVideoFinished() {
 }
 
 void Game::pauseMovie() {
-	error("TODO: Implemet me");
+	static const Common::String layoutName("video");
+	_music.pause();
+	_gui4.spriteLayout(layoutName);
+	error("TODO: Finish implementation if pauseMovie");
 }
 
-void Game::playMovie(const Common::String &s1, const Common::String &s2) {
-	error("TODO: Implemet me");
+void Game::playMovie(const Common::String &s1, const Common::String &musicPath) {
+	Application *app = g_engine->getApplication();
+	app->captureFade();
+	static const Common::String videoBackgroundLayoutName("videoBackgroundButton");
+	TeButtonLayout *videoBackgroundButton = _gui4.buttonLayout(videoBackgroundLayoutName);
+	videoBackgroundButton->setVisible(true);
+
+	static const Common::String skipVideoLayoutName("skipVideoButton");
+	TeButtonLayout *skipVideoButton = _gui4.buttonLayout(skipVideoLayoutName);
+	skipVideoButton->setVisible(false);
+
+	TeMusic &music = app->music();
+	music.stop();
+	music.setChannelName("video");
+	music.repeat(false);
+	music.volume(1.0f);
+	music.load(musicPath);
+
+	_running = false;
+
+	static const Common::String videoSpriteLayoutName("video");
+	TeSpriteLayout *videoSpriteLayout = _gui4.spriteLayout(videoSpriteLayoutName);
+	videoSpriteLayout->load(s1);
+	videoSpriteLayout->setVisible(true);
+	music.play();
+	videoSpriteLayout->play();
+
+	app->fade();
 }
 
 void Game::playRandomSound(const Common::String &name) {

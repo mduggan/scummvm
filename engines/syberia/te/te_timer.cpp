@@ -27,20 +27,24 @@ TeTimer::TeTimer() : _stopped(true) {
 }
 
 void TeTimer::stop() {
-	// TODO: implement me
+	error("TODO: Implement me");
 }
 
 void TeTimer::start() {
-	// TODO: implement me
+	error("TODO: Implement me");
 }
 
 void TeTimer::pause() {
-	// TODO: implement me
+	error("TODO: Implement me");
 }
 
 double TeTimer::getTimeFromStart() {
-	// TODO: implement me
+	error("TODO: Implement me");
 	return 1.0;
+}
+
+void TeTimer::setAlarmIn(long val) {
+	error("TODO: Implement me");
 }
 
 } // end namespace Syberia

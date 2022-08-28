@@ -49,7 +49,7 @@ namespace Syberia {
 class TeLuaGUI : public TeObject {
 public:
 	TeLuaGUI();
-	~TeLuaGUI();
+	virtual ~TeLuaGUI() {};
 
 	virtual void enter() {};
 	virtual void leave() {};

@@ -38,6 +38,8 @@ public:
 
 		TeTimer _timer;
 	};
+
+	bool visible();
 	// TODO add public members
 
 private:

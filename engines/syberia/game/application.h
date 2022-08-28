@@ -77,6 +77,7 @@ public:
 	MainMenu &mainMenu() { return _mainMenu; }
 	TeMusic &music() { return _music; }
 	Credits &credits() { return _credits; }
+	TeVisualFade &visualFade() { return _visFade; }
 
 	bool _finishedGame;
 	bool _finishedFremium;

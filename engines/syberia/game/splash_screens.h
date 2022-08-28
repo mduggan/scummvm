@@ -42,6 +42,7 @@ public:
 private:
 	bool _entered;
 	TeTimer _timer;
+	int _splashNo;
 };
 
 } // end namespace Syberia

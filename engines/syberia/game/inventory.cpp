@@ -20,6 +20,11 @@
  */
 
 #include "common/textconsole.h"
+
+#include "syberia/syberia.h"
+#include "syberia/game/application.h"
+#include "syberia/game/cellphone.h"
+#include "syberia/game/game.h"
 #include "syberia/game/inventory.h"
 
 namespace Syberia {
@@ -27,12 +32,122 @@ namespace Syberia {
 Inventory::Inventory() {
 }
 
+void Inventory::enter() {
+	error("TODO: implement me.");
+}
+
+void Inventory::leave() {
+	error("TODO: implement me.");
+}
+
+void Inventory::load() {
+	error("TODO: implement me.");
+}
+
+void Inventory::unload() {
+	error("TODO: implement me.");
+}
+
+void Inventory::loadCellphone() {
+	_cellphone = new Cellphone();
+	_cellphone->load();
+}
+
+//void loadFromBackup(TiXmlNode *node);
+//void saveToBackup(TiXmlNode *node);
+
 void Inventory::addObject(const Common::String &objname) {
+	error("TODO: implement me.");
+}
+
+void Inventory::addObject(InventoryObject &obj) {
+	error("TODO: implement me.");
+}
+
+bool Inventory::isDocument(const Common::String &objname) {
+	error("TODO: implement me.");
+}
+
+int Inventory::objectCount(const Common::String &objname) {
+	error("TODO: implement me.");
+}
+
+Common::String Inventory::objectDescription(const Common::String &objname) {
+	error("TODO: implement me.");
+}
+
+Common::String Inventory::objectName(const Common::String &objname) {
+	error("TODO: implement me.");
+}
+
+bool Inventory::onMainMenuButton() {
+	leave();
+	Game *game = g_engine->getGame();
+	game->leave(false);
+	Application *app = g_engine->getApplication();
+	app->mainMenu().enter();
+	return true;
+}
+
+bool Inventory::onObjectSelected(InventoryObject &obj) {
+	error("TODO: implement me.");
+}
+
+bool Inventory::onQuitButton() {
+	Game *game = g_engine->getGame();
+	game->inventoryMenu().leave();
+	return true;
+}
+
+bool Inventory::onTakeObjectSelected() {
+	Game *game = g_engine->getGame();
+	game->inventoryMenu().leave();
+	return false;
+}
+
+bool Inventory::onVisibleCellphone() {
+	error("TODO: implement me.");
+}
+
+bool Inventory::onZoomed() {
+	error("TODO: implement me.");
+}
+
+void Inventory::pauseAnims() {
+	error("TODO: implement me.");
+}
+
+void Inventory::unPauseAnims() {
+	error("TODO: implement me.");
+}
+
+void Inventory::removeObject(const Common::String &objname) {
+	error("TODO: implement me.");
+}
+
+void Inventory::removeSelectedObject() {
+	error("TODO: implement me.");
+}
+
+InventoryObject *Inventory::selectedInventoryObject() {
 	error("TODO: implement me.");
 }
 
 void Inventory::selectedObject(const Common::String &objname) {
 	error("TODO: implement me.");
 }
+
+void Inventory::selectedObject(InventoryObject &obj) {
+	error("TODO: implement me.");
+}
+
+const Common::String &Inventory::selectedObject() {
+	error("TODO: implement me.");
+}
+
+bool Inventory::updateLayout() {
+	error("TODO: implement me.");
+}
+
 
 } // end namespace Syberia

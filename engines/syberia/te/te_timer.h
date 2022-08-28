@@ -34,6 +34,7 @@ public:
 	void start();
 	void pause();
 	double getTimeFromStart();
+	void setAlarmIn(long val);
 	
 	void pausable(bool ispausable);
 

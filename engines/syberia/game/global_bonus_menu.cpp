@@ -29,14 +29,16 @@ GlobalBonusMenu::GlobalBonusMenu() : _entered(false) {
 }
 
 void GlobalBonusMenu::enter() {
-	Application *app = g_engine->getApplication();
 	error("TODO: Finish implementing GlobalBonusMenu::enter");
-	app->captureFade();
-	_entered = true;
-	load("menus/bonusmenu/GlobalBonusMenu.lua");
-	TeLayout *menu = layout("menu");
-	
-	// todo: finish this.
+	//Application *app = g_engine->getApplication();
+	//todo: call some virtual function on a field in app
+	//app->captureFade();
+	//_entered = true;
+	//load("menus/bonusmenu/GlobalBonusMenu.lua");
+	//TeLayout *menu = layout("menu");
+	//if (menu) {
+	//   ...
+	//}
 }
 
 void GlobalBonusMenu::leave() {

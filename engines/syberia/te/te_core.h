@@ -54,6 +54,7 @@ public:
 	void enableActivityTracking(bool enable);
 	void setActivityTrackingFolder(const Common::String &path);
 
+	bool _coreNotReady;
 private:
 	TeILoc *_loc;
 

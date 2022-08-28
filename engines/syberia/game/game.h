@@ -24,9 +24,13 @@
 
 #include "common/types.h"
 #include "common/str.h"
+#include "syberia/game/documents_browser.h"
 #include "syberia/game/inventory.h"
+#include "syberia/game/inventory_menu.h"
 #include "syberia/game/in_game_scene.h"
+#include "syberia/game/notifier.h"
 #include "syberia/te/te_lua_gui.h"
+#include "syberia/te/te_music.h"
 #include "syberia/te/te_checkbox_layout.h"
 #include "syberia/te/te_vector2s32.h"
 
@@ -48,7 +52,7 @@ public:
 		byte onSoundFinished();
 	};
 	
-	enum EGameScoreID {};
+	//enum EGameScoreID {}; // Not needed?
 	
 	bool addAnimToSet(const Common::String &path);
 	void addArtworkUnlocked(const Common::String &name, bool bonus);
@@ -58,7 +62,7 @@ public:
 	void addRandomSound(const Common::String &s1, const Common::String &s2, float f1, float f2);
 	void addToBag(const Common::String &objname);
 	void addToHand(const Common::String &objname);
-	void addToScore(enum EGameScoreID scoreid);
+	void addToScore(int score);
 	void attachButtonsLayoutGoto() {}; // does nothing?
 	void createButtonsLayoutGoto() {}; // does nothing?
 	void deleteButtonsLayoutGoto() {}; // does nothing?
@@ -76,7 +80,7 @@ public:
 	void finishGame();
 	void initLoadedBackupData();
 	void initNoScale();
-	void initScene(bool param_1, const Common::String &param_2);
+	void initScene(bool param_1, const Common::String &scenePath);
 	void initWarp(const Common::String &zone, const Common::String &scene, bool fadeFlag);
 	bool isDocumentOpened();
 	bool isMouse() { return false; }
@@ -108,7 +112,7 @@ public:
 	
 	void pauseMovie();
 	void pauseSounds() {}; // does nothing?
-	void playMovie(const Common::String &s1, const Common::String &s2);
+	void playMovie(const Common::String &s1, const Common::String &musicPath);
 	void playRandomSound(const Common::String &name);
 	void playSound(const Common::String &name, int param_2, float param_3);
 	void removeNoScale2Child(TeILayout *layout);
@@ -128,7 +132,8 @@ public:
 	bool unloadCharacters();
 	bool unloadPlayerCharacter(const Common::String &character);
 	void update();
-	
+
+	InventoryMenu &inventoryMenu() { return _inventoryMenu; }
 private:
 	TeLuaGUI _gui1;
 	TeLuaGUI _gui2;
@@ -136,7 +141,8 @@ private:
 	TeLuaGUI _gui4;
 	
 	Inventory _inventory;
-	enum EGameScoreID _score;
+	InventoryMenu _inventoryMenu;
+	int _score;
 	
 	bool _running;
 	int _frameCounter;
@@ -154,6 +160,17 @@ private:
 	
 	TeTimer _playedTimer;
 	TeLuaScript _luaScript;
+	TeMusic _music;
+	Notifier _notifier;
+	DocumentsBrowser _documentsBrowser;
+
+	static const int NUM_OBJECTS_TAKEN_IDS = 5;
+	static const char *OBJECTS_TAKEN_IDS[NUM_OBJECTS_TAKEN_IDS];
+	bool _objectsTakenBits[NUM_OBJECTS_TAKEN_IDS];
+	int _objectsTakenVal;
+
+	bool _sceneCharacterVisibleFromLoad;
+	bool _markersVisible;
 };
 
 } // end namespace Syberia

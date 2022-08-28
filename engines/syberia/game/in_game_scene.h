@@ -33,14 +33,14 @@ namespace Syberia {
 class Character;
 class TeLayout;
 
-class InGameScene : TeScene {
+class InGameScene : public TeScene {
 public:
 	InGameScene();
-	
+
 	class AnimObject {
 		void onFinished();
 	};
-	
+
 	class AnchorZone {
 	};
 
@@ -54,7 +54,7 @@ public:
 	static float angularDistance(float a1, float a2);
 	bool aroundAnchorZone(const AnchorZone *zone);
 	TeLayout *background();
-	
+
 	void draw();
 	Character *character(const Common::String &name);
 	void close();
@@ -62,8 +62,10 @@ public:
 	bool loadPlayerCharacter(const Common::String &name);
 	bool changeBackground(const Common::String &name);
 	void unloadPlayerCharacter(const Common::String &character);
+
 	// TODO add public members
 
+	Character *_character;
 private:
 	Common::Array<Common::String> _blockingObjects;
 	TeLuaGUI _gui;

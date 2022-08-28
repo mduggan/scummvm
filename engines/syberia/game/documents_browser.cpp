@@ -26,6 +26,14 @@ namespace Syberia {
 DocumentsBrowser::DocumentsBrowser() {
 }
 
+void DocumentsBrowser::enter() {
+	error("TODO: Implement me");
+}
+
+void DocumentsBrowser::leave() {
+	error("TODO: Implement me");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

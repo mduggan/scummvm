@@ -35,6 +35,10 @@ void TeVisualFade::animateFade() {
 	error("TODO: Implement me.");
 }
 
+void TeVisualFade::init() {
+	error("TODO: Implement me.");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

@@ -36,7 +36,7 @@ public:
 	void execute(const Common::String &fname, const TeVariant &param1);
 	void execute(const Common::String &fname, const TeVariant &param1, const TeVariant &param2);
 
-	// TODO add public members
+	void load(const Common::String &fname);
 
 private:
 	// TODO add private members

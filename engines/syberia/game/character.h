@@ -29,13 +29,14 @@
 #include "syberia/te/te_model_animation.h"
 #include "syberia/te/te_vector3f32.h"
 #include "syberia/te/te_matrix4x4.h"
+#include "syberia/te/te_model.h"
 #include "syberia/te/te_bezier_curve.h"
 #include "syberia/te/te_free_move_zone.h"
 #include "syberia/te/te_trs.h"
 
 namespace Syberia {
 
-class Character : TeAnimation {
+class Character : public TeAnimation {
 public:
 	Character();
 
@@ -99,6 +100,8 @@ public:
 	WalkPart walkAnim(uint offset);
 	void walkMode(const Common::String &mode);
 	void walkTo(float param_1, bool param_2);
+
+	TeModel *_model; //TODO: should be a smart pointer?
 	
 private:
 	float _curveOffset;

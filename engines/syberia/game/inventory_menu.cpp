@@ -19,6 +19,8 @@
  *
  */
 
+#include "syberia/syberia.h"
+#include "syberia/game/application.h"
 #include "syberia/game/inventory_menu.h"
 
 namespace Syberia {
@@ -26,6 +28,52 @@ namespace Syberia {
 InventoryMenu::InventoryMenu() {
 }
 
-// TODO: Add more functions here.
+void InventoryMenu::enter() {
+	error("TODO: implement me");
+}
+
+void InventoryMenu::leave() {
+	error("TODO: implement me");
+}
+
+void InventoryMenu::load() {
+	error("TODO: implement me");
+}
+
+void InventoryMenu::unload() {
+	error("TODO: implement me");
+}
+
+bool InventoryMenu::isVisible() {
+	static const Common::String layoutName("inventoryMenu");
+	TeLayout *menuLayout = layout(layoutName);
+	return menuLayout->visible();
+}
+
+bool InventoryMenu::onDocumentsButton() {
+	error("TODO: implement me");
+}
+
+bool InventoryMenu::onInventoryButton() {
+	error("TODO: implement me");
+}
+
+bool InventoryMenu::onMainMenuButton() {
+	Application *app = g_engine->getApplication();
+	app->captureFade();
+	error("TODO: set some game flag here");
+	//Game *game = g_engine->getGame();
+	//app->fade();
+	return false;
+}
+
+bool InventoryMenu::onQuitButton() {
+	leave();
+	return false;
+}
+
+bool InventoryMenu::onSaveButton(){
+   return false;
+}
 
 } // end namespace Syberia

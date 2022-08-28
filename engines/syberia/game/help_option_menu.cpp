@@ -19,6 +19,8 @@
  *
  */
 
+#include "syberia/syberia.h"
+#include "syberia/game/application.h"
 #include "syberia/game/help_option_menu.h"
 
 namespace Syberia {
@@ -26,12 +28,22 @@ namespace Syberia {
 HelpOptionMenu::HelpOptionMenu() : _entered(false) {
 }
 
-void HelpOptionMenu::enter()	{
-	
+void HelpOptionMenu::enter() {
+	if (!_entered) {
+		static const Common::String scriptPath("menus/helpoptionMenu/optionsMenu.lua");
+		Application *app = g_engine->getApplication();
+		app->captureFade();
+		load(scriptPath);
+		error("TODO: finish implementation of HelpOptionMenu::enter");
+	}
 }
 
-void HelpOptionMenu::leave()	{
-	
+void HelpOptionMenu::leave() {
+	Application *app = g_engine->getApplication();
+	app->captureFade();
+	unload();
+	app->fade();
+	_entered = false;
 }
 
 // TODO: Add more functions here.
