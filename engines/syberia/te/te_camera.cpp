@@ -23,9 +23,89 @@
 
 namespace Syberia {
 
-TeCamera::TeCamera() {
+TeCamera::TeCamera() : _projectionMatrixType(0), _orthogonalParam1(1.0f),
+	_orthogonalParam2(0.0f), _orthogonalParam3(1.0f), _orthogonalParam4(0.0f) {
 }
 
-// TODO: Add more functions here.
+void TeCamera::applyProjection() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::applyTransformations() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::buildOrthoMatrix() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::buildPerspectiveMatrix() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::buildPerspectiveMatrix2() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::buildPerspectiveMatrix3() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::draw() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::getRay(const TeVector2s32 &param_1, TeVector3f32 &out1, TeVector3f32 &out2) {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::loadBin(const Common::String &path) {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::loadBin(const Common::ReadStream &stream) {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::orthogonalParams(float f1, float f2, float f3, float f4) {
+	error("TODO: Implement me.");
+}
+
+TeMatrix4x4 TeCamera::projectionMatrix() {
+	error("TODO: Implement me.");
+}
+
+TeVector3f32 TeCamera::projectPoint(const TeVector3f32 &pt) {
+	error("TODO: Implement me.");
+}
+
+TeVector3f32 TeCamera::projectPoint3f32(const TeVector3f32 &pt) {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::restore() {
+	error("TODO: Implement me.");
+}
+
+TeMatrix4x4 TeCamera::transformationMatrix() {
+	error("TODO: Implement me.");
+}
+
+TeVector3f32 TeCamera::transformCoord(const TeVector3f32 &pt) {
+	error("TODO: Implement me.");
+}
+
+TeVector3f32 TeCamera::transformPoint2Dto3D(const TeVector2f32 &pt) {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::updateProjectionMatrix() {
+	error("TODO: Implement me.");
+}
+
+void TeCamera::viewport(int x1, int y1, uint width, uint height) {
+	error("TODO: Implement me.");
+}
+
 
 } // end namespace Syberia

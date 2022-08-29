@@ -22,11 +22,9 @@
 #ifndef SYBERIA_TE_TE_I_LAYOUT_H
 #define SYBERIA_TE_TE_I_LAYOUT_H
 
-#include "syberia/te/te_i_3d_object2.h"
-
 namespace Syberia {
 
-class TeILayout : public TeI3DObject2 {
+class TeILayout {
 public:
 	TeILayout();
 

@@ -81,6 +81,9 @@ public:
 
 	bool _finishedGame;
 	bool _finishedFremium;
+	TeLayout _frontLayout;
+	TeLayout _frontOrientationLayout;
+	TeLayout _backLayout;
 
 private:
 	TeVisualFade _visFade;
@@ -90,6 +93,7 @@ private:
 	BonusMenu _bonusMenu;
 	MainMenu _mainMenu;
 	Credits _credits;
+	
 	
 	bool _created;
 
