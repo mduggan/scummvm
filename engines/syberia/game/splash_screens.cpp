@@ -33,6 +33,7 @@ SplashScreens::SplashScreens() : _splashNo(0), _entered(false) {
 void SplashScreens::enter()	{
 	if (!_entered) {
 		_entered = true;
+		_splashNo = 0;
 		static const Common::Path scriptPath("menus/splashes/splash0.lua");
 		if (Common::File::exists(scriptPath)) {
 			TeLuaGUI::load(scriptPath.toString());
@@ -62,8 +63,7 @@ bool SplashScreens::onAlarm() {
 	if (!Common::File::exists(scriptName)) {
 		onQuitSplash();
 	} else {
-		static const Common::String layoutName("splash");
-		load(scriptName);
+		load("splash");
 		error("TODO: Finish implementation of splash.");
 
 		//TeButtonLayout *btnLayout = buttonLayout(layoutName);

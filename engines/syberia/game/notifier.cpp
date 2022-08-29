@@ -30,19 +30,35 @@ Notifier::Notifier() {
 }
 
 void Notifier::launchNextnotifier() {
-	error("TODO: Implement me.");
+	TeCurveAnim2<TeI3DObject2, TeColor> *fadeInAnim = _gui.colorLinearAnimation("fadeIn");
+	if (fadeInAnim->_runTimer._stopped) {
+		error("TODO: Implement me.");
+	}
 }
 
 void Notifier::load() {
-	error("TODO: Implement me.");
+	_gui.load("menus/Notifier.lua");
+	TeLayout *notifierLayout = _gui.layout("notifier");
+	Game *game = g_engine->getGame();
+	game->addNoScale2Child(notifierLayout);
+	notifierLayout->setVisible(false);
+	//TeCurveAnim2<TeI3DObject2,TeColor> *fadeIn = _gui.colorLinearAnimation("fadeIn");
+	//TeCurveAnim2<TeI3DObject2,TeColor> *visible = _gui.colorLinearAnimation("visible");
+	//TeCurveAnim2<TeI3DObject2,TeColor> *fadeOut = _gui.colorLinearAnimation("fadeOut");
+
+	error("TODO: Finish implementing Notifier::load.");
 }
 
 bool Notifier::onFadeInFinished() {
+	//TeCurveAnim2<TeI3DObject2,TeColor> *visible = _gui.colorLinearAnimation("visible");
 	error("TODO: Implement me.");
 }
 
 bool Notifier::onFadeOutFinished() {
-	error("TODO: Implement me.");
+	TeLayout *notifierLayout = _gui.layout("notifier");
+	notifierLayout->setVisible(false);
+	launchNextnotifier();
+	return false;
 }
 
 bool Notifier::onVisibleFinished() {
@@ -56,8 +72,7 @@ void Notifier::push(const Common::String &name, const Common::String &imgpath) {
 }
 
 void Notifier::unload() {
-	static const Common::String layoutName("notifier");
-	TeLayout *layout = _gui.layout(layoutName);
+	TeLayout *layout = _gui.layout("notifier");
 	g_engine->getGame()->removeNoScale2Child(layout);
 	_gui.unload();
 }

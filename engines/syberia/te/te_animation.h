@@ -47,11 +47,12 @@ public:
 	void resumeAll();
 	void updateAll();
 
+	TeTimer _runTimer;
+
 private:
 
 	void removeThisFromAnimations();
 
-	TeTimer _runTimer;
 	TeSignal0Param *_stopCallback;
 
 	static Common::Array<TeAnimation *> _animations;

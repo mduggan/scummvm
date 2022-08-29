@@ -45,8 +45,7 @@ void InventoryMenu::unload() {
 }
 
 bool InventoryMenu::isVisible() {
-	static const Common::String layoutName("inventoryMenu");
-	TeLayout *menuLayout = layout(layoutName);
+	TeLayout *menuLayout = layout("inventoryMenu");
 	return menuLayout->visible();
 }
 

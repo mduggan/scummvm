@@ -53,8 +53,7 @@ void InGameScene::unloadPlayerCharacter(const Common::String &character) {
 }
 
 TeLayout *InGameScene::background() {
-	static const Common::String layoutName("background");
-	return _gui.layout(layoutName);
+	return _gui.layout("background");
 }
 
 Character *InGameScene::character(const Common::String &name) {

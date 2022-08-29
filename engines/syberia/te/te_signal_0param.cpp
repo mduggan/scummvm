@@ -19,7 +19,7 @@
  *
  */
 
-#include "syberia/te/te_signal0_param.h"
+#include "syberia/te/te_signal_0param.h"
 
 namespace Syberia {
 

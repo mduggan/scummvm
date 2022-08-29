@@ -36,8 +36,7 @@ void OwnerErrorMenu::enter() {
 	error("TODO: Finish implementation of OwnerErrorMenu::enter");
 	/*
 	Application *app = g_engine->getApplication();
-	static const Common::String layoutName("menu");
-	TeLayout *menuLayout = TeLuaGUI::layout(layoutName);
+	TeLayout *menuLayout = TeLuaGUI::layout("menu");
 	 ...
 	 */
 }

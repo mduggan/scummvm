@@ -213,14 +213,12 @@ void Game::initWarp(const Common::String &zone, const Common::String &scene, boo
 }
 
 bool Game::isDocumentOpened() {
-	static const Common::String layoutName("zoomed");
-	TeLayout *layout = _documentsBrowser.layout(layoutName);
+	TeLayout *layout = _documentsBrowser.layout("zoomed");
 	return layout->visible(); 
 }
 
 bool Game::isMoviePlaying() {
-	static const Common::String layoutName("videoBackgroundButton");
-	TeButtonLayout *vidButton = _gui4.buttonLayout(layoutName);
+	TeButtonLayout *vidButton = _gui4.buttonLayout("videoBackgroundButton");
 	if (vidButton)
 		return vidButton->visible();
 	return false;
@@ -262,8 +260,7 @@ bool Game::loadPlayerCharacter(const Common::String &name) {
 }
 
 bool Game::loadScene(const Common::String &name) {
-	static const Common::String scriptName("scenes/OnGameEnter.lua");
-	_luaScript.load(scriptName);
+	_luaScript.load("scenes/OnGameEnter.lua");
 	_luaScript.execute();
 	Character *character = _scene._character;
 	if (character && character->_model->visible()) {
@@ -273,14 +270,12 @@ bool Game::loadScene(const Common::String &name) {
 }
 
 bool Game::onAnswered(const Common::String &val) {
-	static const Common::String funcName("OnAnswered");
-	_luaScript.execute(funcName, TeVariant(val));
+	_luaScript.execute("OnAnswered", TeVariant(val));
 	return false;
 }
 
 bool Game::onCallNumber(const Common::String &val) {
-	static const Common::String funcName("OnCallNumber");
-	_luaScript.execute(funcName, TeVariant(val));
+	_luaScript.execute("OnCallNumber", TeVariant(val));
 	return false;
 }
 
@@ -314,6 +309,7 @@ bool Game::onFinishedSavingBackup(int something) {
 
 bool Game::onInventoryButtonValidated() {
 	_inventoryMenu.enter();
+	return false;
 }
 
 bool Game::onLockVideoButtonValidated() {
@@ -323,6 +319,7 @@ bool Game::onLockVideoButtonValidated() {
 bool Game::onMarkersVisible(TeCheckboxLayout::State state) {
 	_markersVisible = (state == 0);
 	showMarkers(state == 0);
+	return false;
 }
 
 bool Game::onMouseClick(uint flags)  {
@@ -342,21 +339,18 @@ bool Game::onVideoFinished() {
 }
 
 void Game::pauseMovie() {
-	static const Common::String layoutName("video");
 	_music.pause();
-	_gui4.spriteLayout(layoutName);
+	_gui4.spriteLayout("video");
 	error("TODO: Finish implementation if pauseMovie");
 }
 
 void Game::playMovie(const Common::String &s1, const Common::String &musicPath) {
 	Application *app = g_engine->getApplication();
 	app->captureFade();
-	static const Common::String videoBackgroundLayoutName("videoBackgroundButton");
-	TeButtonLayout *videoBackgroundButton = _gui4.buttonLayout(videoBackgroundLayoutName);
+	TeButtonLayout *videoBackgroundButton = _gui4.buttonLayout("videoBackgroundButton");
 	videoBackgroundButton->setVisible(true);
 
-	static const Common::String skipVideoLayoutName("skipVideoButton");
-	TeButtonLayout *skipVideoButton = _gui4.buttonLayout(skipVideoLayoutName);
+	TeButtonLayout *skipVideoButton = _gui4.buttonLayout("skipVideoButton");
 	skipVideoButton->setVisible(false);
 
 	TeMusic &music = app->music();
@@ -368,8 +362,7 @@ void Game::playMovie(const Common::String &s1, const Common::String &musicPath) 
 
 	_running = false;
 
-	static const Common::String videoSpriteLayoutName("video");
-	TeSpriteLayout *videoSpriteLayout = _gui4.spriteLayout(videoSpriteLayoutName);
+	TeSpriteLayout *videoSpriteLayout = _gui4.spriteLayout("video");
 	videoSpriteLayout->load(s1);
 	videoSpriteLayout->setVisible(true);
 	music.play();

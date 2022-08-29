@@ -26,6 +26,16 @@ namespace Syberia {
 TeMatrix4x4::TeMatrix4x4() {
 }
 
-// TODO: Add more functions here.
+TeMatrix4x4::TeMatrix4x4(const Math::Matrix<4, 4> &matrix) : Math::Matrix<4, 4>(matrix) {
+}
+
+void TeMatrix4x4::scale(const TeVector3f32 &vec) {
+	TeMatrix4x4 scaleMatrix;
+	scaleMatrix(0, 0) = vec.x();
+	scaleMatrix(1, 1) = vec.y();
+	scaleMatrix(2, 2) = vec.z();
+	Math::Matrix<4,4> result = (*this * scaleMatrix);
+	*this = result;
+}
 
 } // end namespace Syberia

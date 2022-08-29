@@ -90,6 +90,8 @@ private:
 	BonusMenu _bonusMenu;
 	MainMenu _mainMenu;
 	Credits _credits;
+	
+	bool _created;
 
 };
 
