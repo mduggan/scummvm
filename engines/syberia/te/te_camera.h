@@ -22,15 +22,59 @@
 #ifndef SYBERIA_TE_TE_CAMERA_H
 #define SYBERIA_TE_TE_CAMERA_H
 
+#include "common/str.h"
+#include "syberia/te/te_matrix4x4.h"
+#include "syberia/te/te_vector2s32.h"
+#include "syberia/te/te_vector2f32.h"
+#include "syberia/te/te_vector3f32.h"
+
 namespace Syberia {
 
 class TeCamera {
 public:
 	TeCamera();
 
-	// TODO add public members
+	void apply() {
+		applyProjection();
+		applyTransformations();
+	}
+
+	void applyProjection();
+	void applyTransformations();
+	void buildOrthoMatrix();
+	void buildPerspectiveMatrix();
+	void buildPerspectiveMatrix2();
+	void buildPerspectiveMatrix3();
+	void draw();
+	
+	void getRay(const TeVector2s32 &param_1, TeVector3f32 &out1, TeVector3f32 &out2);
+	
+	void loadBin(const Common::String &path);
+	void loadBin(const Common::ReadStream &stream);
+
+	//void lookAt(const TeVector3f32 &point) {} // empty and unused?
+	
+	void orthogonalParams(float f1, float f2, float f3, float f4);
+	TeMatrix4x4 projectionMatrix();
+	
+	TeVector3f32 projectPoint(const TeVector3f32 &pt);
+	TeVector3f32 projectPoint3f32(const TeVector3f32 &pt);
+
+	void restore();
+	TeMatrix4x4 transformationMatrix();
+	TeVector3f32 transformCoord(const TeVector3f32 &pt);
+	TeVector3f32 transformPoint2Dto3D(const TeVector2f32 &pt);
+	void updateProjectionMatrix();
+
+	void viewport(int x1, int y1, uint width, uint height);
 
 private:
+	int _projectionMatrixType;
+	float _orthogonalParam1;
+	float _orthogonalParam2;
+	float _orthogonalParam3;
+	float _orthogonalParam4;
+	
 	// TODO add private members
 
 };

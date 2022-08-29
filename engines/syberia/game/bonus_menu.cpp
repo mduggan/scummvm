@@ -35,6 +35,10 @@ void BonusMenu::enter(const Common::String &scriptName) {
 	error("TODO: implement me.");
 }
 
+void BonusMenu::enter() {
+	error("TODO: implement me.");
+}
+
 void BonusMenu::leave() {
 	error("TODO: implement me.");
 }

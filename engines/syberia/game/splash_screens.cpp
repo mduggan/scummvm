@@ -38,14 +38,8 @@ void SplashScreens::enter()	{
 		if (Common::File::exists(scriptPath)) {
 			TeLuaGUI::load(scriptPath.toString());
 			Application *app = g_engine->getApplication();
-			TeLayout *splash = layout(Common::String("splash"));
-			error("TODO: Implement the rest of SplashScreens::enter");
-			//TeI3DObject2 *child = nullptr;
-			if (splash) {
-				// call something
-				//child = something
-			}
-			//app->something->addChild(child);
+			TeLayout *splash = layout("splash");
+			app->_frontLayout.addChild(splash);
 			app->performRender();
 		}
 		onAlarm();
@@ -67,17 +61,11 @@ bool SplashScreens::onAlarm() {
 		error("TODO: Finish implementation of splash.");
 
 		//TeButtonLayout *btnLayout = buttonLayout(layoutName);
-
-		/*
-		TeSignal0Param::add<SplashScreens>
-				((SplashScreens *)&(pTVar2->super).field_0xc0,(FuncDef13 *)this,0.0);
-		TeLayout *pTVar3 = layout(layoutName);
-		TeI3DObject2 *child = nullptr;
-		if (pTVar3) {
-			child = (TeI3DObject2 *)((long)&pTVar3->vptr + (long)pTVar3->vptr[-0x33]);
-		}
-		TeLayout::addChild(&app->field_0xa6a8,child);*/
 		
+		
+		TeLayout *splash = layout("splash");
+		app->_frontLayout.addChild(splash);
+
 		_timer.start();
 		_timer.setAlarmIn(1500000);
 	}
