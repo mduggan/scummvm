@@ -24,12 +24,16 @@
 
 #include "math/matrix4.h"
 
+#include "syberia/te/te_vector3f32.h"
+
 namespace Syberia {
 
-class TeMatrix4x4 : Math::Matrix<4, 4> {
+class TeMatrix4x4 : public Math::Matrix<4, 4> {
 public:
 	TeMatrix4x4();
+	TeMatrix4x4(const Math::Matrix<4, 4> &matrix);
 
+	void scale(const TeVector3f32 &vec);
 	// TODO add public members
 
 private:

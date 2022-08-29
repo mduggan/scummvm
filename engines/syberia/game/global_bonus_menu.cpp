@@ -51,7 +51,7 @@ void GlobalBonusMenu::leave() {
 	}
 }
 
-bool GlobalBonusMenu::onSomeButtonValidated(const Common::String &script) {
+bool GlobalBonusMenu::onSomeButtonValidated(const char *script) {
 	Application *app = g_engine->getApplication();
 	app->captureFade();
 	leave();
@@ -61,33 +61,27 @@ bool GlobalBonusMenu::onSomeButtonValidated(const Common::String &script) {
 }
 
 bool GlobalBonusMenu::onAraButtonValidated() {
-	static const Common::String scriptName("menus/bonusmenu/Ara.lua");
-	return onSomeButtonValidated(scriptName);
+	return onSomeButtonValidated("menus/bonusmenu/Ara.lua");
 }
 
 bool GlobalBonusMenu::onBarButtonValidated() {
-	static const Common::String scriptName("menus/bonusmenu/Bar.lua");
-	return onSomeButtonValidated(scriptName);
+	return onSomeButtonValidated("menus/bonusmenu/Bar.lua");
 }
 
 bool GlobalBonusMenu::onCitButtonValidated() {
-	static const Common::String scriptName("menus/bonusmenu/Cit.lua");
-	return onSomeButtonValidated(scriptName);
+	return onSomeButtonValidated("menus/bonusmenu/Cit.lua");
 }
 
 bool GlobalBonusMenu::onSyb2ButtonValidated() {
-	static const Common::String scriptName("menus/bonusmenu/Syb2.lua");
-	return onSomeButtonValidated(scriptName);
+	return onSomeButtonValidated("menus/bonusmenu/Syb2.lua");
 }
 
 bool GlobalBonusMenu::onSyb3ButtonValidated() {
-	static const Common::String scriptName("menus/bonusmenu/Syb3.lua");
-	return onSomeButtonValidated(scriptName);
+	return onSomeButtonValidated("menus/bonusmenu/Syb3.lua");
 }
 
 bool GlobalBonusMenu::onValButtonValidated() {
-	static const Common::String scriptName("menus/bonusmenu/Val.lua");
-	return onSomeButtonValidated(scriptName);
+	return onSomeButtonValidated("menus/bonusmenu/Val.lua");
 }
 
 bool GlobalBonusMenu::onQuitButton() {

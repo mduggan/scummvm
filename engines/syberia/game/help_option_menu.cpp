@@ -30,10 +30,9 @@ HelpOptionMenu::HelpOptionMenu() : _entered(false) {
 
 void HelpOptionMenu::enter() {
 	if (!_entered) {
-		static const Common::String scriptPath("menus/helpoptionMenu/optionsMenu.lua");
 		Application *app = g_engine->getApplication();
 		app->captureFade();
-		load(scriptPath);
+		load("menus/helpoptionMenu/optionsMenu.lua");
 		error("TODO: finish implementation of HelpOptionMenu::enter");
 	}
 }

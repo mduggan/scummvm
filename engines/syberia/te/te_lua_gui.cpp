@@ -47,7 +47,7 @@ TeClipLayout *TeLuaGUI::clipLayout(const Common::String &name) {
 	return nullptr;
 }
 
-TeCurveAnim2<TeI3DObject2,TeColor> *TeLuaGUI::colorLinearAnimation(const Common::String &name) {
+TeCurveAnim2<TeI3DObject2, TeColor> *TeLuaGUI::colorLinearAnimation(const Common::String &name) {
 	error("TODO: Implement me.");
 	return nullptr;
 }
@@ -66,7 +66,7 @@ TeLayout *TeLuaGUI::layout(const Common::String &name) {
 	return nullptr;
 }
 
-TeCurveAnim2<TeILayout,TeVector3f32> *TeLuaGUI::layoutAnchorLinearAnimation(const Common::String &name) {
+TeCurveAnim2<TeILayout, TeVector3f32> *TeLuaGUI::layoutAnchorLinearAnimation(const Common::String &name) {
 	error("TODO: Implement me.");
 	return nullptr;
 }
@@ -83,7 +83,7 @@ TeListLayout *TeLuaGUI::listLayout(const Common::String &name) {
 	return nullptr;
 }
 
-TeCurveAnim2<TeI3DObject2,TeQuaternion> *TeLuaGUI::rotationLinearAnimation(const Common::String &name) {
+TeCurveAnim2<TeI3DObject2, TeQuaternion> *TeLuaGUI::rotationLinearAnimation(const Common::String &name) {
 	error("TODO: Implement me.");
 	return nullptr;
 }

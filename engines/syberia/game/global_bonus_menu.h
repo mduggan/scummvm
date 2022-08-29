@@ -43,7 +43,7 @@ public:
 	bool onQuitButton();
 
 private:
-	bool onSomeButtonValidated(const Common::String &script);
+	bool onSomeButtonValidated(const char *script);
 
 	bool _entered;
 

@@ -68,15 +68,26 @@ public:
 	const Common::String &name() const {
 		return _name;
 	}
+	
+	bool onParentWorldColorChanged();
+	bool onParentWorldTransformationMatrixChanged();
+	/* TODO: check these return types.. */
+	long onPositionChanged();
+	long onSizeChanged();
+	long onWorldColorChanged();
+	long onWorldTransformationMatrixChanged();
+	long onWorldVisibleChanged();
+	bool onWorldVisibleChangedSlot();
+
 	Te3DObject2 *parent() {
 		return _parent;
 	}
 	const TeVector3f32 &position() const {
 		return _position;
 	}
-	void removeChild(Te3DObject2 *dest);
+	void removeChild(Te3DObject2 *child);
 	void removeChildren();
-	void rotate(TeQuaternion *rot);
+	void rotate(const TeQuaternion &rot);
 	const TeQuaternion &rotation() const {
 		return _rotation;
 	}
@@ -87,8 +98,8 @@ public:
 	void setColorInheritance(bool val) {
 		_colorInheritance = val;
 	}
-	bool setName(const Common::String &name) {
-		_name = name;
+	bool setName(const Common::String &newName) {
+		_name = newName;
 		return true;
 	}
 	void setParent(TeI3DObject2 *newparent);

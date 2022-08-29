@@ -27,7 +27,7 @@ namespace Syberia {
 class TeVector2s32 {
 public:
 	TeVector2s32();
-	TeVector2s32(int x, int y) : _x(x), _y(y) {};
+	TeVector2s32(int x_, int y_) : _x(x_), _y(y_) {};
 
 public:
 	int _x;

@@ -27,7 +27,7 @@ MODULE_OBJS := \
 	game/loc_file.o \
 	game/main_menu.o \
 	game/notifier.o \
-	game/object3_d.o \
+	game/object3d.o \
 	game/options_menu.o \
 	game/owner_error_menu.o \
 	game/question2.o \
@@ -72,7 +72,7 @@ MODULE_OBJS := \
 	te/te_screen.o \
 	te/te_scrolling_layout.o \
 	te/te_sfx.o \
-	te/te_signal0_param.o \
+	te/te_signal_0param.o \
 	te/te_sprite_layout.o \
 	te/te_text_layout.o \
 	te/te_timer.o \
