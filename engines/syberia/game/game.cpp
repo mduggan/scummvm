@@ -396,7 +396,8 @@ void Game::resetPreviousMousePos() {
 }
 
 void Game::resumeMovie() {
-	error("TODO: Implemet me");
+	_music.play();
+	_gui4.spriteLayout("video")->play();
 }
 
 void Game::saveBackup(const Common::String &saveName) {
@@ -408,7 +409,14 @@ void Game::setBackground(const Common::String &name) {
 }
 
 void Game::setCurrentObjectSprite(const Common::String &spritePath) {
-	error("TODO: Implemet me");
+	TeSpriteLayout *currentSprite = _gui4.spriteLayout("currentObjectSprite");
+	if (currentSprite) {
+		if (!spritePath.empty()) {
+			currentSprite->unload();
+		} else {
+			currentSprite->load(spritePath);
+	  }
+	}
 }
 
 bool Game::showMarkers(bool val) {

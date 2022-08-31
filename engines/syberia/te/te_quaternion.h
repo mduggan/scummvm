@@ -29,7 +29,21 @@ namespace Syberia {
 class TeQuaternion: public Math::Quaternion {
 public:
 	TeQuaternion();
+	TeQuaternion(const Math::Quaternion &q) : Math::Quaternion(q) {};
 
+	static void deserialize(Common::ReadStream *stream, TeQuaternion *dest) {
+		dest->value(0) = stream->readFloatLE();
+		dest->value(1) = stream->readFloatLE();
+		dest->value(2) = stream->readFloatLE();
+		dest->value(3) = stream->readFloatLE();
+	}
+
+	static void serialize(Common::WriteStream *stream, const TeQuaternion *src) {
+		stream->writeFloatLE(src->value(0));
+		stream->writeFloatLE(src->value(1));
+		stream->writeFloatLE(src->value(2));
+		stream->writeFloatLE(src->value(3));
+	}
 	// TODO: does this need anything not in Math::Quaternion?
 
 };

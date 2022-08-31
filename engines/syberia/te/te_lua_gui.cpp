@@ -19,7 +19,11 @@
  *
  */
 
+#include "common/file.h"
+#include "syberia/syberia.h"
+#include "syberia/te/te_core.h"
 #include "syberia/te/te_lua_gui.h"
+#include "syberia/te/te_lua_gui_lua_callbacks.h"
 
 namespace Syberia {
 
@@ -27,21 +31,21 @@ TeLuaGUI::TeLuaGUI() {
 }
 
 TeButtonLayout *TeLuaGUI::buttonLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeButtonLayout *>::iterator iter = _buttonLayouts.find(name);
+	StringMap<TeButtonLayout *>::iterator iter = _buttonLayouts.find(name);
 	if (iter != _buttonLayouts.end())
 		return iter->_value;
 	return nullptr;
 }
 
 TeCheckboxLayout *TeLuaGUI::checkboxLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeCheckboxLayout *>::iterator iter = _checkboxLayouts.find(name);
+	StringMap<TeCheckboxLayout *>::iterator iter = _checkboxLayouts.find(name);
 	if (iter != _checkboxLayouts.end())
 		return iter->_value;
 	return nullptr;
 }
 
 TeClipLayout *TeLuaGUI::clipLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeClipLayout *>::iterator iter = _clipLayouts.find(name);
+	StringMap<TeClipLayout *>::iterator iter = _clipLayouts.find(name);
 	if (iter != _clipLayouts.end())
 		return iter->_value;
 	return nullptr;
@@ -53,14 +57,14 @@ TeCurveAnim2<TeI3DObject2, TeColor> *TeLuaGUI::colorLinearAnimation(const Common
 }
 
 TeExtendedTextLayout *TeLuaGUI::extendedTextLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeExtendedTextLayout *>::iterator iter = _extendedTextLayouts.find(name);
+	StringMap<TeExtendedTextLayout *>::iterator iter = _extendedTextLayouts.find(name);
 	if (iter != _extendedTextLayouts.end())
 		return iter->_value;
 	return nullptr;
 }
 
 TeLayout *TeLuaGUI::layout(const Common::String &name) {
-	Common::HashMap<Common::String, TeLayout *>::iterator iter = _layouts.find(name);
+	StringMap<TeLayout *>::iterator iter = _layouts.find(name);
 	if (iter != _layouts.end())
 		return iter->_value;
 	return nullptr;
@@ -77,7 +81,7 @@ TeCurveAnim2<TeI3DObject2, TeVector3f32> *TeLuaGUI::layoutPositionLinearAnimatio
 }
 
 TeListLayout *TeLuaGUI::listLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeListLayout *>::iterator iter = _listLayouts.find(name);
+	StringMap<TeListLayout *>::iterator iter = _listLayouts.find(name);
 	if (iter != _listLayouts.end())
 		return iter->_value;
 	return nullptr;
@@ -89,29 +93,74 @@ TeCurveAnim2<TeI3DObject2, TeQuaternion> *TeLuaGUI::rotationLinearAnimation(cons
 }
 
 TeScrollingLayout *TeLuaGUI::scrollingLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeScrollingLayout *>::iterator iter = _scrollingLayouts.find(name);
+	StringMap<TeScrollingLayout *>::iterator iter = _scrollingLayouts.find(name);
 	if (iter != _scrollingLayouts.end())
 		return iter->_value;
 	return nullptr;
 }
 
 TeSpriteLayout *TeLuaGUI::spriteLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeSpriteLayout *>::iterator iter = _spriteLayouts.find(name);
+	StringMap<TeSpriteLayout *>::iterator iter = _spriteLayouts.find(name);
 	if (iter != _spriteLayouts.end())
 		return iter->_value;
 	return nullptr;
 }
 
 TeTextLayout *TeLuaGUI::textLayout(const Common::String &name) {
-	Common::HashMap<Common::String, TeTextLayout *>::iterator iter = _textLayouts.find(name);
+	StringMap<TeTextLayout *>::iterator iter = _textLayouts.find(name);
 	if (iter != _textLayouts.end())
 		return iter->_value;
 	return nullptr;
 }
 
-bool TeLuaGUI::load(const Common::String &path) {
-	error("TODO: Implement me.");
-	return false;
+bool TeLuaGUI::load(const Common::String &pathStr) {
+	unload();
+	_scriptPath = pathStr;
+	TeCore *core = g_engine->getCore();
+	Common::Path path(pathStr);
+	if (!core->_coreNotReady) {
+		if (!Common::File::exists(pathStr)) {
+			path = pathStr;
+			Common::Path dir = path.getParent();
+			dir.appendInPlace(core->language());
+			path = dir.append(path.getLastComponent());
+			if (!Common::File::exists(pathStr)) {
+				path = pathStr;
+				Common::Path dir = path.getParent();
+				dir.appendInPlace("en");
+				path = dir.append(path.getLastComponent());
+			}
+		}
+	}
+	_luaContext.setGlobal("Pixel", 0);
+	_luaContext.setGlobal("Percent", 1);
+	_luaContext.setGlobal("None", 0);
+	_luaContext.setGlobal("LetterBox", 1);
+	_luaContext.setGlobal("PanScan", 2);
+	_luaContext.setGlobal("MultiLine", 0);
+	_luaContext.setGlobal("SingleLine", 1);
+	_luaContext.setGlobal("Fixed", 0);
+	_luaContext.setGlobal("Proportional", 1);
+	_luaContext.registerCFunction("TeLayout", layoutBindings);
+	_luaContext.registerCFunction("TeListLayout", listLayoutBindings);
+	_luaContext.registerCFunction("TeSpriteLayout", spriteLayoutBindings);
+	_luaContext.registerCFunction("TeButtonLayout", buttonLayoutBindings);
+	_luaContext.registerCFunction("TeCheckboxLayout", checkboxLayoutBindings);
+	_luaContext.registerCFunction("TeLayoutPositionLinearAnimation", layoutPositionLinearAnimationBindings);
+	_luaContext.registerCFunction("TeLayoutAnchorLinearAnimation", layoutAnchorLinearAnimationBindings);
+	_luaContext.registerCFunction("TeTextLayout", textLayoutBindings);
+	_luaContext.registerCFunction("TeClipLayout", clipLayoutBindings);
+	_luaContext.registerCFunction("TeColorLinearAnimation", colorLinearAnimationBindings);
+	_luaContext.registerCFunction("TeRotationLinearAnimation", rotationLinearAnimationBindings);
+	_luaContext.registerCFunction("TeScrollingLayout", scrollingLayoutBindings);
+	_luaContext.registerCFunction("TeExtendedTextLayout", extendedTextLayoutBindings);
+	_luaContext.setInRegistry("__TeLuaGUIThis",this);
+	_luaScript.attachToContext(&_luaContext);
+	_luaScript.load(path);
+	_luaScript.execute();
+	_luaScript.unload();
+	_loaded = true;
+	return true;
 }
 
 void TeLuaGUI::unload() {

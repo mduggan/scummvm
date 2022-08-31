@@ -23,16 +23,34 @@
 
 namespace Syberia {
 
-Te3DObject2::Te3DObject2() : _childListChanged(false), _parent(nullptr), _colorInheritance(true) {
+Te3DObject2::Te3DObject2() : _childListChanged(false), _parent(nullptr), _scale(1.0f, 1.0f, 1.0f), _color(255, 255, 255, 255), _visible(true), _colorInheritance(true) {
+	_onWorldVisibleChangedParentCallback.reset(
+			new TeCallback0Param<Te3DObject2>(this, &Te3DObject2::onWorldVisibleChangedSlot));
+	_onWorldColorChangedParentCallback.reset(
+			new TeCallback0Param<Te3DObject2>(this, &Te3DObject2::onParentWorldColorChanged));
+	_onWorldTransformationMatrixChangedParentCallback.reset(
+			new TeCallback0Param<Te3DObject2>(this, &Te3DObject2::onParentWorldTransformationMatrixChanged));
 }
 
 void Te3DObject2::addChild(Te3DObject2 *child) {
 	_children.push_back(child);
-	error("TODO: call some virtual function then childListChangedSignal here");
+	child->setParent(this); // TODO: This seems like the right thing to call here? Confirm it.
+	_childListChangedSignal.call();
 }
 
-void Te3DObject2::addChildBefore(Te3DObject2 *newChild, Te3DObject2 *ref) {
-	error("TODO: Implement me");
+void Te3DObject2::addChildBefore(Te3DObject2 *newChild, const Te3DObject2 *ref) {
+	Common::Array<Te3DObject2 *>::iterator iter;
+	for (iter = _children.begin(); iter != _children.end(); iter++) {
+		if (*iter == ref) {
+			_children.insert(iter, newChild);
+			break;
+		}
+	}
+	if (iter == _children.end())
+		_children.push_back(newChild);
+
+	newChild->setParent(this);
+	_childListChangedSignal.call();
 }
 
 Te3DObject2 *Te3DObject2::child(long offset) {
@@ -48,41 +66,48 @@ long Te3DObject2::childIndex(Te3DObject2 *child) {
 }
 
 /*static*/ void Te3DObject2::deserialize(Common::ReadStream *stream, Te3DObject2 *dest) {
-	error("TODO: Implement me");
+	char buf[256];
+	uint slen = stream->readUint32LE();
+	stream->read(buf, slen);
+	buf[slen] = 0;
+	Common::String str(buf);
+	dest->setName(str);
+
+	TeVector3f32 vect;
+	TeVector3f32::deserialize(stream, &vect);
+	dest->setPosition(vect);
+
+	TeQuaternion quat;
+	TeQuaternion::deserialize(stream, &quat);
+	dest->setRotation(quat);
+
+	TeVector3f32::deserialize(stream, &vect);
+	dest->setScale(vect);
 }
 
-/*static*/ void Te3DObject2::serialize(Common::ReadStream *stream, Te3DObject2 *src) {
-	error("TODO: Implement me");
+/*static*/ void Te3DObject2::serialize(Common::WriteStream *stream, Te3DObject2 *src) {
+	const Common::String &name = src->name();
+	stream->writeUint32LE(name.size());
+	stream->write(name.c_str(), name.size());
+
+	const TeVector3f32 pos = src->position();
+	TeVector3f32::serialize(stream, &pos);
+
+	const TeQuaternion rot = src->rotation();
+	TeQuaternion::serialize(stream, &rot);
+
+	const TeVector3f32 sca = src->scale();
+	TeVector3f32::serialize(stream, &sca);
 }
 
 bool Te3DObject2::onParentWorldColorChanged() {
-	error("TODO: Call onParentWorldColorChangedSignal");
+	_onParentWorldColorChangedSignal.call();
 	return false;
 }
 
 bool Te3DObject2::onParentWorldTransformationMatrixChanged() {
-	error("TODO: onParentWorldTransformationMatrixChangedSignal");
+	_onParentWorldTransformationMatrixChangedSignal.call();
 	return false;
-}
-
-long Te3DObject2::onPositionChanged() {
-	error("TODO: Implement me.");
-}
-
-long Te3DObject2::onSizeChanged() {
-	error("TODO: Implement me.");
-}
-
-long Te3DObject2::onWorldColorChanged() {
-	error("TODO: Implement me.");
-}
-
-long Te3DObject2::onWorldTransformationMatrixChanged() {
-	error("TODO: Implement me.");
-}
-
-long Te3DObject2::onWorldVisibleChanged() {
-	error("TODO: Implement me.");
 }
 
 void Te3DObject2::removeChild(Te3DObject2 *child) {
@@ -93,12 +118,12 @@ void Te3DObject2::removeChild(Te3DObject2 *child) {
 		}
 	}
 	if (i < _children.size()) {
-		error("TODO: Call onChildListChangedSignal");
+		_childListChangedSignal.call();
 	}
 }
 
 bool Te3DObject2::onWorldVisibleChangedSlot() {
-	error("TODO: Call onWorldVisibleChangedSignal");
+	_onWorldVisibleChangedSlotSignal.call();
 	return false;
 }
 
@@ -107,7 +132,7 @@ void Te3DObject2::removeChildren() {
 		_children[i]->setParent(nullptr);
 	}
 	_children.clear();
-	error("TODO: Call childListChangedSignal");
+	_childListChangedSignal.call();
 }
 
 void Te3DObject2::rotate(const TeQuaternion &rot) {
@@ -118,19 +143,39 @@ void Te3DObject2::rotate(const TeQuaternion &rot) {
 
 void Te3DObject2::setColor(const TeColor &col) {
 	_color = col;
-	error("TODO: Call onParentWorldColorChangedSignal");
+	_onParentWorldColorChangedSignal.call();
 }
 
-void Te3DObject2::setParent(TeI3DObject2 *newparent) {
-	error("TODO: Implement me");
+void Te3DObject2::setParent(Te3DObject2 *newparent) {
+	if (_parent) {
+		if (_onWorldVisibleChangedParentCallback)
+			_parent->onWorldVisibleChanged().remove(_onWorldVisibleChangedParentCallback);
+		if (_onWorldTransformationMatrixChangedParentCallback)
+			_parent->onWorldTransformationMatrixChanged().remove(_onWorldTransformationMatrixChangedParentCallback);
+		if (_onWorldColorChangedParentCallback)
+			_parent->onWorldColorChanged().remove(_onWorldColorChangedParentCallback);
+	}
+	_parent = newparent;
+	if (newparent) {
+		if (_onWorldVisibleChangedParentCallback)
+			_parent->onWorldVisibleChanged().insert(_onWorldVisibleChangedParentCallback);
+		if (_onWorldTransformationMatrixChangedParentCallback)
+			_parent->onWorldTransformationMatrixChanged().insert(_onWorldTransformationMatrixChangedParentCallback);
+		if (_onWorldColorChangedParentCallback)
+			_parent->onWorldColorChanged().insert(_onWorldColorChangedParentCallback);
+	}
+	_onWorldVisibleChangedSlotSignal.call();
+	_onParentWorldTransformationMatrixChangedSignal.call();
+	_onParentWorldColorChangedSignal.call();
 }
 
 void Te3DObject2::setPosition(const TeVector3f32 &pos) {
 	if (_position == pos)
 		return;
-	
+
 	_position = pos;
-	error("TODO: Call onPositionChangedSignal and onParentWorldTransformationMatrixChangedSignal");
+	_onPositionChangedSignal.call();
+	_onParentWorldTransformationMatrixChangedSignal.call();
 }
 
 void Te3DObject2::setRotation(const TeQuaternion &rot) {
@@ -138,7 +183,7 @@ void Te3DObject2::setRotation(const TeQuaternion &rot) {
 		return;
 
 	_rotation = rot;
-	error("TODO: Call onParentWorldTransformationMatrixChangedSignal");
+	_onParentWorldTransformationMatrixChangedSignal.call();
 }
 
 void Te3DObject2::setScale(const TeVector3f32 &scale) {
@@ -146,7 +191,7 @@ void Te3DObject2::setScale(const TeVector3f32 &scale) {
 		return;
 
 	_scale = scale;
-	error("TODO: Call onParentWorldTransformationMatrixChangedSignal");
+	_onParentWorldTransformationMatrixChangedSignal.call();
 }
 
 void Te3DObject2::setSize(const TeVector3f32 &size) {
@@ -154,7 +199,7 @@ void Te3DObject2::setSize(const TeVector3f32 &size) {
 		return;
 
 	_size = size;
-	error("TODO: Call onSizeChangedSignal");
+	_onSizeChangedSignal.call();
 }
 
 void Te3DObject2::setVisible(bool visible) {
@@ -171,7 +216,7 @@ void Te3DObject2::setZPosition(float zpos) {
 	setPosition(pos);
 }
 
-TeMatrix4x4 Te3DObject2::transformationMatrix() const {
+TeMatrix4x4 Te3DObject2::transformationMatrix() {
 	TeMatrix4x4 retval;
 	retval.translate(position());
 	retval = retval * rotation().toMatrix();
@@ -179,8 +224,60 @@ TeMatrix4x4 Te3DObject2::transformationMatrix() const {
 	return retval;
 }
 
-void Te3DObject2::translate(TeVector3f32 *vec) {
-	
+void Te3DObject2::translate(const TeVector3f32 &vec) {
+	TeVector3f32 pos = position();
+	pos += vec;
+	setPosition(pos);
+}
+
+TeColor Te3DObject2::worldColor() {
+	if (!_parent || !_colorInheritance) {
+		return color();
+	} else {
+		TeColor parentCol = _parent->worldColor();
+		TeColor thisCol = color();
+		return parentCol * thisCol;
+	}
+}
+
+TeVector3f32 Te3DObject2::worldPosition() {
+	if (!_parent) {
+		return position();
+	} else {
+		return _parent->worldPosition() + position();
+	}
+}
+
+TeQuaternion Te3DObject2::worldRotation() {
+	if (!_parent) {
+		return rotation();
+	} else {
+		return _parent->worldRotation() * rotation();
+	}
+}
+
+TeVector3f32 Te3DObject2::worldScale() {
+	if (!_parent) {
+		return scale();
+	} else {
+		return _parent->worldScale() * scale();
+	}
+}
+
+TeMatrix4x4 Te3DObject2::worldTransformationMatrix() {
+	if (!_parent) {
+		return transformationMatrix();
+	} else {
+		return _parent->worldTransformationMatrix() * transformationMatrix();
+	}
+}
+
+bool Te3DObject2::worldVisible() {
+	if (!_parent) {
+		return visible();
+	} else {
+		return _parent->worldVisible() && visible();
+	}
 }
 
 } // end namespace Syberia

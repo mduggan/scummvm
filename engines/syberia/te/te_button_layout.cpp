@@ -23,7 +23,110 @@
 
 namespace Syberia {
 
+/*static*/ bool TeButtonLayout::_mousePositionChangedCatched = false;
+/*static*/ TeTimer *TeButtonLayout::_doubleValidationProtectionTimer = nullptr;
+
+/*static*/ TeTimer *TeButtonLayout::getDoubleValidationProtectionTimer() {
+	if (!_doubleValidationProtectionTimer) {
+		_doubleValidationProtectionTimer = new TeTimer();
+	}
+	return _doubleValidationProtectionTimer;
+}
+
 TeButtonLayout::TeButtonLayout() {
+	_onMousePositionChangedMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChangedMaxPriority, FLT_MAX));
+
+	_onMousePositionChangedCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChanged));
+	_onMouseLeftDownCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftDown));
+	_onMouseLeftUpMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftUpMaxPriority, FLT_MAX));
+	_onMouseLeftUpCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftUp));
+
+	setEditionColor(TeColor(128, 128, 128, 255));
+}
+
+bool TeButtonLayout::isMouseIn(const TeVector2s32 &mouseloc) {
+	error("TODO: Implement me.");
+}
+
+bool TeButtonLayout::onMouseLeftDown(uint flags) {
+	if (!visible())
+		return false;
+	error("TODO: Implement me.");
+}
+
+bool TeButtonLayout::onMouseLeftUp(uint flags) {
+	if (!visible())
+		return false;
+	error("TODO: Implement me.");
+}
+
+bool TeButtonLayout::onMousePositionChanged(uint flags) {
+	if (!visible())
+		return false;
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::reset() {
+	_intArr.clear();
+	State newState = (_currentState == BUTTON_STATE_UP ? BUTTON_STATE_UP : BUTTON_STATE_DISABLED);
+	setState(newState);
+}
+
+void TeButtonLayout::resetTimeFromLastValidation() {
+	TeTimer *timer = getDoubleValidationProtectionTimer();
+	if (timer->_stopped) {
+		timer->start();
+	}
+	timer->timeElapsed();
+}
+
+long TeButtonLayout::timeFromLastValidation() {
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::setDisabledLayout(TeLayout *disabledLayout) {
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::setHitZone(TeLayout *hitZoneLayout) {
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::setDownLayout(TeLayout *downLayout) {
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::setRollOverLayout(TeLayout *rollOverLayout) {
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::setUpLayout(TeLayout *upLayout) {
+	error("TODO: Implement me.");
+}
+
+void TeButtonLayout::setDoubleValidationProtectionEnabled(bool enable) {
+	_doubleValidationProtectionEnabled = true;
+}
+
+void TeButtonLayout::setEnable(bool enable) {
+	if (enable) {
+		_currentState = BUTTON_STATE_UP;
+		setState(_currentState);
+	} else {
+		_currentState = BUTTON_STATE_DISABLED;
+		setState(_currentState);
+	}
+}
+
+void TeButtonLayout::setPosition(const TeVector3f32 &pos) {
+	TeLayout::setPosition(pos);
+	if (_currentState != BUTTON_STATE_UP) {
+		error("TODO: Implement setPosition logic for not up.");
+	}
+}
+
+void TeButtonLayout::setState(State newState) {
+	error("TODO: Implement me.");
 }
 
 // TODO: Add more functions here.

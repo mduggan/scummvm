@@ -28,9 +28,16 @@ class TeILayout {
 public:
 	TeILayout();
 
-	enum CoordinatesType {};
+	enum CoordinatesType {
+		ABSOLUTE, // use User Position?
+		RELATIVE_TO_PARENT // scale based on parent size
+	};
 	enum DrawMode {};
-	enum RatioMode {};
+	enum RatioMode {
+		RATIO_MODE_NONE,
+		RATIO_MODE_1,
+		RATIO_MODE_2
+	};
 	// TODO add public members
 
 private:

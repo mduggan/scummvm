@@ -73,18 +73,26 @@ public:
 
 	Common::String value(const Common::String &path);
 
+	template <typename T> using StringMap = Common::HashMap<Common::String, T>;
+
+	StringMap<TeLayout *> &layouts() { return _layouts; };
+
 private:
 	TeLuaContext _luaContext;
 	TeLuaScript _luaScript;
-	Common::HashMap<Common::String, TeLayout *> _layouts;
-	Common::HashMap<Common::String, TeButtonLayout *> _buttonLayouts;
-	Common::HashMap<Common::String, TeCheckboxLayout *> _checkboxLayouts;
-	Common::HashMap<Common::String, TeListLayout *> _listLayouts;
-	Common::HashMap<Common::String, TeSpriteLayout *> _spriteLayouts;
-	Common::HashMap<Common::String, TeTextLayout *> _textLayouts;
-	Common::HashMap<Common::String, TeScrollingLayout *> _scrollingLayouts;
-	Common::HashMap<Common::String, TeClipLayout *> _clipLayouts;
-	Common::HashMap<Common::String, TeExtendedTextLayout *> _extendedTextLayouts;
+
+	bool _loaded;
+	Common::String _scriptPath;
+
+	StringMap<TeLayout *> _layouts;
+	StringMap<TeButtonLayout *> _buttonLayouts;
+	StringMap<TeCheckboxLayout *> _checkboxLayouts;
+	StringMap<TeListLayout *> _listLayouts;
+	StringMap<TeSpriteLayout *> _spriteLayouts;
+	StringMap<TeTextLayout *> _textLayouts;
+	StringMap<TeScrollingLayout *> _scrollingLayouts;
+	StringMap<TeClipLayout *> _clipLayouts;
+	StringMap<TeExtendedTextLayout *> _extendedTextLayouts;
 
 };
 

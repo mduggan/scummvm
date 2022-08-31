@@ -19,13 +19,28 @@
  *
  */
 
-#include "syberia/te/te_signal_0param.h"
+#ifndef SYBERIA_TE_TE_LUA_GUI_LUA_CALLBACKS_H
+#define SYBERIA_TE_TE_LUA_GUI_LUA_CALLBACKS_H
+
+struct lua_State;
 
 namespace Syberia {
 
-TeSignal0Param::TeSignal0Param() {
-}
+int layoutBindings(lua_State *state);
+int listLayoutBindings(lua_State *state);
+int spriteLayoutBindings(lua_State *state);
+int buttonLayoutBindings(lua_State *state);
+int checkboxLayoutBindings(lua_State *state);
+int layoutPositionLinearAnimationBindings(lua_State *state);
+int layoutAnchorLinearAnimationBindings(lua_State *state);
+int textLayoutBindings(lua_State *state);
+int clipLayoutBindings(lua_State *state);
+int colorLinearAnimationBindings(lua_State *state);
+int rotationLinearAnimationBindings(lua_State *state);
+int scrollingLayoutBindings(lua_State *state);
+int extendedTextLayoutBindings(lua_State *state);
 
-// TODO: Add more functions here.
 
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_LUA_GUI_LUA_CALLBACKS_H

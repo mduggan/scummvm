@@ -55,6 +55,7 @@ MODULE_OBJS := \
 	te/te_list_layout.o \
 	te/te_lua_context.o \
 	te/te_lua_gui.o \
+	te/te_lua_gui_lua_callbacks.o \
 	te/te_lua_script.o \
 	te/te_lua_thread.o \
 	te/te_matrix4x4.o \
@@ -72,7 +73,6 @@ MODULE_OBJS := \
 	te/te_screen.o \
 	te/te_scrolling_layout.o \
 	te/te_sfx.o \
-	te/te_signal_0param.o \
 	te/te_sprite_layout.o \
 	te/te_text_layout.o \
 	te/te_timer.o \

@@ -30,8 +30,9 @@ public:
 
 	void animateBlackFade();
 	void animateFade();
+	void captureFrame();
+	void clear() {};
 	void init();
-	// TODO add public members
 
 private:
 	// TODO add private members

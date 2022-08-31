@@ -20,31 +20,72 @@
  */
 
 #include "common/textconsole.h"
+#include "common/file.h"
 #include "syberia/te/te_lua_script.h"
+#include "syberia/te/te_lua_thread.h"
+#include "syberia/te/te_lua_context.h"
 
 namespace Syberia {
 
-TeLuaScript::TeLuaScript() {
+TeLuaScript::TeLuaScript() : _started(false), _luaContext(nullptr) {
+}
+
+void TeLuaScript::attachToContext(TeLuaContext *context) {
+	_luaContext = context;
 }
 
 void TeLuaScript::execute() {
-	error("TODO: Implement me.");
+	if (_luaContext) {
+		lua_State *state = _luaContext->luaState();
+		if (state) {
+			TeLuaThread *thread = TeLuaThread::create(_luaContext);
+			thread->executeFile(_scriptPath);
+			thread->resume();
+			_started = true;
+		}
+	}
 }
 
 void TeLuaScript::execute(const Common::String &fname) {
-	error("TODO: Implement me.");
+	if (_luaContext) {
+		TeLuaThread *thread = TeLuaThread::create(_luaContext);
+		thread->execute(fname);
+		thread->release();
+	}
 }
 
-void TeLuaScript::execute(const Common::String &fname, const TeVariant &param1) {
-	error("TODO: Implement me.");
+void TeLuaScript::execute(const Common::String &fname, const TeVariant &p1) {
+	if (_luaContext) {
+		TeLuaThread *thread = TeLuaThread::create(_luaContext);
+		thread->execute(fname, p1);
+		thread->release();
+	}
 }
 
-void TeLuaScript::execute(const Common::String &fname, const TeVariant &param1, const TeVariant &param2) {
-	error("TODO: Implement me.");
+void TeLuaScript::execute(const Common::String &fname, const TeVariant &p1, const TeVariant &p2) {
+	if (_luaContext) {
+		TeLuaThread *thread = TeLuaThread::create(_luaContext);
+		thread->execute(fname, p1, p2);
+		thread->release();
+	}
 }
 
-void TeLuaScript::load(const Common::String &fname) {
-	error("TODO: Implement me.");
+void TeLuaScript::execute(const Common::String &fname, const TeVariant &p1, const TeVariant &p2, const TeVariant &p3) {
+	if (_luaContext) {
+		TeLuaThread *thread = TeLuaThread::create(_luaContext);
+		thread->execute(fname, p1, p2, p3);
+		thread->release();
+	}
+}
+
+void TeLuaScript::load(const Common::Path &path) {
+	_started = false;
+	_scriptPath = path;
+}
+
+void TeLuaScript::unload() {
+	_scriptPath.set("");
+	_started = false;
 }
 
 } // end namespace Syberia

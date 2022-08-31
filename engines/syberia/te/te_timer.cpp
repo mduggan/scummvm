@@ -43,6 +43,11 @@ double TeTimer::getTimeFromStart() {
 	return 1.0;
 }
 
+double TeTimer::timeElapsed() {
+	error("TODO: Implement me");
+	return 1.0;
+}
+
 void TeTimer::setAlarmIn(long val) {
 	error("TODO: Implement me");
 }

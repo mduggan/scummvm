@@ -19,11 +19,16 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "syberia/te/te_xml_gui.h"
 
 namespace Syberia {
 
 TeXmlGui::TeXmlGui() {
+}
+
+Common::String TeXmlGui::value(const Common::String &key) {
+	error("TODO: Implement me.");
 }
 
 // TODO: Add more functions here.

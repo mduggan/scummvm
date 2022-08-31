@@ -24,7 +24,7 @@
 
 #include "common/array.h"
 #include "engines/syberia/te/te_timer.h"
-#include "engines/syberia/te/te_signal_0param.h"
+#include "engines/syberia/te/te_signal.h"
 
 namespace Syberia {
 
@@ -53,7 +53,7 @@ private:
 
 	void removeThisFromAnimations();
 
-	TeSignal0Param *_stopCallback;
+	TeSignal0Param _stopCallbacks;
 
 	static Common::Array<TeAnimation *> _animations;
 

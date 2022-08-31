@@ -30,10 +30,33 @@ class TeSpriteLayout : public TeLayout {
 public:
 	TeSpriteLayout();
 
-	void load(const Common::String &path);
+	void cont();
+	void draw() override;
 	
+	bool onParentWorldColorChanged() override;
+
+	void load(const Common::String &path);
+	//void load(TeImage &img);
+	//void load(TeIntrusivePtr<Te3DTexture> &texture);
+
+	void unload();
+	void pause();
 	void play();
-	// TODO add public members
+
+	void setBufferSize(long bufsize);
+	void setColor(const TeColor &col) override;
+
+	void setColorKey(const TeColor &col);
+	void setColorKeyActivated(bool activated);
+	void setColorKeyTolerance(float val);
+
+	bool setName(const Common::String &newName) override;
+	void setSize(const TeVector3f32 &newSize) override;
+
+	void stop();
+
+	void updateMesh() override;
+	void updateSize() override;
 
 private:
 	// TODO add private members

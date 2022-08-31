@@ -36,16 +36,16 @@ class TeLayout : public TeILayout, public Te3DObject2 {
 public:
 	TeLayout();
 
-	void addChild(TeI3DObject2 *child);
-	void addChildBefore(TeI3DObject2 *newchild, const TeI3DObject2 *current);
+	void addChild(Te3DObject2 *child) override;
+	void addChildBefore(Te3DObject2 *newchild, const Te3DObject2 *ref) override;
 	const TeVector3f32 &anchor();
 	void disableAutoZ();
 	void enableAutoZ();
 	bool isAutoZEnabled();
 
-	void draw();
+	void draw() override;
 
-	bool isMouseIn(const TeVector2s32 &mouseloc);
+	virtual bool isMouseIn(const TeVector2s32 &mouseloc);
 
 	DrawMode mode();
 
@@ -53,46 +53,46 @@ public:
 	bool onParentSizeChanged();
 	bool onParentWorldTransformationMatrixChanged();
 
-	TeVector3f32 position();
+	TeVector3f32 position() override;
 	CoordinatesType positionType() const;
 	float ratio() const;
 	RatioMode ratioMode() const;
-	void removeChild(TeI3DObject2 *child);
+	void removeChild(Te3DObject2 *child) override;
 	float safeAreaRatio() const;
 	void setAnchor(const TeVector3f32 &anchor);
-	//void setEditionColor(TeColor col); // does nothing?
+	virtual void setEditionColor(TeColor col) {};
 	void setMode(DrawMode mode);
-	void setParent(TeI3DObject2 *parent);
-	void setPosition(const TeVector3f32 &pos);
+	void setParent(Te3DObject2 *parent) override;
+	void setPosition(const TeVector3f32 &pos) override;
 	void setPositionType(CoordinatesType newtype);
 	void setRatio(float val);
 	void setRatioMode(RatioMode mode);
-	void setRotation(TeQuaternion *rot);
+	void setRotation(const TeQuaternion &rot) override;
 	void setSafeAreaRatio(float ratio);
-	void setScale(const TeVector3f32 &scale);
-	void setSize(const TeVector3f32 &size);
+	void setScale(const TeVector3f32 &scale) override;
+	void setSize(const TeVector3f32 &size) override;
 	void setSizeType(CoordinatesType coordtype);
-	void setZPosition(float zpos);
+	void setZPosition(float zpos) override;
 
 	TeVector3f32 size();
 	CoordinatesType sizeType() const;
 	TeVector3f32 transformMousePosition(const TeVector2s32 &mousepos);
 
-	//void updateMesh(); // does nothing?
+	virtual void updateMesh() {}; // override available for TeSpriteLayout
 	void updatePosition();
-	void updateSize();
+	virtual void updateSize();
 	void updateWorldMatrix();
-	void updateZ();
+	void updateZ() override;
 	void updateZSize();
 
 	TeVector3f32 userPosition() const;
-	TeVector3f32 userSize() const;
-	TeVector3f32 worldPosition();
-	TeMatrix4x4 worldTransformationMatrix();
-	bool worldVisible();
-	float xSize();
-	float ySize();
-	float zSize();
+	TeVector3f32 userSize();
+	TeVector3f32 worldPosition() override;
+	TeMatrix4x4 worldTransformationMatrix() override;
+	bool worldVisible() override;
+	float xSize() override;
+	float ySize() override;
+	float zSize() override;
 
 private:
 	TeVector3f32 _anchor;
@@ -100,20 +100,29 @@ private:
 	TeVector3f32 _userPosition;
 	CoordinatesType _sizeType;
 	TeVector3f32 _userSize;
-	
-										  
+	TeMatrix4x4 _worldMatrixCache;
+
 	DrawMode _drawMode;
 	bool _autoz;
 	bool _sizeChanged;
 	bool _positionChanged;
-	bool _somethingChanged;
+	bool _worldMatrixChanged;
 	bool _childChanged;
 	bool _childOrParentChanged;
+	bool _updatingZ;
+	bool _updatingZSize;
+	bool _updatingSize;
+	bool _updatingPosition;
+	bool _updatingWorldMatrix;
 	float _ratio;
 	RatioMode _ratioMode;
 	float _safeAreaRatio;
 	float _zPos;
 	float _zSize;
+
+	TeICallback0ParamPtr _onChildSizeChangedCallback;
+	TeICallback0ParamPtr _onParentSizeChangedCallback;
+	TeICallback0ParamPtr _onParentWorldTransformationMatrixChangedCallback;
 };
 
 } // end namespace Syberia

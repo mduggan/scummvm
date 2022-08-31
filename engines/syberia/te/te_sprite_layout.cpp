@@ -26,6 +26,18 @@ namespace Syberia {
 TeSpriteLayout::TeSpriteLayout() {
 }
 
+void TeSpriteLayout::cont() {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::draw() {
+	error("TODO: Implement me.");
+}
+
+bool TeSpriteLayout::onParentWorldColorChanged() {
+	error("TODO: Implement me.");
+}
+
 void TeSpriteLayout::load(const Common::String &path) {
 	error("TODO: Implement me.");
 }
@@ -34,6 +46,53 @@ void TeSpriteLayout::play() {
 	error("TODO: Implement me.");
 }
 
-// TODO: Add more functions here.
+void TeSpriteLayout::unload() {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::pause() {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::setBufferSize(long bufsize) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::setColor(const TeColor &col) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::setColorKey(const TeColor &col) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::setColorKeyActivated(bool activated) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::setColorKeyTolerance(float val) {
+	error("TODO: Implement me.");
+}
+
+bool TeSpriteLayout::setName(const Common::String &newName) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::setSize(const TeVector3f32 &newSize) {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::stop() {
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::updateMesh() {
+	TeLayout::updateMesh();
+	error("TODO: Implement me.");
+}
+
+void TeSpriteLayout::updateSize() {
+	error("TODO: Implement me.");
+}
 
 } // end namespace Syberia
