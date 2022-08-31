@@ -29,6 +29,7 @@
 #include "syberia/game/main_menu.h"
 #include "syberia/te/te_visual_fade.h"
 #include "syberia/te/te_music.h"
+#include "syberia/te/te_xml_gui.h"
 
 namespace Syberia {
 
@@ -94,8 +95,10 @@ private:
 	MainMenu _mainMenu;
 	Credits _credits;
 	
-	
+	bool _captureFade;
 	bool _created;
+	
+	TeXmlGui _helpGui;
 
 };
 

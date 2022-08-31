@@ -34,11 +34,16 @@ public:
 	TeColor(uint16 shortcol);
 	TeColor(byte r, byte g, byte b, byte a);
 
-	byte r() const { return _c[0]; };
-	byte g() const { return _c[1]; };
-	byte b() const { return _c[2]; };
-	byte a() const { return _c[3]; };
-	
+	byte &r() { return _c[0]; };
+	byte &g() { return _c[1]; };
+	byte &b() { return _c[2]; };
+	byte &a() { return _c[3]; };
+
+	const byte &r() const { return _c[0]; };
+	const byte &g() const { return _c[1]; };
+	const byte &b() const { return _c[2]; };
+	const byte &a() const { return _c[3]; };
+
 	uint32 getPacked();
 	
 	bool serialize(Common::WriteStream &stream) const;
@@ -46,8 +51,9 @@ public:
 
 private:
 	byte _c[4];
-
 };
+
+TeColor operator*(const TeColor &c1, const TeColor &c2);
 
 } // end namespace Syberia
 

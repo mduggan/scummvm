@@ -39,13 +39,22 @@ public:
 		TypeInt32,
 		TypeUInt32,
 		TypeInt64,
-		TypeUint64,
+		TypeUInt64,
 		TypeFloat32,
 		TypeFloat64,
 		TypeString
 	};
 	
-	// TODO add public members
+	VariantType type() const { return _type; }
+
+	bool toBoolean(bool *success = nullptr) const;
+	float toFloat32(bool *success = nullptr) const;
+	double toFloat64(bool *success = nullptr) const;
+	int32 toSigned32(bool *success = nullptr) const;
+	int64 toSigned64(bool *success = nullptr) const;
+	Common::String toString(bool *success = nullptr) const;
+	int32 toUnsigned32(bool *success = nullptr) const;
+	int64 toUnsigned64(bool *success = nullptr) const;
 
 private:
 	uint64 _data;

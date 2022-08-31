@@ -20,24 +20,60 @@
  */
 
 #include "common/textconsole.h"
+#include "syberia/syberia.h"
 #include "syberia/te/te_layout.h"
 #include "syberia/te/te_i_3d_object2.h"
 
 namespace Syberia {
 
-TeLayout::TeLayout() {
+TeLayout::TeLayout() : Te3DObject2(), _updatingZ(false), _updatingZSize(false),
+	_updatingPosition(false), _updatingWorldMatrix(false), _updatingSize(false),
+	_autoz(true), _childOrParentChanged(true), _childChanged(true),
+	_sizeChanged(true), _positionChanged(true), _worldMatrixChanged(true),
+	_sizeType(CoordinatesType::ABSOLUTE), _userSize(_size)
+{
+	_onChildSizeChangedCallback.reset(
+		new TeCallback0Param<TeLayout>(this, &TeLayout::onChildSizeChanged));
+	_onParentSizeChangedCallback.reset(
+		new TeCallback0Param<TeLayout>(this, &TeLayout::onParentSizeChanged));
+	_onParentWorldTransformationMatrixChangedCallback.reset(
+		new TeCallback0Param<TeLayout>(this, &TeLayout::onParentWorldTransformationMatrixChanged));
+
+	updateSize();
+	updateMesh();
 }
 
-void TeLayout::addChild(TeI3DObject2 *child) {
-	error("TODO: Implement me");
+void TeLayout::addChild(Te3DObject2 *child) {
+	Te3DObject2::addChild(child);
+	if (_onChildSizeChangedCallback) {
+		child->onSizeChanged().insert(_onChildSizeChangedCallback);
+	}
+	_childChanged = true;
+	_childOrParentChanged = true;
+	updateZSize();
+	updateZ();
 }
 
-void TeLayout::addChildBefore(TeI3DObject2 *newchild, const TeI3DObject2 *current) {
-	error("TODO: Implement me");
+void TeLayout::addChildBefore(Te3DObject2 *child, const Te3DObject2 *ref) {
+	Te3DObject2::addChildBefore(child, ref);
+	if (_onChildSizeChangedCallback) {
+		child->onSizeChanged().insert(_onChildSizeChangedCallback);
+	}
+	_childChanged = true;
+	_childOrParentChanged = true;
+	updateZSize();
+	updateZ();
 }
 
-void TeLayout::removeChild(TeI3DObject2 *child) {
-	error("TODO: Implement me");
+void TeLayout::removeChild(Te3DObject2 *child) {
+	if (_onChildSizeChangedCallback) {
+		child->onSizeChanged().remove(_onChildSizeChangedCallback);
+	}
+	Te3DObject2::removeChild(child);
+	_childChanged = true;
+	_childOrParentChanged = true;
+	updateZSize();
+	updateZ();
 }
 
 const TeVector3f32 &TeLayout::anchor() {
@@ -55,11 +91,27 @@ bool TeLayout::isAutoZEnabled() {
 }
 
 void TeLayout::draw() {
-	error("TODO: Implement me");
+	if (visible() && worldVisible()) {
+		// Ensure world transform is up-to-date.
+		worldTransformationMatrix();
+		Common::Array<Te3DObject2*> children = childList();
+		uint nchildren = children.size();
+		for (uint i = 0; i < nchildren; i++) {
+			children[i]->draw();
+		}
+	}
 }
 
+static const float EPSILON = 1.192093e-07;
+
 bool TeLayout::isMouseIn(const TeVector2s32 &mouseloc) {
-	error("TODO: Implement me");
+	TeVector3f32 transformedPos = transformMousePosition(mouseloc);
+	TeVector3f32 halfSize = size() / 2.0;
+
+	return (   (transformedPos.x() >= -halfSize.x() - EPSILON)
+			&& (transformedPos.x() < halfSize.x() + EPSILON)
+			&& (transformedPos.y() >= -halfSize.y() - EPSILON)
+			&& (transformedPos.y() < halfSize.y() + EPSILON));
 }
 
 TeILayout::DrawMode TeLayout::mode() {
@@ -69,24 +121,30 @@ TeILayout::DrawMode TeLayout::mode() {
 bool TeLayout::onChildSizeChanged() {
 	_childChanged = true;
 	_childOrParentChanged = true;
-	error("TODO: call some virtual function here");
+
+	updateSize();
+	if (!_updatingZSize)
+		updateZSize();
+
 	return false;
 }
 
 bool TeLayout::onParentSizeChanged() {
 	_sizeChanged = true;
 	_positionChanged = true;
-	_somethingChanged = true;
+	_worldMatrixChanged = true;
 	return false;
 }
 
 bool TeLayout::onParentWorldTransformationMatrixChanged() {
-	_somethingChanged = true;
+	_worldMatrixChanged = true;
 	return false;
 }
 
-TeVector3f32 TeLayout::position(){
-	error("TODO: call some virtual functions here and calc position");
+TeVector3f32 TeLayout::position() {
+	updateZ();
+	updatePosition();
+	return _position;
 }
 
 TeLayout::CoordinatesType TeLayout::positionType() const {
@@ -109,8 +167,8 @@ void TeLayout::setAnchor(const TeVector3f32 &anchor) {
 	if (_anchor != anchor) {
 		_anchor = anchor;
 		_positionChanged = true;
-		_somethingChanged = true;
-		error("TODO: call a virtual function here");
+		_worldMatrixChanged = true;
+		updatePosition();
 	}
 }
 
@@ -118,17 +176,41 @@ void TeLayout::setMode(DrawMode mode) {
 	_drawMode = mode;
 }
 
-void TeLayout::setParent(TeI3DObject2 *parent) {
-	error("TODO: implement me");
+void TeLayout::setParent(Te3DObject2 *parent) {
+	Te3DObject2 *oldParent = Te3DObject2::parent();
+	if (oldParent) {
+		if (_onParentSizeChangedCallback)
+			parent->onSizeChanged().remove(_onParentSizeChangedCallback);
+		if (_onParentWorldTransformationMatrixChangedCallback)
+			parent->onWorldTransformationMatrixChanged().remove(_onParentWorldTransformationMatrixChangedCallback);
+	}
+
+	warning("TODO: remove callback from main window");
+	//TeMainWindow *mainWindow = g_engine->getMainWindow();
+
+	Te3DObject2::setParent(parent);
+	if (parent) {
+		if (_onParentSizeChangedCallback)
+			parent->onSizeChanged().insert(_onParentSizeChangedCallback);
+		if (_onParentWorldTransformationMatrixChangedCallback)
+			parent->onWorldTransformationMatrixChanged().insert(_onParentWorldTransformationMatrixChangedCallback);
+		// TODO: add a new callback to the MainWindow.
+		warning("TODO: update signal on main window");
+	}
+	_childOrParentChanged = true;
+	_sizeChanged = true;
+	_positionChanged = true;
+	_worldMatrixChanged = true;
+	updateSize();
 }
-	
+
 void TeLayout::setPosition(const TeVector3f32 &pos) {
 	TeVector3f32 pos3d(pos.x(), pos.y(), _zPos);
 	if (_userPosition != pos3d) {
 		_userPosition.x() = pos.x();
 		_userPosition.y() = pos.y();
 		_positionChanged = true;
-		_somethingChanged = true;
+		_worldMatrixChanged = true;
 	}
 }
 
@@ -136,7 +218,7 @@ void TeLayout::setPositionType(CoordinatesType newtype) {
 	if (_positionType != newtype) {
 		_positionType = newtype;
 		_positionChanged = true;
-		_somethingChanged = true;
+		_worldMatrixChanged = true;
 	}
 }
 
@@ -144,7 +226,7 @@ void TeLayout::setRatio(float val) {
 	if (_ratio != val) {
 	  _ratio = val;
 	  _sizeChanged = true;
-	  _somethingChanged = true;
+	  _worldMatrixChanged = true;
 	}
 }
 
@@ -152,25 +234,28 @@ void TeLayout::setRatioMode(RatioMode mode) {
 	if (_ratioMode != mode) {
 		_ratioMode = mode;
 		_sizeChanged = true;
-		_somethingChanged = true;
+		_worldMatrixChanged = true;
    }
 }
 
-void TeLayout::setRotation(TeQuaternion *rot) {
-	error("TODO: implement me");
+void TeLayout::setRotation(const TeQuaternion &rot) {
+	if (rot != _rotation) {
+		Te3DObject2::setRotation(rot);
+		_worldMatrixChanged = true;
+	}
 }
 
 void TeLayout::setSafeAreaRatio(float ratio) {
 	if (_safeAreaRatio != ratio) {
 		_safeAreaRatio = ratio;
 		_sizeChanged = true;
-		_somethingChanged = true;
+		_worldMatrixChanged = true;
 	}
 }
 
 void TeLayout::setScale(const TeVector3f32 &scale) {
-	error("TODO: call virtual setScale here");
-	//_somethingChanged = true;
+	Te3DObject2::setScale(scale);
+	_worldMatrixChanged = true;
 }
 
 void TeLayout::setSize(const TeVector3f32 &size) {
@@ -180,16 +265,15 @@ void TeLayout::setSize(const TeVector3f32 &size) {
 		_userSize.y() = size.y();
 		_sizeChanged = true;
 		_positionChanged = true;
-		_somethingChanged = true;
+		_worldMatrixChanged = true;
 	}
-
 }
 
 void TeLayout::setSizeType(CoordinatesType coordtype) {
 	if (_sizeType != coordtype) {
 		_sizeType = coordtype;
 		_sizeChanged = true;
-		_somethingChanged = true;
+		_worldMatrixChanged = true;
 	}
 }
 
@@ -197,12 +281,14 @@ void TeLayout::setZPosition(float zpos) {
 	if (_zPos != zpos) {
 	  _zPos = zpos;
 	  _positionChanged = true;
-	  _somethingChanged = true;
+	  _worldMatrixChanged = true;
 	}
 }
 
 TeVector3f32 TeLayout::size() {
-	error("TODO: call some virtual functions here and calc size");
+	updateSize();
+	updateZSize();
+	return _size;
 }
 
 TeLayout::CoordinatesType TeLayout::sizeType() const {
@@ -210,72 +296,184 @@ TeLayout::CoordinatesType TeLayout::sizeType() const {
 }
 
 TeVector3f32 TeLayout::transformMousePosition(const TeVector2s32 &mousepos) {
-	error("TODO: calc mouse pos");
+	//TeMainWindow *mainWindow = g_engine->getMainWindow();
+	error("TODO: calc mouse pos based on main window");
 	return TeVector3f32();
 }
 
-//void updateMesh(); // does nothing?
 void TeLayout::updatePosition() {
 	if (!_positionChanged)
 		return;
-	error("TODO: implement me");
+
+	_positionChanged = false;
+	_updatingPosition = true;
+	TeVector3f32 oldpos = _position;
+	if (_positionType == RELATIVE_TO_PARENT) {
+		static const TeVector3f32 halfPixel(0.5, 0.5, 0.5);
+		const TeVector3f32 offsetUserPos = _userPosition - halfPixel;
+		Te3DObject2 *parentObj = parent();
+		const TeVector3f32 parentSize(parentObj->xSize(), parentObj->ySize(), 0.0);
+		const TeVector3f32 offsetAnchor = _anchor - halfPixel;
+		const TeVector3f32 thisSize(xSize(), ySize(), 0.0);
+		_position = (offsetUserPos * parentSize) + (offsetAnchor * thisSize);
+	} else if (_positionType == ABSOLUTE) {
+		_position = _userPosition;
+	}
+	_worldMatrixChanged = true;
+	_updatingPosition = false;
+
+	if (_position != oldpos) {
+		onPositionChanged().call();
+	}
 }
 
 void TeLayout::updateSize() {
 	if (!_sizeChanged)
 		return;
-	error("TODO: implement me");
+
+	_sizeChanged = false;
+	_updatingSize = true;
+	const TeVector3f32 oldSize = _size;
+
+	if (_sizeType == ABSOLUTE) {
+		TeVector3f32 newSize = _userSize;
+		newSize.x() = abs(newSize.x());
+		newSize.y() = abs(newSize.y());
+		newSize.z() = abs(newSize.z());
+		_size = newSize;
+	} else if (_sizeType == RELATIVE_TO_PARENT) {
+		Te3DObject2 *parentObj = parent();
+		if (parentObj) {
+			const TeVector3f32 parentSize(parentObj->xSize(), parentObj->ySize(), 0.0);
+			TeVector3f32 newSize = _userSize * parentSize;
+			if (newSize.x() > 0.0f && newSize.y() > 0.0f && _ratio > 0.0f && _safeAreaRatio > 0.0f) {
+				float newSizeRatio = newSize.x() / newSize.y();
+				if (_ratioMode  == RATIO_MODE_2) {
+					if (_safeAreaRatio <= newSizeRatio) {
+						newSize.x() = _ratio * newSize.y();
+					} else {
+						newSize.x() =
+							(1.0f - (_safeAreaRatio - newSizeRatio) / _safeAreaRatio) *
+							_ratio * newSize.y();
+					}
+				} else if (_ratioMode == RATIO_MODE_1) {
+					if (_ratio < newSizeRatio)
+						newSize.x() = _ratio * newSize.y();
+					else
+						newSize.y() = newSize.x() / _ratio;
+			  }
+			}
+
+			_size = newSize;
+		} else {
+			_size = TeVector3f32(0.0f, 0.0f, 0.0f);
+		}
+	}
+	_updatingSize = false;
+	// TODO: check this, is it the right flag to set?
+	_positionChanged = true;
+
+	if (_size != oldSize) {
+		onSizeChanged().call();
+	}
 }
 
 void TeLayout::updateWorldMatrix() {
-	if (!_somethingChanged)
+	if (!_worldMatrixChanged)
 		return;
-	error("TODO: implement me");
+
+	_worldMatrixChanged = false;
+	_updatingWorldMatrix = true;
+	const TeMatrix4x4 oldMatrix = _worldMatrixCache;
+	_worldMatrixCache = Te3DObject2::worldTransformationMatrix();
+	_updatingWorldMatrix = false;
+	if (_worldMatrixCache != oldMatrix) {
+		onWorldTransformationMatrixChanged().call();
+	}
 }
 
 void TeLayout::updateZ() {
 	if (!_childOrParentChanged || !_autoz)
 		return;
-	error("TODO: implement me");
+
+	_childOrParentChanged = false;
+	_updatingZ = true;
+
+	uint nchildren = childCount();
+	float ztotal = 0.1;
+	for (uint i = 0; i < nchildren; i++) {
+		Te3DObject2 *c = child(i);
+		ztotal += c->zSize();
+	}
+	_updatingZ = false;
 }
 
 void TeLayout::updateZSize() {
 	if (!_childChanged)
 		return;
-	error("TODO: implement me");
+
+	_childChanged = false;
+	_updatingZSize = true;
+	const TeVector3f32 oldSize = _size;
+	_size.z() = 0.1f;
+
+	uint nchildren = childCount();
+	for (uint i = 0; i < nchildren; i++) {
+		Te3DObject2 *c = child(i);
+		_size.z() += c->zSize();
+	}
+
+	_positionChanged = true;
+	_updatingZSize = false;
+	if (_size != oldSize) {
+		onSizeChanged().call();
+	}
 }
 
 TeVector3f32 TeLayout::userPosition() const {
 	return _userPosition;
 }
 
-TeVector3f32 TeLayout::userSize() const {
-	error("TODO: call virtual function here");
+TeVector3f32 TeLayout::userSize() {
+	updateZ();
 	return _userSize;
 }
 
 TeVector3f32 TeLayout::worldPosition() {
-	error("TODO: Implement me");
+	if (!parent()) {
+		return position();
+	} else {
+		return parent()->position() + position();
+	}
 }
 
 TeMatrix4x4 TeLayout::worldTransformationMatrix() {
-	error("TODO: Implement me");
+	updateZ();
+	updatePosition();
+	updateWorldMatrix();
+	return _worldMatrixCache;
 }
 
 bool TeLayout::worldVisible() {
-	error("TODO: Implement me");
+	if (Te3DObject2::visible() && parent()) {
+		return parent()->visible();
+	}
+	return false;
 }
 
 float TeLayout::xSize() {
-	error("TODO: Implement me");
+	updateSize();
+	return size().x();
 }
 
 float TeLayout::ySize() {
-	error("TODO: Implement me");
+	updateSize();
+	return size().y();
 }
 
 float TeLayout::zSize() {
-	error("TODO: Implement me");
+	updateZSize();
+	return size().z();
 }
 
 } // end namespace Syberia

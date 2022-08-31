@@ -35,6 +35,10 @@ void TeVisualFade::animateFade() {
 	error("TODO: Implement me.");
 }
 
+void TeVisualFade::captureFrame() {
+	error("TODO: Implement me.");
+}
+
 void TeVisualFade::init() {
 	error("TODO: Implement me.");
 }

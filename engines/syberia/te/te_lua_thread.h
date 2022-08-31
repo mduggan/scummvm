@@ -22,15 +22,51 @@
 #ifndef SYBERIA_TE_TE_LUA_THREAD_H
 #define SYBERIA_TE_TE_LUA_THREAD_H
 
+#include "common/array.h"
+#include "common/str.h"
+#include "common/path.h"
+
+struct lua_State;
+
 namespace Syberia {
+
+class TeLuaContext;
+class TeVariant;
 
 class TeLuaThread {
 public:
-	TeLuaThread();
+	TeLuaThread(TeLuaContext *context);
 
-	// TODO add public members
+	static TeLuaThread *create(TeLuaContext *context);
+
+	void execute(const Common::String &str);
+	void execute(const Common::String &str, const TeVariant &p1);
+	void execute(const Common::String &str, const TeVariant &p1, const TeVariant &p2);
+	void execute(const Common::String &str, const TeVariant &p1, const TeVariant &p2, const TeVariant &p3);
+
+	void executeFile(const Common::Path &path);
+	void pushValue(const TeVariant &val);
+
+	void release();
+
+	void resume();
+	void resume(const TeVariant &p1);
+	void resume(const TeVariant &p1, const TeVariant &p2);
+	void resume(const TeVariant &p1, const TeVariant &p2, const TeVariant &p3);
+
+	static TeLuaThread *threadFromState(lua_State *state);
+	void yield();
 
 private:
+	void _resume(int nargs);
+
+	lua_State *_luaThread;
+	int _bottomRef;
+	long _resumeCount;
+	int _lastResumeResult;
+	bool _released;
+
+	static Common::Array<TeLuaThread *> _threadList;
 	// TODO add private members
 
 };

@@ -32,6 +32,107 @@ TeVariant::TeVariant(const Common::String &val) : _type(TypeString), _data(0), _
 TeVariant::TeVariant(const char *val) : _type(TypeString), _data(0), _strVal(val) {
 }
 
-// TODO: Add more functions here.
+bool TeVariant::toBoolean(bool *success) const {
+	if (_type == TypeBoolean) {
+		if (success)
+			*success = true;
+		return _data != 0;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+}
+
+float TeVariant::toFloat32(bool *success) const {
+	if (_type == TypeFloat32) {
+		if (success)
+			*success = true;
+		return *(float *)_data;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+
+}
+
+double TeVariant::toFloat64(bool *success) const {
+	if (_type == TypeFloat64) {
+		if (success)
+			*success = true;
+		return *(double *)_data;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+
+}
+
+int32 TeVariant::toSigned32(bool *success) const {
+	if (_type == TypeInt32) {
+		if (success)
+			*success = true;
+		return *(int32 *)_data;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+
+}
+
+int64 TeVariant::toSigned64(bool *success) const {
+	if (_type == TypeInt64) {
+		if (success)
+			*success = true;
+		return *(int64 *)_data;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+
+}
+
+Common::String TeVariant::toString(bool *success) const {
+	if (_type == TypeString) {
+		if (success)
+			*success = true;
+		return _strVal;
+	} else {
+		if (success)
+			*success = false;
+		return "";
+	}
+
+}
+
+int32 TeVariant::toUnsigned32(bool *success) const {
+	if (_type == TypeUInt32) {
+		if (success)
+			*success = true;
+		return *(uint32 *)_data;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+
+}
+
+int64 TeVariant::toUnsigned64(bool *success) const {
+	if (_type == TypeUInt64) {
+		if (success)
+			*success = true;
+		return *(uint64 *)_data;
+	} else {
+		if (success)
+			*success = false;
+		return false;
+	}
+
+}
 
 } // end namespace Syberia

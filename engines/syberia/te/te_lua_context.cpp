@@ -20,18 +20,83 @@
  */
 
 #include "common/textconsole.h"
+#include "common/lua/lua.h"
+#include "common/lua/lualib.h"
+#include "common/lua/lauxlib.h"
+
 #include "syberia/te/te_lua_context.h"
 
 namespace Syberia {
 
+static int luaPanicFunction(lua_State *state) {
+	const char *msg = lua_tolstring(state, -1, nullptr);
+	warning("Lua: %s\n",msg);
+	lua_settop(state, -2);
+	return 1;
+}
+
 TeLuaContext::TeLuaContext() {
 }
 
-Common::String TeLuaContext::global(const Common::String &path) {
+void TeLuaContext::addBindings(void(*fn)(lua_State *)) {
+	fn(_luaState);
+}
+
+void TeLuaContext::create() {
+	_luaState = luaL_newstate();
+	luaL_openlibs(_luaState);
+	lua_atpanic(_luaState, luaPanicFunction);
+}
+
+void TeLuaContext::destroy() {
+	if (_luaState)
+		lua_close(_luaState);
+}
+
+Common::String TeLuaContext::global(const Common::String &name) {
+	lua_getglobal(_luaState, name.c_str());
+	int type = lua_type(_luaState, -1);
+	if (type == LUA_TBOOLEAN) {
+		error("TODO: implement me TeLuaContext::global");
+	} else if (type == LUA_TNUMBER) {
+		error("TODO: implement me TeLuaContext::global");
+	} else if (type == LUA_TSTRING) {
+		error("TODO: implement me TeLuaContext::global");
+	}
+	lua_settop(_luaState, -2);
 	error("TODO: implement me TeLuaContext::global");
 	return Common::String();//_luaContextImpl(path);
 }
 
-// TODO: Add more functions here.
+void TeLuaContext::setGlobal(const Common::String &name, int val) {
+	lua_pushinteger(_luaState, val);
+	lua_setglobal(_luaState, name.c_str());
+}
+
+void TeLuaContext::setGlobal(const Common::String &name, bool val) {
+	lua_pushboolean(_luaState, val);
+	lua_setglobal(_luaState, name.c_str());
+}
+
+void TeLuaContext::setGlobal(const Common::String &name, const Common::String &val) {
+	lua_pushstring(_luaState, val.c_str());
+	lua_setglobal(_luaState, name.c_str());
+}
+
+void TeLuaContext::removeGlobal(const Common::String &name) {
+	lua_pushnil(_luaState);
+	lua_setglobal(_luaState, name.c_str());
+}
+
+void TeLuaContext::registerCFunction(const Common::String &name, int(*fn)(lua_State *)) {
+	error("TODO: implement me TeLuaContext::registerCFunction");
+}
+
+void TeLuaContext::setInRegistry(const Common::String &name, TeLuaGUI *gui) {
+	lua_pushstring(_luaState, name.c_str());
+	lua_pushlightuserdata(_luaState, gui);
+	lua_settable(_luaState, -1001000);
+}
+
 
 } // end namespace Syberia

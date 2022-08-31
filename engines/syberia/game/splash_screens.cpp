@@ -28,6 +28,7 @@
 namespace Syberia {
 
 SplashScreens::SplashScreens() : _splashNo(0), _entered(false) {
+	_timer.alarmSignal().add(this, &SplashScreens::onAlarm);
 }
 
 void SplashScreens::enter()	{
@@ -51,17 +52,16 @@ bool SplashScreens::onAlarm() {
 	app->visualFade().init();
 	app->captureFade();
 	TeLuaGUI::unload();
-	Common::String scriptName = Common::String::format("menus/splashes/splash%d.lua", _splashNo);
+	const Common::String scriptName = Common::String::format("menus/splashes/splash%d.lua", _splashNo);
 	_splashNo++;
 
 	if (!Common::File::exists(scriptName)) {
 		onQuitSplash();
 	} else {
-		load("splash");
-		error("TODO: Finish implementation of splash.");
+		load(scriptName);
 
-		//TeButtonLayout *btnLayout = buttonLayout(layoutName);
-		
+		TeButtonLayout *btnLayout = buttonLayout("splash");
+		btnLayout->onMouseClickValidated().add<SplashScreens>(this, &SplashScreens::onQuitSplash);
 		
 		TeLayout *splash = layout("splash");
 		app->_frontLayout.addChild(splash);

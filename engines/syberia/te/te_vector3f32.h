@@ -33,6 +33,19 @@ public:
 	TeVector3f32(float x_, float y_, float z_) {
 		set(x_, y_, z_);
 	}
+	TeVector3f32(const Math::Vector3d &v) : Math::Vector3d(v) {}
+
+	static void deserialize(Common::ReadStream *stream, TeVector3f32 *dest) {
+		dest->x() = stream->readFloatLE();
+		dest->y() = stream->readFloatLE();
+		dest->z() = stream->readFloatLE();
+	}
+
+	static void serialize(Common::WriteStream *stream, const TeVector3f32 *src) {
+		stream->writeFloatLE(src->x());
+		stream->writeFloatLE(src->y());
+		stream->writeFloatLE(src->z());
+	}
 
 	/*
 	 TODO: do we need anything not already provided by Vector3d?

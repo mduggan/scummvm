@@ -56,4 +56,12 @@ bool TeColor::deserialize(Common::ReadStream &stream) {
 	return result == 4;
 }
 
+TeColor operator*(const TeColor &c1, const TeColor &c2) {
+	return TeColor(
+		((c2.r() * (c1.r() / 255.0)) / 255.0) * 255.0,
+		((c2.g() * (c1.g() / 255.0)) / 255.0) * 255.0,
+		((c2.b() * (c1.b() / 255.0)) / 255.0) * 255.0,
+		((c2.a() * (c1.a() / 255.0)) / 255.0) * 255.0);
+}
+
 } // end namespace Syberia

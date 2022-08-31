@@ -23,29 +23,32 @@
 #define SYBERIA_TE_TE_TIMER_H
 
 #include "common/array.h"
+#include "syberia/te/te_signal.h"
 
 namespace Syberia {
 
 class TeTimer {
 public:
 	TeTimer();
-	
+
 	void stop();
 	void start();
 	void pause();
 	double getTimeFromStart();
 	void setAlarmIn(long val);
-	
+	double timeElapsed();
+
 	void pausable(bool ispausable);
+
+	TeSignal0Param &alarmSignal() { return _alarmSignal; }
 
 	bool _stopped;
 
 private:
-	
 	double _startTime;
-	
+	TeSignal0Param _alarmSignal;
+
 	static bool _pausedAll;
-	// TODO add private members
 
 	static Common::Array<TeTimer *> _timers;
 };

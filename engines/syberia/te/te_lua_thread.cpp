@@ -20,12 +20,209 @@
  */
 
 #include "syberia/te/te_lua_thread.h"
+#include "syberia/te/te_lua_context.h"
+#include "syberia/te/te_variant.h"
+
+#include "common/str.h"
+#include "common/file.h"
+#include "common/lua/lua.h"
+#include "common/lua/lauxlib.h"
+#include "common/lua/lualib.h"
 
 namespace Syberia {
 
-TeLuaThread::TeLuaThread() {
+/*static*/ Common::Array<TeLuaThread *> TeLuaThread::_threadList;
+
+TeLuaThread::TeLuaThread(TeLuaContext *context) : _resumeCount(0), _lastResumeResult(0), _released(false) {
+	_luaThread = lua_newthread(context->luaState());
+	_bottomRef = luaL_ref(context->luaState(), -1001000);
+	_threadList.push_back(this);
 }
 
-// TODO: Add more functions here.
+/*static*/ TeLuaThread *TeLuaThread::create(TeLuaContext *context) {
+	return new TeLuaThread(context);
+}
+
+void TeLuaThread::_resume(int nargs) {
+	_resumeCount++;
+	_lastResumeResult = lua_resume(_luaThread, nargs);
+	if (_lastResumeResult > 1) {
+		const char *msg = lua_tolstring(_luaThread, -1, nullptr);
+		warning("TeLuaThread::_resume: %s\n", msg);
+	}
+	// TODO: This seems suspicous... but it's what the original does.
+	if (_lastResumeResult != 1 && _released) {
+		warning("TeLuaThread:: deleting this??");
+		delete this;
+	}
+}
+
+void TeLuaThread::execute(const Common::String &fname) {
+	if (!_luaThread)
+		return;
+
+	lua_getglobal(_luaThread, fname.c_str());
+	if (lua_type(_luaThread, -1) == LUA_TFUNCTION) {
+		_resume(0);
+	} else {
+		if (!fname.contains("Update"))
+			warning("[TeLuaThread::Execute] La fonction : \"%s\" n\'existe pas.\n", fname.c_str());
+		lua_settop(_luaThread, -2);
+	}
+}
+
+void TeLuaThread::execute(const Common::String &fname, const TeVariant &p1) {
+	if (!_luaThread)
+		return;
+
+	lua_getglobal(_luaThread, fname.c_str());
+	if (lua_type(_luaThread, -1) == LUA_TFUNCTION) {
+		pushValue(p1);
+		_resume(1);
+	} else {
+		if (!fname.contains("Update"))
+			warning("[TeLuaThread::Execute] La fonction : \"%s\" n\'existe pas.\n", fname.c_str());
+		lua_settop(_luaThread, -2);
+	}
+}
+
+void TeLuaThread::execute(const Common::String &fname, const TeVariant &p1, const TeVariant &p2) {
+	if (!_luaThread)
+		return;
+
+	lua_getglobal(_luaThread, fname.c_str());
+	if (lua_type(_luaThread, -1) == LUA_TFUNCTION) {
+		pushValue(p1);
+		pushValue(p2);
+		_resume(2);
+	} else {
+		if (!fname.contains("Update"))
+			warning("[TeLuaThread::Execute] La fonction : \"%s\" n\'existe pas.\n", fname.c_str());
+		lua_settop(_luaThread, -2);
+	}
+}
+
+void TeLuaThread::execute(const Common::String &fname, const TeVariant &p1, const TeVariant &p2, const TeVariant &p3) {
+	if (!_luaThread)
+		return;
+
+	lua_getglobal(_luaThread, fname.c_str());
+	if (lua_type(_luaThread, -1) == LUA_TFUNCTION) {
+		pushValue(p1);
+		pushValue(p2);
+		pushValue(p3);
+		_resume(3);
+	} else {
+		if (!fname.contains("Update"))
+			warning("[TeLuaThread::Execute] La fonction : \"%s\" n\'existe pas.\n", fname.c_str());
+		lua_settop(_luaThread, -2);
+	}
+}
+
+void TeLuaThread::executeFile(const Common::Path &path) {
+	Common::File scriptFile;
+	if (!scriptFile.open(path)) {
+		warning("TeLuaThread::executeFile: File %s can\'t be opened", path.toString().c_str());
+		return;
+	}
+
+	int64 fileLen = scriptFile.size();
+	char *buf = new char[fileLen + 1];
+	scriptFile.read(buf, fileLen);
+	buf[fileLen] = 0;
+	scriptFile.close();
+	_lastResumeResult = luaL_loadbuffer(_luaThread, buf, fileLen, path.toString().c_str());
+	if (_lastResumeResult) {
+		const char *msg = lua_tostring(_luaThread, -1);
+		warning("TeLuaThread::executeFile: %s\n", msg);
+	}
+	delete [] buf;
+
+	_resume(0);
+}
+
+void TeLuaThread::pushValue(const TeVariant &val) {
+	TeVariant::VariantType valType = val.type();
+	switch(valType) {
+		case TeVariant::TypeBoolean:
+			lua_pushboolean(_luaThread, val.toBoolean());
+			break;
+		case TeVariant::TypeInt32:
+			lua_pushinteger(_luaThread, val.toSigned32());
+			break;
+		case TeVariant::TypeUInt32:
+			lua_pushinteger(_luaThread, val.toUnsigned32());
+			break;
+		case TeVariant::TypeInt64:
+			lua_pushinteger(_luaThread, val.toSigned64());
+			break;
+		case TeVariant::TypeUInt64:
+			lua_pushinteger(_luaThread, val.toUnsigned64());
+			break;
+		case TeVariant::TypeFloat32:
+			lua_pushnumber(_luaThread, val.toFloat32());
+			break;
+		case TeVariant::TypeFloat64:
+			lua_pushnumber(_luaThread, val.toFloat64());
+			break;
+		case TeVariant::TypeString:
+			lua_pushstring(_luaThread, val.toString().c_str());
+			break;
+		default:
+			warning("TeLuaThread::pushValue: Unknown type");
+			return;
+	}
+}
+
+void TeLuaThread::release() {
+	_released = true;
+	if (_lastResumeResult != 1) {
+		warning("TeLuaThread:: deleting this??");
+		delete this;
+	}
+}
+
+void TeLuaThread::resume() {
+	if (_luaThread)
+		_resume(0);
+}
+
+void TeLuaThread::resume(const TeVariant &p1) {
+	if (_luaThread) {
+		pushValue(p1);
+		_resume(1);
+	}
+}
+
+void TeLuaThread::resume(const TeVariant &p1, const TeVariant &p2) {
+	if (_luaThread) {
+		pushValue(p1);
+		pushValue(p2);
+		_resume(2);
+	}
+}
+
+void TeLuaThread::resume(const TeVariant &p1, const TeVariant &p2, const TeVariant &p3) {
+	if (_luaThread) {
+		pushValue(p1);
+		pushValue(p2);
+		pushValue(p3);
+		_resume(3);
+	}
+}
+
+/*static*/ TeLuaThread *TeLuaThread::threadFromState(lua_State *state) {
+	uint nthread = _threadList.size();
+	for (uint i = 0; i < nthread; i++) {
+		if (_threadList[i]->_luaThread == state) {
+			return _threadList[i];
+		}
+	}
+	return nullptr;
+}
+
+void TeLuaThread::yield() {
+	lua_yield(_luaThread, 0);
+}
 
 } // end namespace Syberia

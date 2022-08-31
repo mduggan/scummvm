@@ -23,24 +23,33 @@
 #define SYBERIA_TE_TE_LUA_SCRIPT_H
 
 #include "common/str.h"
+#include "common/path.h"
 #include "syberia/te/te_variant.h"
 
 namespace Syberia {
 
+class TeLuaContext;
+
 class TeLuaScript {
 public:
 	TeLuaScript();
-	
+
+	void attachToContext(TeLuaContext *context);
+
 	void execute();
 	void execute(const Common::String &fname);
-	void execute(const Common::String &fname, const TeVariant &param1);
-	void execute(const Common::String &fname, const TeVariant &param1, const TeVariant &param2);
+	void execute(const Common::String &fname, const TeVariant &p1);
+	void execute(const Common::String &fname, const TeVariant &p1, const TeVariant &p2);
+	void execute(const Common::String &fname, const TeVariant &p1, const TeVariant &p2, const TeVariant &p3);
 
-	void load(const Common::String &fname);
+	void load(const Common::Path &path);
+	void unload();
 
 private:
-	// TODO add private members
+	TeLuaContext *_luaContext;
 
+	Common::Path _scriptPath;
+	bool _started;
 };
 
 } // end namespace Syberia

@@ -24,18 +24,50 @@
 
 #include "common/str.h"
 
+struct lua_State;
+
 namespace Syberia {
 
+class TeLuaGUI;
+
+/*
+ * The lua state holder.  In the original Te engine this is split into an
+ * interface and Impl class, but it just ends up being a 1-line wrapper in
+ * each function so there's very little point.
+ */
 class TeLuaContext {
 public:
 	TeLuaContext();
 
-	Common::String global(const Common::String &path);
-	// TODO add public members
+	void addBindings(void(*fn)(lua_State *));
+	void create();
+	void destroy();
+	Common::String global(const Common::String &name);
+	void global(const Common::String &name, bool &outVal);
+	void global(const Common::String &name, Common::String &outVal);
+	void global(const Common::String &name, int &outVal);
+	void global(const Common::String &name, float &outVal);
+	bool isCreated() {
+		return _luaState != nullptr;
+	}
 
+	//void load(TiXmlNode *node);
+	//void save(TiXmlNode *node);
+
+	lua_State *luaState() { return _luaState; }
+
+	void registerCFunction(const Common::String &name, int(*fn)(lua_State *));
+
+	void removeGlobal(const Common::String &name);
+
+	void setGlobal(const Common::String &name, int val);
+	void setGlobal(const Common::String &name, bool val);
+	void setGlobal(const Common::String &name, const Common::String &val);
+
+	void setInRegistry(const Common::String &name, TeLuaGUI *gui);
 private:
+	lua_State *_luaState;
 	// TODO add private members
-
 };
 
 } // end namespace Syberia

@@ -60,7 +60,7 @@ void TeAnimation::stop() {
 	if (!_runTimer._stopped) {
 		removeThisFromAnimations();
 		_runTimer.stop();
-		_stopCallback->call();
+		_stopCallbacks.call();
 	}
 }
 

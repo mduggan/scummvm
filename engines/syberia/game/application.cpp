@@ -24,7 +24,7 @@
 
 namespace Syberia {
 
-Application::Application() : _finishedGame(false), _finishedFremium(false) {
+Application::Application() : _finishedGame(false), _finishedFremium(false), _captureFade(false) {
 }
 
 void Application::create() {
@@ -86,7 +86,11 @@ void Application::blackFade() {
 }
 
 void Application::captureFade() {
-	error("TODO: Implement me.");
+	if (_captureFade)
+		return;
+	_captureFade = true;
+	performRender();
+	_visFade.captureFrame();
 }
 
 bool Application::isFading() {
@@ -136,7 +140,7 @@ void Application::saveOptions(const Common::String &fname) {
 }
 
 const Common::String &Application::getHelpText(const Common::String &key) {
-	error("TODO: Implement me.");
+	return _helpGui.value(key);
 }
 
 const char *Application::inAppUnlockFullVersionID() {

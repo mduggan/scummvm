@@ -27,6 +27,7 @@
 #include "syberia/te/te_i_3d_object2.h"
 #include "syberia/te/te_matrix4x4.h"
 #include "syberia/te/te_quaternion.h"
+#include "syberia/te/te_signal.h"
 #include "syberia/te/te_vector3f32.h"
 
 namespace Syberia {
@@ -36,9 +37,10 @@ public:
 	Te3DObject2();
 	virtual ~Te3DObject2() {};
 
-	void addChild(Te3DObject2 *child);
-	void addChildBefore(Te3DObject2 *newChild, Te3DObject2 *ref);
-	Te3DObject2 *child(long offset);
+	// note, probably should be Te*I*3DObject2 args here
+	virtual void addChild(Te3DObject2 *child);
+	virtual void addChildBefore(Te3DObject2 *newChild, const Te3DObject2 *ref);
+	virtual Te3DObject2 *child(long offset);
 	long childCount() {
 		return _children.size();
 	}
@@ -60,74 +62,89 @@ public:
 	bool colorInheritance() const {
 		return _colorInheritance;
 	}
-	
+
 	static void deserialize(Common::ReadStream *stream, Te3DObject2 *dest);
-	static void serialize(Common::ReadStream *stream, Te3DObject2 *src);
+	static void serialize(Common::WriteStream *stream, Te3DObject2 *src);
 
 	virtual void draw() {};
 	const Common::String &name() const {
 		return _name;
 	}
-	
-	bool onParentWorldColorChanged();
+
+	virtual bool onParentWorldColorChanged();
 	bool onParentWorldTransformationMatrixChanged();
-	/* TODO: check these return types.. */
-	long onPositionChanged();
-	long onSizeChanged();
-	long onWorldColorChanged();
-	long onWorldTransformationMatrixChanged();
-	long onWorldVisibleChanged();
 	bool onWorldVisibleChangedSlot();
+	TeSignal0Param &onPositionChanged() {
+		return _onPositionChangedSignal;
+	}
+	TeSignal0Param &onSizeChanged() {
+		return _onSizeChangedSignal;
+	}
+	TeSignal0Param &onWorldColorChanged() {
+		return _onParentWorldColorChangedSignal;
+	}
+	TeSignal0Param &onWorldTransformationMatrixChanged() {
+		return _onParentWorldTransformationMatrixChangedSignal;
+	}
+	TeSignal0Param &onWorldVisibleChanged() {
+		return _onWorldVisibleChangedSlotSignal;
+	}
 
 	Te3DObject2 *parent() {
 		return _parent;
 	}
-	const TeVector3f32 &position() const {
+	virtual TeVector3f32 position() {
 		return _position;
 	}
-	void removeChild(Te3DObject2 *child);
+	virtual void removeChild(Te3DObject2 *child);
 	void removeChildren();
 	void rotate(const TeQuaternion &rot);
-	const TeQuaternion &rotation() const {
+	const TeQuaternion &rotation() {
 		return _rotation;
 	}
 	const TeVector3f32 &scale() const {
 		return _scale;
 	}
-	void setColor(const TeColor &col);
+	virtual void setColor(const TeColor &col);
 	void setColorInheritance(bool val) {
 		_colorInheritance = val;
 	}
-	bool setName(const Common::String &newName) {
+	virtual bool setName(const Common::String &newName) {
 		_name = newName;
 		return true;
 	}
-	void setParent(TeI3DObject2 *newparent);
-	void setPosition(const TeVector3f32 &pos);
-	void setRotation(const TeQuaternion &rot);
-	void setScale(const TeVector3f32 &scale);
-	void setSize(const TeVector3f32 &size);
+	virtual void setParent(Te3DObject2 *newparent);  // note, probably should be Te*I*3DObject2 arg
+	virtual void setPosition(const TeVector3f32 &pos);
+	virtual void setRotation(const TeQuaternion &rot);
+	virtual void setScale(const TeVector3f32 &scale);
+	virtual void setSize(const TeVector3f32 &size);
 	void setVisible(bool visible);
-	void setZPosition(float zpos);
-	const TeVector3f32 &size() const {
+	virtual void setZPosition(float zpos);
+	virtual const TeVector3f32 &size() const {
 		return _size;
 	}
-	TeMatrix4x4 transformationMatrix() const;
-	void translate(TeVector3f32 *vec);
-	void updateZ() {};
+	TeMatrix4x4 transformationMatrix();
+	void translate(const TeVector3f32 &vec);
+	virtual void updateZ() {};
 	virtual bool visible() const {
 		return _visible;
 	}
-	
+
 	TeColor worldColor();
-	TeVector3f32 worldPosition();
+	virtual TeVector3f32 worldPosition();
 	TeQuaternion worldRotation();
 	TeVector3f32 worldScale();
-	TeMatrix4x4 worldTransformationMatrix();
-	bool worldVisible();
-	float xSize() const { return _size.x(); };
-	float ySize() const { return _size.y(); };
-	float zSize() const { return _size.z(); };
+	virtual TeMatrix4x4 worldTransformationMatrix();
+	virtual bool worldVisible();
+	virtual float xSize() { return _size.x(); };
+	virtual float ySize() { return _size.y(); };
+	virtual float zSize() { return _size.z(); };
+
+protected:
+	TeVector3f32 _size;
+	TeVector3f32 _position;
+	TeQuaternion _rotation;
+	TeVector3f32 _scale;
 
 private:
 	Common::Array<Te3DObject2 *> _children;
@@ -136,12 +153,18 @@ private:
 	bool _colorInheritance;
 	Common::String _name;
 	Te3DObject2 *_parent;
-	TeVector3f32 _position;
-	TeQuaternion _rotation;
-	TeVector3f32 _scale;
-	TeVector3f32 _size;
 	bool _visible;
-	// TODO add private members
+
+	TeSignal0Param _childListChangedSignal;
+	TeSignal0Param _onWorldVisibleChangedSlotSignal;
+	TeSignal0Param _onPositionChangedSignal;
+	TeSignal0Param _onSizeChangedSignal;
+	TeSignal0Param _onParentWorldColorChangedSignal;
+	TeSignal0Param _onParentWorldTransformationMatrixChangedSignal;
+
+	TeICallback0ParamPtr _onWorldVisibleChangedParentCallback;
+	TeICallback0ParamPtr _onWorldTransformationMatrixChangedParentCallback;
+	TeICallback0ParamPtr _onWorldColorChangedParentCallback;
 
 };
 

@@ -22,11 +22,15 @@
 #ifndef SYBERIA_TE_TE_XML_GUI_H
 #define SYBERIA_TE_TE_XML_GUI_H
 
+#include "common/str.h"
+
 namespace Syberia {
 
 class TeXmlGui {
 public:
 	TeXmlGui();
+
+	Common::String value(const Common::String &key);
 
 	// TODO add public members
 
