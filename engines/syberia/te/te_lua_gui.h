@@ -43,6 +43,7 @@
 #include "syberia/te/te_sprite_layout.h"
 #include "syberia/te/te_text_layout.h"
 #include "syberia/te/te_vector3f32.h"
+#include "syberia/te/te_variant.h"
 
 namespace Syberia {
 
@@ -71,7 +72,7 @@ public:
 	bool load(const Common::String &path);
 	void unload();
 
-	Common::String value(const Common::String &path);
+	TeVariant value(const Common::String &path);
 
 	template <typename T> using StringMap = Common::HashMap<Common::String, T>;
 

@@ -22,16 +22,47 @@
 #ifndef SYBERIA_TE_TE_SCENE_H
 #define SYBERIA_TE_TE_SCENE_H
 
+#include "common/array.h"
+#include "common/ptr.h"
+#include "common/str.h"
+#include "common/path.h"
+
+#include "syberia/te/te_camera.h"
+#include "syberia/te/te_model.h"
+
 namespace Syberia {
 
 class TeScene {
 public:
 	TeScene();
 
-	// TODO add public members
+	void close();
+
+	Common::SharedPtr<TeCamera> camera(const Common::String &name);
+	Common::SharedPtr<TeModel> model(const Common::String &name);
+
+	Common::SharedPtr<TeCamera> currentCamera();
+	int currentCameraIndex() const { return _currentCameraIndex; }
+	Common::String currentCameraName() const;
+
+	void draw();
+	virtual void load(Common::Path &path) {};
+
+	void removeModel(const Common::String &name);
+	void setCurrentCamera(const Common::String &name);
+	void setCurrentCameraIndex(uint index) {
+		_currentCameraIndex = index;
+	}
+
+	void update();
+
+	Common::Array<Common::SharedPtr<TeCamera>> &cameras() { return _cameras; }
+	Common::Array<Common::SharedPtr<TeModel>> &models() { return _models; }
 
 private:
-	// TODO add private members
+	uint _currentCameraIndex;
+	Common::Array<Common::SharedPtr<TeCamera>> _cameras;
+	Common::Array<Common::SharedPtr<TeModel>> _models;
 
 };
 

@@ -45,6 +45,7 @@ class Game;
 class TeCore;
 class TeSoundManager;
 class TeRenderer;
+class TeResourceManager;
 
 class SyberiaEngine : public Engine {
 private:
@@ -55,6 +56,7 @@ private:
 	Game *_game;
 	TeSoundManager *_soundManager;
 	TeRenderer *_renderer;
+	TeResourceManager *_resourceManager;
 
 protected:
 	// Engine APIs
@@ -113,6 +115,7 @@ public:
 	TeCore *getCore();
 	TeSoundManager *getSoundManager();
 	TeRenderer *getRenderer();
+	TeResourceManager *getResourceManager();
 
 };
 

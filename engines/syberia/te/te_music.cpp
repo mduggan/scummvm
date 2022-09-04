@@ -168,10 +168,10 @@ void TeMusic::setFilePath(const Common::String &name) {
 	if (!core->_coreNotReady) {
 		if (!Common::File::exists(_actualPath)) {
 			// try inserting language between path and file name
-			_actualPath = namePath.getParent().append(core->language()).appendInPlace(namePath.getLastComponent());
+			_actualPath = namePath.getParent().join(core->language()).joinInPlace(namePath.getLastComponent());
 			if (!Common::File::exists(_actualPath)) {
 				// try inserting "en" between path and file name
-				_actualPath = namePath.getParent().append("en").appendInPlace(namePath.getLastComponent());
+				_actualPath = namePath.getParent().join("en").joinInPlace(namePath.getLastComponent());
 			}
 		}
 	}

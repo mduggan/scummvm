@@ -46,7 +46,6 @@ public:
 	void load();
 	void loadFromBackup(const Common::XMLParser::ParserNode *node);
 	
-	// TODO add callbacks Common::Array<Common::Callback1Param<Common::String>> &onCallNumber();
 	bool onCallNumberValidated();
 	bool onCloseButtonValidated();
 	bool onNextNumber();
@@ -55,6 +54,10 @@ public:
 	void saveToBackup(Common::XMLParser::ParserNode *xmlnode);
 	void setVisible(bool visible);
 	
+	TeSignal1Param<Common::String> &onCallNumber() {
+		return _onCallNumberSignal;
+	}
+	
 	void unload();
 
 private:
@@ -62,7 +65,8 @@ private:
 	int _nextNumber;
 	Common::Array<TeTextLayout*> _textLayoutArray;
 	Common::Array<Common::String> _strArray;
-	// Common::Array<Common::Callback1Param<Common::String>> _callbacks;
+	
+	TeSignal1Param<Common::String> _onCallNumberSignal;
 	
 	TeLuaGUI _gui;
 };

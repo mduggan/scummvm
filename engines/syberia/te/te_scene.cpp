@@ -26,6 +26,79 @@ namespace Syberia {
 TeScene::TeScene() {
 }
 
-// TODO: Add more functions here.
+void TeScene::close() {
+	_cameras.clear();
+	_models.clear();
+}
+
+Common::SharedPtr<TeCamera> TeScene::camera(const Common::String &name) {
+	for (auto &c : _cameras) {
+		if (c->name() == name)
+			return c;
+	}
+	return Common::SharedPtr<TeCamera>();
+}
+
+Common::SharedPtr<TeModel> TeScene::model(const Common::String &name) {
+	for (auto &m : _models) {
+		if (m->name() == name)
+			return m;
+	}
+	return Common::SharedPtr<TeModel>();
+}
+
+Common::SharedPtr<TeCamera> TeScene::currentCamera() {
+	if (!_cameras.size() || _currentCameraIndex >= _cameras.size())
+		return Common::SharedPtr<TeCamera>();
+	return _cameras[_currentCameraIndex];
+}
+
+Common::String TeScene::currentCameraName() const {
+	if (_currentCameraIndex < _cameras.size())
+		return _cameras[_currentCameraIndex]->name();
+	else
+		return Common::String("");
+}
+
+void TeScene::draw() {
+	if (_currentCameraIndex >= _cameras.size())
+		return;
+
+	currentCamera()->apply();
+	for (auto &m : _models) {
+		m->draw();
+	}
+	TeCamera::restore();
+}
+
+void TeScene::removeModel(const Common::String &name) {
+	uint n = _models.size();
+	for (uint i = 0; i < n; i++) {
+		if (_models[i]->name() == name) {
+			_models.remove_at(i);
+			break;
+		}
+	}
+}
+
+void TeScene::setCurrentCamera(const Common::String &name) {
+	uint n = _cameras.size();
+	uint i = 0;
+	for (; i < n; i++) {
+		if (_cameras[i]->name() == name) {
+			break;
+		}
+	}
+	if (i == n) {
+		warning("setCurrentCamera: Couldn't find camera %s", name.c_str());
+	}
+	_currentCameraIndex = i;
+}
+
+void TeScene::update() {
+	for (auto &m : _models) {
+		m->update();
+	}
+}
 
 } // end namespace Syberia

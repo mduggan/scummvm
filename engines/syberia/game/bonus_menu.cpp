@@ -40,7 +40,12 @@ void BonusMenu::enter() {
 }
 
 void BonusMenu::leave() {
-	error("TODO: implement me.");
+	for (auto *s : _saveButtons) {
+		delete s;
+	}
+	_saveButtons.clear();
+	warning("TODO: remove oMouseMove signal from inputmgr.");
+	TeLuaGUI::unload();
 }
 
 bool BonusMenu::onLeftButton() {
@@ -84,6 +89,14 @@ bool BonusMenu::onSideButtonDown() {
 	*/
 	error("TODO: implement me.");
 	return false;
+}
+
+Common::String BonusMenu::SaveButton::path() const {
+	return Common::String("Backup/") + name() + ".xml";
+}
+
+bool BonusMenu::SaveButton::onLoadSave() {
+	error("TODO: implement me.");
 }
 
 } // end namespace Syberia

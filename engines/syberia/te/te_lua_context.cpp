@@ -53,19 +53,23 @@ void TeLuaContext::destroy() {
 		lua_close(_luaState);
 }
 
-Common::String TeLuaContext::global(const Common::String &name) {
+TeVariant TeLuaContext::global(const Common::String &name) {
 	lua_getglobal(_luaState, name.c_str());
+	TeVariant retval;
 	int type = lua_type(_luaState, -1);
-	if (type == LUA_TBOOLEAN) {
-		error("TODO: implement me TeLuaContext::global");
-	} else if (type == LUA_TNUMBER) {
-		error("TODO: implement me TeLuaContext::global");
-	} else if (type == LUA_TSTRING) {
-		error("TODO: implement me TeLuaContext::global");
-	}
 	lua_settop(_luaState, -2);
-	error("TODO: implement me TeLuaContext::global");
-	return Common::String();//_luaContextImpl(path);
+	if (type == LUA_TBOOLEAN) {
+		int result = lua_toboolean(_luaState,-1);
+		return TeVariant(result > 0);
+	} else if (type == LUA_TNUMBER) {
+		double result = lua_tonumber(_luaState, -1);
+		return TeVariant(result);
+	} else if (type == LUA_TSTRING) {
+		const char *str = lua_tolstring(_luaState, -1, nullptr);
+		return TeVariant(str);
+	}
+	warning("Unexpected type %d for global %s", type, name.c_str());
+	return TeVariant();
 }
 
 void TeLuaContext::setGlobal(const Common::String &name, int val) {

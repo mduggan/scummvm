@@ -32,11 +32,19 @@ class TeCurveAnim2 : public TeAnimation {
 public:
 	TeCurveAnim2() {}
 
-	void setCurve(const Common::Array<float> &curve);
-	void update(double pos);
+	void setCurve(const Common::Array<float> &curve) {
+		// The original writes the curve to a stream to load it back in in
+		// the interpolation.. we just skip that with a direct array copy.
+		_interp.load(curve);
+	}
+
+	void update(double pos) {
+		error("TODO: Implement me.");
+	}
 
 private:
 	TeInterpolation _interp;
+	double _lastUpdateTime;
 
 };
 

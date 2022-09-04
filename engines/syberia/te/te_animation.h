@@ -39,7 +39,8 @@ public:
 	void play() {
 		cont();
 	}
-
+	virtual void update(double time) = 0;
+	
 	void seekToStart();
 	//void staticDestroy();
 
@@ -48,12 +49,16 @@ public:
 	void updateAll();
 
 	TeTimer _runTimer;
+	
+	TeSignal0Param &onStop() { return _onStopSignal; }
+	TeSignal0Param &onFinished() { return _onFinishedSignal; }
 
 private:
 
 	void removeThisFromAnimations();
 
-	TeSignal0Param _stopCallbacks;
+	TeSignal0Param _onStopSignal;
+	TeSignal0Param _onFinishedSignal;
 
 	static Common::Array<TeAnimation *> _animations;
 

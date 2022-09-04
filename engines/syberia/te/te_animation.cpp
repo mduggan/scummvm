@@ -33,8 +33,7 @@ void TeAnimation::cont() {
 	if (_runTimer._stopped) {
 		_runTimer.start();
 		_animations.push_back(this);
-		// double seconds = _runTimer.getTimeFromStart() / 1000.0;
-		// TODO: call some virtual function with `seconds`
+		update(_runTimer.getTimeFromStart() / 1000.0);
 	}
 }
 
@@ -60,7 +59,7 @@ void TeAnimation::stop() {
 	if (!_runTimer._stopped) {
 		removeThisFromAnimations();
 		_runTimer.stop();
-		_stopCallbacks.call();
+		_onStopSignal.call();
 	}
 }
 
@@ -74,27 +73,26 @@ void TeAnimation::reset() {
 void TeAnimation::seekToStart() {
 	_runTimer.stop();
 	_runTimer.start();
+	update(_runTimer.getTimeFromStart() / 1000.0);
 }
 
 void TeAnimation::pauseAll() {
 	// TODO: Original checks some flag on the animation timers.. pausable?
-	uint len = _animations.size();
-	for (uint i = 0; i < len; i++) {
-		_animations[i]->pause();
+	for (auto &anim : _animations) {
+		anim->pause();
 	}
 }
 
 void TeAnimation::resumeAll() {
-	uint len = _animations.size();
-	for (uint i = 0; i < len; i++) {
-		_animations[i]->pause();
+	for (auto &anim : _animations) {
+		anim->cont();
 	}
 }
 
 void TeAnimation::updateAll() {
-	uint len = _animations.size();
-	for (uint i = 0; i < len; i++) {
-		// TODO: update based on _animations[i]->timer.getTimeFromStart()
+	for (auto &anim : _animations) {
+		if (!anim->_runTimer._stopped)
+			anim->update(anim->_runTimer.getTimeFromStart() / 1000.0);
 	}
 
 }

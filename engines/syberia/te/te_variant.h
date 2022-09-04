@@ -30,8 +30,11 @@ namespace Syberia {
 class TeVariant {
 public:
 	TeVariant();
+	TeVariant(bool val);
+	TeVariant(double val);
 	TeVariant(const Common::String &val);
 	TeVariant(const char *val);
+	TeVariant(const TeVariant &other);
 
 	enum VariantType {
 		TypeNone,

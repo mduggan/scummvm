@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/math.h"
 #include "syberia/te/te_button_layout.h"
 
 namespace Syberia {

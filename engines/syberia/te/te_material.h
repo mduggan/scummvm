@@ -19,19 +19,45 @@
  *
  */
 
-#include "common/textconsole.h"
-#include "syberia/game/object3d.h"
+#ifndef SYBERIA_TE_TE_MATERIAL_H
+#define SYBERIA_TE_TE_MATERIAL_H
+
+#include "common/ptr.h"
+#include "common/path.h"
+#include "common/stream.h"
+#include "syberia/te/te_color.h"
+#include "syberia/te/te_3d_texture.h"
 
 namespace Syberia {
 
-Object3D::Object3D() {
-}
+class TeMaterial {
+public:
+	enum Mode {
+		Mode0,
+		Mode1,
+		Mode2,
+		Mode3
+	};
 
-/*static*/ bool Object3D::loadSettings(const Common::String &path) {
-	error("TODO: Implement me.");
-	return false;
-}
+	TeMaterial();
+	TeMaterial(Common::SharedPtr<Te3DTexture> texture, Mode mode);
 
-// TODO: Add more functions here.
+	void apply();
+	void defaultValues();
+	static void deserialize(Common::SeekableReadStream &stream, TeMaterial &material, const Common::Path &path);
+	static void serialize(Common::SeekableWriteStream &stream, TeMaterial &material);
+
+private:
+	Common::SharedPtr<Te3DTexture> _texture;
+	Mode _mode;
+	TeColor _ambientColor;
+	TeColor _diffuseColor;
+	TeColor _specularColor;
+	TeColor _emissionColor;
+	float _shininess;
+	bool _enableLights;
+};
 
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_MATERIAL_H

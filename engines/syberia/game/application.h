@@ -23,10 +23,13 @@
 #define SYBERIA_GAME_APPLICATION_H
 
 #include "common/str.h"
+
 #include "syberia/game/bonus_menu.h"
 #include "syberia/game/credits.h"
 #include "syberia/game/global_bonus_menu.h"
 #include "syberia/game/main_menu.h"
+#include "syberia/game/loc_file.h"
+
 #include "syberia/te/te_visual_fade.h"
 #include "syberia/te/te_music.h"
 #include "syberia/te/te_xml_gui.h"
@@ -85,6 +88,7 @@ public:
 	TeLayout _frontLayout;
 	TeLayout _frontOrientationLayout;
 	TeLayout _backLayout;
+	LocFile _loc;
 
 private:
 	TeVisualFade _visFade;

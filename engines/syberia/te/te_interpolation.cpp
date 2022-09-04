@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/file.h"
+
 #include "syberia/te/te_interpolation.h"
 
 namespace Syberia {
@@ -26,6 +28,48 @@ namespace Syberia {
 TeInterpolation::TeInterpolation() {
 }
 
-// TODO: Add more functions here.
+void TeInterpolation::load(Common::ReadStream &stream) {
+	uint32 len = stream.readUint32LE();
+	if (len > 1000000)
+		error("Unexpected interpolation length");
+	_array.resize(len);
+	for (uint32 i = 0; i < len && !stream.err(); i++)
+		_array[i] = stream.readFloatLE();
+}
+
+void TeInterpolation::load(Common::Path &path) {
+	Common::File f;
+	if (!f.open(path))
+		error("Couldn't open %s", path.toString().c_str());
+
+	load(f);
+}
+
+
+// Note: this function is not in the original but simplifies
+// the code for TeCurveAnim2 a lot.
+void TeInterpolation::load(const Common::Array<double> &array) {
+	_array = array;
+}
+
+double TeInterpolation::interpole(double where, double max) const {
+	const uint arrayLen = _array.size();
+	if (!arrayLen)
+		return 0.0;
+
+	double elemNum = (arrayLen - 1) * where / max;
+	int leftElemNum = (int)floor(elemNum);
+
+	if (leftElemNum >= (int)arrayLen - 1)
+		return _array[arrayLen - 1];
+	else if (leftElemNum <= 0)
+		return _array[0];
+
+	double left = _array[leftElemNum];
+	double right = _array[leftElemNum + 1];
+
+	return left + (right - left) * (elemNum - leftElemNum);
+}
+
 
 } // end namespace Syberia
