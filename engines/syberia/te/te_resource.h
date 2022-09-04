@@ -22,7 +22,7 @@
 #ifndef SYBERIA_TE_TE_RESOURCE_H
 #define SYBERIA_TE_TE_RESOURCE_H
 
-#include "common/str.h"
+#include "common/path.h"
 #include "engines/syberia/te/te_object.h"
 
 namespace Syberia {
@@ -33,16 +33,16 @@ public:
 
 	void generateAccessName();
 	
-	const Common::String &getAccessName() const {
+	const Common::Path &getAccessName() const {
 		return _accessName;
 	}
 	
-	void setAccessName(const Common::String &name) {
+	void setAccessName(const Common::Path &name) {
 		_accessName = name;
 	}
 
 private:
-	Common::String _accessName;
+	Common::Path _accessName;
 	static uint32 _idCounter;
 };
 

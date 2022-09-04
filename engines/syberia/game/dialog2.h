@@ -51,7 +51,7 @@ public:
 	void startDownAnimation();
 	void unload();
 	
-
+	Common::String _prevSceneName;
 	// TODO add public members
 
 private:

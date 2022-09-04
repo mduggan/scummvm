@@ -66,6 +66,12 @@ public:
 	template<class T> void add(T *obj, typename TeCallback0Param<T>::TMethod method) {
 		this->insert(TeICallback0ParamPtr(new TeCallback0Param<T>(obj, method)));
 	}
+
+	template<class T> void remove(T *obj, typename TeCallback0Param<T>::TMethod method) {
+		TeICallback0ParamPtr temp(new TeCallback0Param<T>(obj, method));
+		this->remove(temp);
+	}
+
 };
 
 template<class T> using TeICallback1ParamPtr = Common::SharedPtr<TeICallback1Param<T>>;
@@ -91,6 +97,15 @@ public:
 				break;
 			}
 		}
+	}
+
+	template<class S> void add(S *obj, typename TeCallback1Param<S, T>::TMethod method) {
+		this->insert(TeICallback1ParamPtr<T>(new TeCallback1Param<S, T>(obj, method)));
+	}
+
+	template<class S> void remove(S *obj, typename TeCallback1Param<S, T>::TMethod method) {
+		TeICallback1ParamPtr<T> temp(new TeCallback1Param<S, T>(obj, method));
+		this->remove(temp);
 	}
 };
 } // end namespace Syberia

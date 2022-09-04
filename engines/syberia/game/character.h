@@ -25,6 +25,7 @@
 #include "common/array.h"
 #include "common/str.h"
 #include "common/types.h"
+#include "common/ptr.h"
 #include "syberia/te/te_animation.h"
 #include "syberia/te/te_model_animation.h"
 #include "syberia/te/te_vector3f32.h"
@@ -86,7 +87,7 @@ public:
 	bool setAnimation(const Common::String &param_1, bool param_2, bool param_3, bool param_4, int param_5, int param_6);
 	void setAnimationSound(const Common::String &name, uint param_2);
 	void setCurveOffset(float offset);
-	void setFreeMoveZone(const TeFreeMoveZone &zone);
+	void setFreeMoveZone(const Common::SharedPtr<TeFreeMoveZone> &zone);
 	bool setShadowVisible(bool visible);
 	void setStepSound(const Common::String &stepSound1, const Common::String &stepSound2);
 	float speedFromAnim(double movepercent);
@@ -101,12 +102,12 @@ public:
 	void walkMode(const Common::String &mode);
 	void walkTo(float param_1, bool param_2);
 
-	TeModel *_model; //TODO: should be a smart pointer?
+	Common::SharedPtr<TeModel> _model;
 	
 private:
 	float _curveOffset;
 	TeBezierCurve _curve;
-	TeFreeMoveZone _freeMoveZone;
+	Common::SharedPtr<TeFreeMoveZone> _freeMoveZone;
 	Common::String _stepSound1;
 	Common::String _stepSound2;
 	Common::String _walkModeStr; // Walk or Jog

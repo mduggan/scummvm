@@ -122,13 +122,13 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 		if (!Common::File::exists(pathStr)) {
 			path = pathStr;
 			Common::Path dir = path.getParent();
-			dir.appendInPlace(core->language());
-			path = dir.append(path.getLastComponent());
+			dir.joinInPlace(core->language());
+			path = dir.join(path.getLastComponent());
 			if (!Common::File::exists(pathStr)) {
 				path = pathStr;
 				Common::Path dir = path.getParent();
-				dir.appendInPlace("en");
-				path = dir.append(path.getLastComponent());
+				dir.joinInPlace("en");
+				path = dir.join(path.getLastComponent());
 			}
 		}
 	}
@@ -167,7 +167,7 @@ void TeLuaGUI::unload() {
 	error("TODO: Implement me.");
 }
 
-Common::String TeLuaGUI::value(const Common::String &path) {
+TeVariant TeLuaGUI::value(const Common::String &path) {
 	return _luaContext.global(path);
 }
 

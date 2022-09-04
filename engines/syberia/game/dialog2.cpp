@@ -26,6 +26,10 @@ namespace Syberia {
 Dialog2::Dialog2() {
 }
 
+void Dialog2::load() {
+	error("TODO: Implement me.");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

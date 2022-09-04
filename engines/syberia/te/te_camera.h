@@ -23,6 +23,7 @@
 #define SYBERIA_TE_TE_CAMERA_H
 
 #include "common/str.h"
+#include "syberia/te/te_3d_object2.h"
 #include "syberia/te/te_matrix4x4.h"
 #include "syberia/te/te_vector2s32.h"
 #include "syberia/te/te_vector2f32.h"
@@ -30,7 +31,7 @@
 
 namespace Syberia {
 
-class TeCamera {
+class TeCamera : public Te3DObject2 {
 public:
 	TeCamera();
 
@@ -60,7 +61,7 @@ public:
 	TeVector3f32 projectPoint(const TeVector3f32 &pt);
 	TeVector3f32 projectPoint3f32(const TeVector3f32 &pt);
 
-	void restore();
+	static void restore();
 	TeMatrix4x4 transformationMatrix();
 	TeVector3f32 transformCoord(const TeVector3f32 &pt);
 	TeVector3f32 transformPoint2Dto3D(const TeVector2f32 &pt);

@@ -22,11 +22,15 @@
 #ifndef SYBERIA_GAME_OBJECT3D_H
 #define SYBERIA_GAME_OBJECT3D_H
 
+#include "common/str.h"
+
 namespace Syberia {
 
 class Object3D {
 public:
 	Object3D();
+
+	static bool loadSettings(const Common::String &path);
 
 	// TODO add public members
 

@@ -94,10 +94,8 @@ void TeLayout::draw() {
 	if (visible() && worldVisible()) {
 		// Ensure world transform is up-to-date.
 		worldTransformationMatrix();
-		Common::Array<Te3DObject2*> children = childList();
-		uint nchildren = children.size();
-		for (uint i = 0; i < nchildren; i++) {
-			children[i]->draw();
+		for (auto &child : childList()) {
+			child->draw();
 		}
 	}
 }
@@ -399,11 +397,9 @@ void TeLayout::updateZ() {
 	_childOrParentChanged = false;
 	_updatingZ = true;
 
-	uint nchildren = childCount();
 	float ztotal = 0.1;
-	for (uint i = 0; i < nchildren; i++) {
-		Te3DObject2 *c = child(i);
-		ztotal += c->zSize();
+	for (auto &child : childList()) {
+		ztotal += child->zSize();
 	}
 	_updatingZ = false;
 }
@@ -417,10 +413,8 @@ void TeLayout::updateZSize() {
 	const TeVector3f32 oldSize = _size;
 	_size.z() = 0.1f;
 
-	uint nchildren = childCount();
-	for (uint i = 0; i < nchildren; i++) {
-		Te3DObject2 *c = child(i);
-		_size.z() += c->zSize();
+	for (auto &child : childList()) {
+		_size.z() += child->zSize();
 	}
 
 	_positionChanged = true;

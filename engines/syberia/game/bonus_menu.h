@@ -35,6 +35,7 @@ public:
 	BonusMenu();
 
 	class SaveButton : public TeLayout {
+	public:
 		bool onLoadSave();
 		Common::String path() const;
 	};

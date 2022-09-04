@@ -24,6 +24,8 @@
 
 #include "common/str.h"
 
+#include "syberia/te/te_variant.h"
+
 struct lua_State;
 
 namespace Syberia {
@@ -42,7 +44,7 @@ public:
 	void addBindings(void(*fn)(lua_State *));
 	void create();
 	void destroy();
-	Common::String global(const Common::String &name);
+	TeVariant global(const Common::String &name);
 	void global(const Common::String &name, bool &outVal);
 	void global(const Common::String &name, Common::String &outVal);
 	void global(const Common::String &name, int &outVal);

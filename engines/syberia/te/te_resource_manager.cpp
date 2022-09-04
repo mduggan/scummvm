@@ -19,11 +19,34 @@
  *
  */
 
+#include "syberia/te/te_resource.h"
 #include "syberia/te/te_resource_manager.h"
 
 namespace Syberia {
 
 TeResourceManager::TeResourceManager() {
+}
+
+void TeResourceManager::addResource(TeResource *resource) {
+	_resources.insert_at(0, resource);
+}
+
+bool TeResourceManager::exists(const Common::Path &path) {
+	Common::String pathstr = path.toString();
+	for (auto &resource : _resources) {
+		if (resource->getAccessName() == pathstr)
+			return true;
+	}
+	return false;
+}
+
+void TeResourceManager::removeResource(TeResource *resource) {
+	for (uint i = 0; i < _resources.size(); i++) {
+		if (_resources[i] == resource) {
+			_resources.remove_at(i);
+			break;
+		}
+	}
 }
 
 // TODO: Add more functions here.

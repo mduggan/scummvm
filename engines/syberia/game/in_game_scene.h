@@ -57,18 +57,25 @@ public:
 
 	void draw();
 	Character *character(const Common::String &name);
-	void close();
 	bool loadCharacter(const Common::String &name);
 	bool loadPlayerCharacter(const Common::String &name);
 	bool changeBackground(const Common::String &name);
 	void unloadPlayerCharacter(const Common::String &character);
-
-	// TODO add public members
+	void unloadCharacter(const Common::String &name);
+	
+	void close();
+	void reset();
+	void freeSceneObjects();
+	void unloadSpriteLayouts();
+	
+	bool findKate();
 
 	Character *_character;
 private:
 	Common::Array<Common::String> _blockingObjects;
-	TeLuaGUI _gui;
+	TeLuaGUI _bgGui;
+	TeLuaGUI _gui2; // TODO: find a better name.
+	TeLuaGUI _gui3; // TODO: find a better name.
 	// TODO add private members
 
 };

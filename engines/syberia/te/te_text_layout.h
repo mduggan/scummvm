@@ -30,6 +30,7 @@ class TeTextLayout : public TeLayout {
 public:
 	TeTextLayout();
 
+	void setText(const Common::String &val);
 	// TODO add public members
 
 private:

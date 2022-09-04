@@ -22,15 +22,35 @@
 #ifndef SYBERIA_TE_TE_MESH_H
 #define SYBERIA_TE_TE_MESH_H
 
+#include "common/array.h"
+#include "syberia/te/te_3d_object2.h"
+#include "syberia/te/te_color.h"
+#include "syberia/te/te_vector2f32.h"
+#include "syberia/te/te_vector3f32.h"
+#include "syberia/te/te_matrix4x4.h"
+#include "syberia/te/te_material.h"
+
 namespace Syberia {
 
-class TeMesh {
+
+class TeMesh : public Te3DObject2 {
 public:
 	TeMesh();
 
-	// TODO add public members
-
 private:
+	Common::Array<unsigned char> _materialIndexes;
+	Common::Array<TeVector3f32> _verticies;
+	Common::Array<TeVector3f32> _normals;
+	Common::Array<TeVector3f32> _updatedVerticies;
+	Common::Array<TeVector3f32> _updatedNormals;
+	Common::Array<TeVector2f32> _uvs;
+	Common::Array<unsigned short> _indexes;
+	Common::Array<unsigned short> _faceCounts;
+	Common::Array<TeColor> _colors;
+	
+	bool _matrixForced;
+	TeMatrix4x4 _forceMatrix;
+
 	// TODO add private members
 
 };

@@ -41,11 +41,13 @@ bool Credits::onAnimFinished() {
 }
 
 bool Credits::onBackgroundAnimFinished() {
+	TeLayout *buttonsLayout = _gui.layout("buttons");
 	error("TODO: Credits: implement me");
 }
 
 bool Credits::onPadButtonUp(uint button) {
-	_gui.layout("buttons");
+	// Original calls this function here but it seems unnecessary?
+	//TeLayout *buttonsLayout = _gui.layout("buttons");
 	if (button & 2) // TODO; which button is 2?
 		leave();
 	return false;

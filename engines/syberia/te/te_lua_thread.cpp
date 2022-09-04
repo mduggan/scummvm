@@ -212,11 +212,9 @@ void TeLuaThread::resume(const TeVariant &p1, const TeVariant &p2, const TeVaria
 }
 
 /*static*/ TeLuaThread *TeLuaThread::threadFromState(lua_State *state) {
-	uint nthread = _threadList.size();
-	for (uint i = 0; i < nthread; i++) {
-		if (_threadList[i]->_luaThread == state) {
-			return _threadList[i];
-		}
+	for (auto &thread : _threadList) {
+		if (thread->_luaThread == state)
+			return thread;
 	}
 	return nullptr;
 }

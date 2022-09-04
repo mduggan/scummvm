@@ -19,19 +19,30 @@
  *
  */
 
-#include "common/textconsole.h"
-#include "syberia/game/object3d.h"
+#ifndef SYBERIA_TE_TE_3D_TEXTURE_H
+#define SYBERIA_TE_TE_3D_TEXTURE_H
+
+#include "common/path.h"
+#include "common/ptr.h"
+#include "common/str.h"
+#include "syberia/te/te_resource.h"
 
 namespace Syberia {
 
-Object3D::Object3D() {
-}
+class Te3DTexture : public TeResource {
+public:
+	Te3DTexture();
 
-/*static*/ bool Object3D::loadSettings(const Common::String &path) {
-	error("TODO: Implement me.");
-	return false;
-}
+	static Common::SharedPtr<Te3DTexture> load2(const Common::Path &path, uint size);
+	
+	void load(const Common::Path &path);
+	// TODO add public members
 
-// TODO: Add more functions here.
+private:
+	// TODO add private members
+
+};
 
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_3D_TEXTURE_H

@@ -29,6 +29,9 @@
 #include "syberia/game/inventory_menu.h"
 #include "syberia/game/in_game_scene.h"
 #include "syberia/game/notifier.h"
+#include "syberia/game/cellphone.h"
+#include "syberia/game/question2.h"
+#include "syberia/game/dialog2.h"
 #include "syberia/te/te_lua_gui.h"
 #include "syberia/te/te_music.h"
 #include "syberia/te/te_checkbox_layout.h"
@@ -72,9 +75,10 @@ public:
 	
 	void deleteNoScale();
 	void draw();
-	void enter();
-	static TeI3DObject2 *findLayoutByName(TeILayout *ilayout, const Common::String &name);
-	static TeSpriteLayout *findSpriteLayoutByName(TeILayout *ilayout, const Common::String &name);
+	void enter(bool newgame);
+	// Note: game uses ILayouts here..
+	static TeI3DObject2 *findLayoutByName(TeLayout *layout, const Common::String &name);
+	static TeSpriteLayout *findSpriteLayoutByName(TeLayout *layout, const Common::String &name);
 
 	void finishFreemium();
 	void finishGame();
@@ -94,7 +98,7 @@ public:
 	bool loadScene(const Common::String &name);
 	
 	bool onAnswered(const Common::String &val);
-	bool onCallNumber(const Common::String &val);
+	bool onCallNumber(Common::String val);
 	bool onCharacterAnimationFinished(const Common::String &val);
 	bool onCharacterAnimationPlayerFinished(const Common::String &val);
 	bool onDialogFinished(const Common::String &val);
@@ -146,6 +150,7 @@ private:
 	
 	bool _running;
 	int _frameCounter;
+	bool _luaShowOwnerError;
 	
 	InGameScene _scene;
 	
@@ -157,12 +162,22 @@ private:
 	Common::String _warpScene;
 	bool _warpFlag;
 	bool _warped;
+
+	Common::String _currentZone;
+	Common::String _currentScene;
 	
+	Common::String _loadName;
+
 	TeTimer _playedTimer;
 	TeLuaScript _luaScript;
+	TeLuaContext _luaContext;
 	TeMusic _music;
 	Notifier _notifier;
 	DocumentsBrowser _documentsBrowser;
+	
+	Cellphone _cellphone;
+	Question2 _question2;
+	Dialog2 _dialog2;
 
 	static const int NUM_OBJECTS_TAKEN_IDS = 5;
 	static const char *OBJECTS_TAKEN_IDS[NUM_OBJECTS_TAKEN_IDS];

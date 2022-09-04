@@ -19,8 +19,11 @@
  *
  */
 
+#include "common/file.h"
+#include "common/path.h"
 #include "common/textconsole.h"
 #include "syberia/game/in_game_scene.h"
+#include "syberia/game/character.h"
 
 namespace Syberia {
 
@@ -32,11 +35,13 @@ void InGameScene::draw() {
 }
 
 bool InGameScene::changeBackground(const Common::String &name) {
-	error("TODO: implement me");
-}
-
-void InGameScene::unloadPlayerCharacter(const Common::String &character) {
-	error("TODO: implement me");
+	if (Common::File::exists(name)) {
+		TeSpriteLayout *spriteLayout = _bgGui.spriteLayout("root");
+		assert(spriteLayout);
+		spriteLayout->load(name);
+		return true;
+	}
+	return false;
 }
 
 
@@ -53,7 +58,30 @@ void InGameScene::unloadPlayerCharacter(const Common::String &character) {
 }
 
 TeLayout *InGameScene::background() {
-	return _gui.layout("background");
+	return _bgGui.layout("background");
+}
+
+void InGameScene::close() {
+	reset();
+	error("TODO: Implement me");
+}
+
+void InGameScene::reset() {
+	if (_character)
+		_character->setFreeMoveZone(Common::SharedPtr<TeFreeMoveZone>());
+	freeSceneObjects();
+	_bgGui.unload();
+	unloadSpriteLayouts();
+	_gui2.unload();
+	_gui3.unload();
+}
+
+void InGameScene::freeSceneObjects() {
+	error("TODO: Implement me");
+}
+
+void InGameScene::unloadSpriteLayouts() {
+	error("TODO: Implement me");
 }
 
 Character *InGameScene::character(const Common::String &name) {
@@ -68,6 +96,20 @@ bool InGameScene::loadPlayerCharacter(const Common::String &name) {
 	error("TODO: Implement me");
 }
 
-// TODO: Add more functions here.
+void InGameScene::unloadPlayerCharacter(const Common::String &name) {
+	error("TODO: Implement me");
+}
+
+void InGameScene::unloadCharacter(const Common::String &name) {
+	error("TODO: Implement me");
+}
+
+bool InGameScene::findKate() {
+	for (auto &m : models()) {
+		if (m->name() == "Kate")
+			return true;
+	}
+	return false;
+}
 
 } // end namespace Syberia

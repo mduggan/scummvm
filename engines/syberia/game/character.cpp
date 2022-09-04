@@ -152,7 +152,7 @@ void Character::setCurveOffset(float offset) {
 	updatePosition(offset);
 }
 
-void Character::setFreeMoveZone(const TeFreeMoveZone &zone) {
+void Character::setFreeMoveZone(const Common::SharedPtr<TeFreeMoveZone> &zone) {
 	_freeMoveZone = zone;
 }
 

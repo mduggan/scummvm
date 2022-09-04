@@ -26,6 +26,10 @@ namespace Syberia {
 TeTextLayout::TeTextLayout() {
 }
 
+void TeTextLayout::setText(const Common::String &val) {
+	error("TODO: Implement me");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

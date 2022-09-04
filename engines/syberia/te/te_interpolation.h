@@ -22,16 +22,27 @@
 #ifndef SYBERIA_TE_TE_INTERPOLATION_H
 #define SYBERIA_TE_TE_INTERPOLATION_H
 
+#include "common/array.h"
+#include "common/stream.h"
+#include "common/path.h"
+
 namespace Syberia {
 
 class TeInterpolation {
 public:
 	TeInterpolation();
 
-	// TODO add public members
+	void load(Common::ReadStream &stream);
+	void load(Common::Path &path);
+
+	// Note: this function is not in the original but simplifies
+	// the code for TeCurveAnim2 a lot.
+	void load(const Common::Array<double> &array);
+	
+	double interpole(double amount, double max) const;
 
 private:
-	// TODO add private members
+	Common::Array<double> _array;
 
 };
 

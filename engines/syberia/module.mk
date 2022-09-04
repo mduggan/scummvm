@@ -15,6 +15,7 @@ MODULE_OBJS := \
 	game/documents_browser.o \
 	game/gallery_menu.o \
 	game/game.o \
+	game/game_achievements.o \
 	game/game_sound.o \
 	game/global_bonus_menu.o \
 	game/help_option_menu.o \
@@ -33,6 +34,7 @@ MODULE_OBJS := \
 	game/question2.o \
 	game/splash_screens.o \
 	te/te_3d_object2.o \
+	te/te_3d_texture.o \
 	te/te_animation.o \
 	te/te_bezier_curve.o \
 	te/te_button_layout.o \
@@ -58,6 +60,7 @@ MODULE_OBJS := \
 	te/te_lua_gui_lua_callbacks.o \
 	te/te_lua_script.o \
 	te/te_lua_thread.o \
+	te/te_material.o \
 	te/te_matrix4x4.o \
 	te/te_mesh.o \
 	te/te_model.o \

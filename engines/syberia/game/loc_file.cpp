@@ -19,11 +19,21 @@
  *
  */
 
+#include "common/textconsole.h"
+
 #include "syberia/game/loc_file.h"
 
 namespace Syberia {
 
 LocFile::LocFile() {
+}
+
+void LocFile::load(const Common::String &path) {
+	error("TODO: implement me.");
+}
+
+const Common::String *LocFile::value(const Common::String &key) {
+	error("TODO: implement me.");
 }
 
 // TODO: Add more functions here.

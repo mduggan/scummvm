@@ -29,6 +29,8 @@
 #include "syberia/game/character.h"
 #include "syberia/game/in_game_scene.h"
 #include "syberia/game/game.h"
+#include "syberia/game/game_achievements.h"
+#include "syberia/game/object3d.h"
 #include "syberia/te/te_variant.h"
 
 namespace Syberia {
@@ -167,16 +169,97 @@ void Game::draw() {
 	}
 }
 
-void Game::enter() {
-	error("TODO: Implemet me");
+void Game::enter(bool newgame) {
+	warning("TODO: set 2 fields true here");
+	_luaShowOwnerError = false;
+	_score = 0;
+	Application *app = g_engine->getApplication();
+	app->visualFade().init();
+	warning("TODO: add onMouseClick handler and set some other fields here");
+	_sceneCharacterVisibleFromLoad = false;
+	Character::loadSettings("models/ModelsSettings.xml");
+	Object3D::loadSettings("objects/ObjectsSettings.xml");
+	if (_scene._character) {
+		_scene._character->onFinished().remove(this, &Game::onDisplacementFinished);
+		warning("TODO: Who should we unload here?");
+		_scene.unloadCharacter("");
+	}
+	bool loaded = loadPlayerCharacter("Kate");
+	if (!loaded)
+		warning("[Game::enter] Can\'t load player character");
+
+	_running = true;
+	_luaContext.create();
+	GameAchievements::registerAchievements(_luaContext);
+	
+	_luaContext.setGlobal("BUTTON_VALID", 1);
+	_luaContext.setGlobal("BUTTON_CANCEL", 2);
+	_luaContext.setGlobal("BUTTON_EXTRA1", 4);
+	_luaContext.setGlobal("BUTTON_EXTRA2", 8);
+	_luaContext.setGlobal("BUTTON_L1", 0x10);
+	_luaContext.setGlobal("BUTTON_R1", 0x20);
+	_luaContext.setGlobal("BUTTON_START", 0x40);
+	_luaContext.setGlobal("BUTTON_UP", 0x80);
+	_luaContext.setGlobal("BUTTON_DOWN", 0x100);
+	_luaContext.setGlobal("BUTTON_LEFT", 0x200);
+	_luaContext.setGlobal("BUTTON_RIGHT", 0x400);
+	_luaContext.setGlobal("BUTTON_LS_CLIC", 0x800);
+	_luaContext.setGlobal("BUTTON_RS_CLIC", 0x1000);
+	_luaContext.setGlobal("BUTTON_BACK", 0x2000);
+	_luaContext.setGlobal("BUTTON_SELECT", 0x4000);
+	_luaContext.setGlobal("BUTTON_L2", 0x8000);
+	_luaContext.setGlobal("BUTTON_R2", 0x10000);
+	_luaContext.setGlobal("BUTTON_LS_UP", 0x20000);
+	_luaContext.setGlobal("BUTTON_LS_DOWN", 0x40000);
+	_luaContext.setGlobal("BUTTON_LS_LEFT", 0x80000);
+	_luaContext.setGlobal("BUTTON_LS_RIGHT", 0x100000);
+	_luaContext.setGlobal("BUTTON_RS_UP", 0x200000);
+	_luaContext.setGlobal("BUTTON_RS_DOWN", 0x400000);
+	_luaContext.setGlobal("BUTTON_RS_LEFT", 0x800000);
+	_luaContext.setGlobal("BUTTON_RS_RIGHT", 0x1000000);
+
+	_luaScript.attachToContext(&_luaContext);
+	warning("TODO: load Objectif");
+	
+	_question2.load();
+	_dialog2.load();
+	_documentsBrowser.load();
+	_documentsBrowser.loadZoomed();
+	_inventory.load();
+	
+	_cellphone.onCallNumber().add(this, &Game::onCallNumber);
+	
+	if (!newgame) {
+		loadBackup(_loadName);
+	} else {
+		warning("set some field here");
+		onFinishedLoadingBackup("");
+	}
+	_sceneCharacterVisibleFromLoad = true;
+	_scene._character->onFinished().remove(this, &Game::onDisplacementFinished);
+	_scene._character->onFinished().add(this, &Game::onDisplacementFinished);
+	_dialog2._prevSceneName.clear();
+	_notifier.load();
 }
 
-/*static*/ TeI3DObject2 *Game::findLayoutByName(TeILayout *ilayout, const Common::String &name) {
-	error("TODO: Implemet me");
+/*static*/ TeI3DObject2 *Game::findLayoutByName(TeLayout *parent, const Common::String &name) {
+	error("TODO: Implement me - although maybe this is never used?");
 }
 
-/*static*/ TeSpriteLayout *Game::findSpriteLayoutByName(TeILayout *ilayout, const Common::String &name) {
-	error("TODO: Implemet me");
+/*static*/ TeSpriteLayout *Game::findSpriteLayoutByName(TeLayout *parent, const Common::String &name) {
+	if (!parent)
+		return nullptr;
+
+	if (parent->name() == name)
+		return dynamic_cast<TeSpriteLayout *>(parent);
+
+	for (auto &child : parent->childList()) {
+		TeSpriteLayout *val = findSpriteLayoutByName(dynamic_cast<TeLayout *>(child), name);
+		if (val)
+			return val;
+	}
+
+	return nullptr;
 }
 
 void Game::finishFreemium() {
@@ -205,10 +288,20 @@ void Game::initNoScale() {
 }
 
 void Game::initScene(bool param_1, const Common::String &scenePath) {
+	_luaContext.setGlobal("SHOW_OWNER_ERROR", _luaShowOwnerError);
+	initWarp(_currentScene, _currentZone, param_1);
+	loadScene(scenePath);
+	if (_scene._character->_model.get() && !_scene.findKate()) {
+		_scene.models().push_back(_scene._character->_model);
+	}
+	_scene._character->_model->setVisible(true);
 	error("TODO: Implemet me");
 }
 
 void Game::initWarp(const Common::String &zone, const Common::String &scene, bool fadeFlag) {
+	_inventoryMenu.unload();
+	_gui4.unload();
+	
 	error("TODO: Implemet me");
 }
 
@@ -274,7 +367,7 @@ bool Game::onAnswered(const Common::String &val) {
 	return false;
 }
 
-bool Game::onCallNumber(const Common::String &val) {
+bool Game::onCallNumber(Common::String val) {
 	_luaScript.execute("OnCallNumber", TeVariant(val));
 	return false;
 }

@@ -34,6 +34,14 @@ void DocumentsBrowser::leave() {
 	error("TODO: Implement me");
 }
 
+void DocumentsBrowser::load() {
+	error("TODO: Implement me");
+}
+
+void DocumentsBrowser::loadZoomed() {
+	error("TODO: Implement me");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

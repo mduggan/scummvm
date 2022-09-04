@@ -22,15 +22,62 @@
 #ifndef SYBERIA_TE_TE_RESOURCE_MANAGER_H
 #define SYBERIA_TE_TE_RESOURCE_MANAGER_H
 
+#include "common/array.h"
+#include "common/path.h"
+#include "common/ptr.h"
+#include "common/file.h"
+#include "common/textconsole.h"
+
+#include "syberia/syberia.h"
+#include "syberia/te/te_resource.h"
+#include "syberia/te/te_core.h"
+
 namespace Syberia {
+
+class TeResource;
 
 class TeResourceManager {
 public:
 	TeResourceManager();
-
-	// TODO add public members
+	
+	void addResource(TeResource *resource);
+	bool exists(const Common::Path &path);
+	void removeResource(TeResource *resource);
+	
+	template<class T> Common::SharedPtr<T> getResource(const Common::Path &path) {
+		for (uint i = 0; i < this->_resources.size(); i++) {
+			if (_resources[i]->getAccessName() == path) {
+				return Common::SharedPtr<T>(static_cast<T *>(this->_resources[i]));
+			}
+		}
+		
+		Common::SharedPtr<T> retval;
+		TeCore *core = g_engine->getCore();
+		if (!core->_coreNotReady) {
+			if (Common::File::exists(path)) {
+				retval.reset(new T());
+			} else {
+				// Try path with langs
+				Common::Path parentPath = path.getParent();
+				Common::Path pathWithLang = parentPath.join(core->language()).joinInPlace(path.getLastComponent());
+				if (Common::File::exists(pathWithLang)) {
+					retval.reset(new T());
+				}
+				Common::Path pathWithEn = parentPath.join("en").joinInPlace(path.getLastComponent());
+				if (Common::File::exists(pathWithEn)) {
+					retval.reset(new T());
+				}
+			}
+		} else {
+			retval.reset(new T());
+		}
+		if (retval.get())
+			addResource(retval.get());
+		return retval;
+	}
 
 private:
+	Common::Array<TeResource *> _resources;
 	// TODO add private members
 
 };

@@ -19,19 +19,26 @@
  *
  */
 
-#include "common/textconsole.h"
-#include "syberia/game/object3d.h"
+#ifndef SYBERIA_GAME_GAME_ACHIEVEMENTS_H
+#define SYBERIA_GAME_GAME_ACHIEVEMENTS_H
+
 
 namespace Syberia {
 
-Object3D::Object3D() {
-}
+class TeLuaContext;
 
-/*static*/ bool Object3D::loadSettings(const Common::String &path) {
-	error("TODO: Implement me.");
-	return false;
-}
+class GameAchievements {
+public:
+	GameAchievements();
 
-// TODO: Add more functions here.
+	static void registerAchievements(TeLuaContext &context);
+	// TODO add public members
+
+private:
+	// TODO add private members
+
+};
 
 } // end namespace Syberia
+
+#endif // SYBERIA_GAME_GAME_ACHIEVEMENTS_H

@@ -22,27 +22,59 @@
 #ifndef SYBERIA_TE_TE_MODEL_H
 #define SYBERIA_TE_TE_MODEL_H
 
+#include "common/array.h"
+#include "common/ptr.h"
+#include "common/stream.h"
 #include "syberia/te/te_timer.h"
+#include "syberia/te/te_mesh.h"
+#include "syberia/te/te_model_animation.h"
 
 namespace Syberia {
 
 class TeModelAnimation;
 
-class TeModel {
+class TeModel : public Te3DObject2 {
 public:
 	TeModel();
 
 	class BonesBlender {
+	public:
 		BonesBlender(TeModelAnimation *modelanim, float blend, TeModel *model);
 		float coef();
 
 		TeTimer _timer;
 	};
 
+	class MeshBlender {
+	public:
+		MeshBlender(const Common::String &s1, const Common::String &s2, float amount, TeModel *model);
+	private:
+		Common::String _name;
+		uint _meshNo;
+		float _amount;
+		TeTimer _timer;
+	};
+
+	void addMesh(const TeMesh &mesh) {
+		_meshes.push_back(mesh);
+	}
+	long anim(); // TODO: Probably wrong type here.
+	void blendAnim(Common::SharedPtr<TeModelAnimation>& anim, float amount, bool flag);
+	void blendMesh(const Common::String &s1, const Common::String &s2, float amount);
+
+	int checkFileType(Common::SeekableReadStream &instream);
+
+	/* Align the stream to the nearest 4 byte boudary*/
+	static void loadAlign(Common::SeekableReadStream &stream);
+	static void saveAlign(Common::SeekableWriteStream &stream);
+
+	void update();
 	bool visible();
-	// TODO add public members
+	void setVisible(bool vis);
 
 private:
+	Common::Array<TeMesh> _meshes;
+	Common::Array<MeshBlender *> _meshBlenders;
 	// TODO add private members
 
 };

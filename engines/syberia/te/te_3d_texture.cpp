@@ -19,18 +19,34 @@
  *
  */
 
-#include "common/textconsole.h"
-#include "syberia/game/object3d.h"
+#include "syberia/syberia.h"
+#include "syberia/te/te_3d_texture.h"
+#include "syberia/te/te_resource_manager.h"
 
 namespace Syberia {
 
-Object3D::Object3D() {
+Te3DTexture::Te3DTexture() {
 }
 
-/*static*/ bool Object3D::loadSettings(const Common::String &path) {
-	error("TODO: Implement me.");
-	return false;
+/*static*/ Common::SharedPtr<Te3DTexture> Te3DTexture::load2(const Common::Path &path, uint size) {
+	Common::Path fullPath = path.append(".3dtex");
+	
+	TeResourceManager *resMgr = g_engine->getResourceManager();
+	if (!resMgr->exists(fullPath)) {
+		Common::SharedPtr<Te3DTexture> retval(new Te3DTexture());
+		retval->load(fullPath);
+		retval->setAccessName(fullPath);
+		resMgr->addResource(retval.get());
+		return retval;
+	} else {
+		return resMgr->getResource<Te3DTexture>(fullPath);
+	}
 }
+
+void Te3DTexture::load(const Common::Path &path) {
+	error("TODO: Implement me");
+}
+
 
 // TODO: Add more functions here.
 

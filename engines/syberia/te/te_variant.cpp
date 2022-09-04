@@ -26,10 +26,19 @@ namespace Syberia {
 TeVariant::TeVariant() : _type(TypeNone), _data(0) {
 }
 
+TeVariant::TeVariant(bool val) : _type(TypeBoolean), _data(val) {
+}
+
+TeVariant::TeVariant(double val) : _type(TypeFloat64), _data((uint64)val) {
+}
+
 TeVariant::TeVariant(const Common::String &val) : _type(TypeString), _data(0), _strVal(val) {	
 }
 
 TeVariant::TeVariant(const char *val) : _type(TypeString), _data(0), _strVal(val) {
+}
+
+TeVariant::TeVariant(const TeVariant &other) : _type(other._type), _data(other._data), _strVal(other._strVal) {
 }
 
 bool TeVariant::toBoolean(bool *success) const {

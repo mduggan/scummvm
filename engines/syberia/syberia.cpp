@@ -30,6 +30,13 @@
 #include "engines/util.h"
 #include "graphics/palette.h"
 
+#include "syberia/game/game.h"
+#include "syberia/te/te_core.h"
+#include "syberia/te/te_renderer.h"
+#include "syberia/te/te_resource_manager.h"
+//#include "syberia/te/te_s.h"
+
+
 namespace Syberia {
 
 SyberiaEngine *g_engine;
@@ -48,19 +55,33 @@ Application *SyberiaEngine::getApplication() {
 }
 
 TeCore *SyberiaEngine::getCore() {
+	if (_core == nullptr)
+		_core = new TeCore();
 	return _core;
 }
 
 Game *SyberiaEngine::getGame() {
+	if (_game == nullptr)
+		_game = new Game();
 	return _game;
 }
 
 TeSoundManager *SyberiaEngine::getSoundManager() {
+	/*if (_soundManager == nullptr)
+		_soundManager = new TeSoundManager();*/
 	return _soundManager;
 }
 
 TeRenderer *SyberiaEngine::getRenderer() {
+	if (_renderer == nullptr)
+		_renderer = new TeRenderer();
 	return _renderer;
+}
+
+TeResourceManager *SyberiaEngine::getResourceManager() {
+	if (_resourceManager == nullptr)
+		_resourceManager = new TeResourceManager();
+	return _resourceManager;
 }
 
 uint32 SyberiaEngine::getFeatures() const {

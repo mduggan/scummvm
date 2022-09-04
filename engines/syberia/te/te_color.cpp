@@ -48,12 +48,14 @@ uint32 TeColor::getPacked() {
 }
 
 bool TeColor::serialize(Common::WriteStream &stream) const {
-	uint32 result = stream.write(_c, 4);
-	return result == 4;
+	for (int i = 0; i < 4; i++)
+		stream.writeByte(_c[i]);
+	return true;
 }
 bool TeColor::deserialize(Common::ReadStream &stream) {
-	uint32 result = stream.read(_c, 4);
-	return result == 4;
+	for (int i = 0; i < 4; i++)
+		_c[i] = stream.readByte();
+	return true;
 }
 
 TeColor operator*(const TeColor &c1, const TeColor &c2) {

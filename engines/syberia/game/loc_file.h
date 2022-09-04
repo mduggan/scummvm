@@ -22,13 +22,17 @@
 #ifndef SYBERIA_GAME_LOC_FILE_H
 #define SYBERIA_GAME_LOC_FILE_H
 
+#include "common/str.h"
+
 namespace Syberia {
 
 class LocFile {
 public:
 	LocFile();
 
-	// TODO add public members
+	//const Common::String *avatar(const Common::String &key);
+	void load(const Common::String &path);
+	const Common::String *value(const Common::String &key);
 
 private:
 	// TODO add private members

@@ -24,21 +24,25 @@
 
 #include "common/str.h"
 
+#include "syberia/te/te_signal.h"
+#include "syberia/te/te_lua_gui.h"
+
 namespace Syberia {
 
 class Confirm {
 public:
 	Confirm();
 
-	void enter(const Common::String &x, const Common::String &y);
+	void enter(const Common::String &guiPath, const Common::String &y);
 	void leave();
 
 	bool onButtonNo();
 	bool onButtonYes();
 
 private:
-	// TODO add private members
-
+	TeSignal0Param _onButtonNoSignal;
+	TeSignal0Param _onButtonYesSignal;
+	TeLuaGUI _gui;
 };
 
 } // end namespace Syberia
