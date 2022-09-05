@@ -74,7 +74,7 @@ public:
 	void setSizeType(CoordinatesType coordtype);
 	void setZPosition(float zpos) override;
 
-	TeVector3f32 size();
+	virtual TeVector3f32 size() override;
 	CoordinatesType sizeType() const;
 	TeVector3f32 transformMousePosition(const TeVector2s32 &mousepos);
 

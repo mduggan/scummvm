@@ -40,6 +40,7 @@ namespace Syberia {
 class Character : public TeAnimation {
 public:
 	Character();
+	virtual ~Character() {}
 
 	class CharacterSettings {};
 	class AnimCacheElement {};

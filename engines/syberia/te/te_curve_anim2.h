@@ -31,6 +31,7 @@ template<class T1, class T2>
 class TeCurveAnim2 : public TeAnimation {
 public:
 	TeCurveAnim2() {}
+	virtual ~TeCurveAnim2() {}
 
 	void setCurve(const Common::Array<float> &curve) {
 		// The original writes the curve to a stream to load it back in in

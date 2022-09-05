@@ -35,6 +35,7 @@ namespace Syberia {
 class TeScene {
 public:
 	TeScene();
+	virtual ~TeScene() {};
 
 	void close();
 

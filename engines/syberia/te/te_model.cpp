@@ -43,7 +43,7 @@ void TeModel::blendMesh(const Common::String &s1, const Common::String &s2, floa
 	_meshBlenders.push_back(new MeshBlender(s1, s2, amount, this));
 }
 
-bool TeModel::visible() {
+bool TeModel::visible() const {
 	error("TODO: Implement me.");
 }
 

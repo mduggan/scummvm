@@ -38,6 +38,7 @@ public:
 	// Note: this function is not in the original but simplifies
 	// the code for TeCurveAnim2 a lot.
 	void load(const Common::Array<double> &array);
+	void load(const Common::Array<float> &array);
 	
 	double interpole(double amount, double max) const;
 
