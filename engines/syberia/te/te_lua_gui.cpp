@@ -126,7 +126,7 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 			path = dir.join(path.getLastComponent());
 			if (!Common::File::exists(pathStr)) {
 				path = pathStr;
-				Common::Path dir = path.getParent();
+				dir = path.getParent();
 				dir.joinInPlace("en");
 				path = dir.join(path.getLastComponent());
 			}

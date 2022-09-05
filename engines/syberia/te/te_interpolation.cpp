@@ -52,6 +52,13 @@ void TeInterpolation::load(const Common::Array<double> &array) {
 	_array = array;
 }
 
+void TeInterpolation::load(const Common::Array<float> &array) {
+	_array.clear();
+	for (auto f : array) {
+		_array.push_back(f);
+	}
+}
+
 double TeInterpolation::interpole(double where, double max) const {
 	const uint arrayLen = _array.size();
 	if (!arrayLen)

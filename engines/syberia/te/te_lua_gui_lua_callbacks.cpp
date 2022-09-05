@@ -213,7 +213,7 @@ int layoutBindings(lua_State *L) {
 	}
 
 	if (layout->name().empty()) {
-		layout->setName(Common::String::format("%p", &layout));
+		layout->setName(Common::String::format("%p", (void *)layout));
 	}
 	lua_pushstring(L,"__TeLuaGUIThis");
     lua_gettable(L,-1001000);

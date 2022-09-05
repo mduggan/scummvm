@@ -69,7 +69,7 @@ public:
 	static void saveAlign(Common::SeekableWriteStream &stream);
 
 	void update();
-	bool visible();
+	virtual bool visible() const override;
 	void setVisible(bool vis);
 
 private:

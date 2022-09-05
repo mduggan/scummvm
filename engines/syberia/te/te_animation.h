@@ -31,6 +31,7 @@ namespace Syberia {
 class TeAnimation {
 public:
 	TeAnimation();
+	virtual ~TeAnimation() {};
 
 	void cont();
 	void pause();

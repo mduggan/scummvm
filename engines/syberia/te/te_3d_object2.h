@@ -120,7 +120,7 @@ public:
 	virtual void setSize(const TeVector3f32 &size);
 	void setVisible(bool visible);
 	virtual void setZPosition(float zpos);
-	virtual const TeVector3f32 &size() const {
+	virtual TeVector3f32 size() {
 		return _size;
 	}
 	TeMatrix4x4 transformationMatrix();
