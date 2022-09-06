@@ -24,6 +24,7 @@
 
 #include "common/array.h"
 #include "syberia/te/te_signal.h"
+#include "syberia/te/te_real_timer.h"
 
 namespace Syberia {
 
@@ -34,23 +35,41 @@ public:
 	void stop();
 	void start();
 	void pause();
-	double getTimeFromStart();
-	void setAlarmIn(long val);
-	double timeElapsed();
+	void update();
+	unsigned long getTimeFromStart();
+	void setAlarmIn(unsigned long offset);
+	unsigned long timeElapsed();
+	unsigned long time_();
+	void setTime(unsigned long time);
 
 	void pausable(bool ispausable);
 
 	TeSignal0Param &alarmSignal() { return _alarmSignal; }
 
+	static void pauseAll();
+	static void resumeAll();
+	static void updateAll();
+
 	bool _stopped;
 
 private:
-	double _startTime;
+	static TeRealTimer *realTimer();
+
+	unsigned long _startTime;
+	unsigned long _startTimeOffset;
+	unsigned long _alarmTime;
+	unsigned long _lastTimeElapsed;
+	bool _pausable;
+	bool _alarmSet;
+	bool _updated;
+
 	TeSignal0Param _alarmSignal;
 
 	static bool _pausedAll;
-
+	static unsigned long _realTime;
 	static Common::Array<TeTimer *> _timers;
+	static Common::Array<TeTimer *> _pausedTimers;
+	static TeRealTimer *_realTimer;
 };
 
 } // end namespace Syberia

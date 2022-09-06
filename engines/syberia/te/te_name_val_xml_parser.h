@@ -19,34 +19,32 @@
  *
  */
 
-#include "common/hash-str.h"
-#include "common/textconsole.h"
-#include "syberia/te/te_xml_gui.h"
-#include "syberia/te/te_name_val_xml_parser.h"
+#ifndef SYBERIA_TE_TE_NAME_VAL_XML_PARSER_H
+#define SYBERIA_TE_TE_NAME_VAL_XML_PARSER_H
+
+#include "common/xmlparser.h"
 
 namespace Syberia {
 
-TeXmlGui::TeXmlGui() {
-}
+class TeNameValXmlParser : public Common::XMLParser {
+public:
+	// Parser
+	CUSTOM_XML_PARSER(TeNameValXmlParser) {
+		XML_KEY(value)
+			XML_PROP(name, true)
+			XML_PROP(value, true)
+		KEY_END()
+	} PARSER_END()
 
-Common::String TeXmlGui::value(const Common::String &key) {
-	error("TODO: TeXmlGui::value Implement me.");
-}
+	// Parser callback methods
+	bool parserCallback_value(ParserNode *node);
 
-void TeXmlGui::load(const Common::Path &path) {
-	clear();
+public:
+	const Common::StringMap &getMap() const { return _map; }
 
-	TeNameValXmlParser parser;
-	if (!parser.loadFile(path.toString()))
-		error("LocFile::load: failed to load xml.");
-	
-	_map = parser.getMap();
-}
-
-void TeXmlGui::clear() {
-	
-}
-
-// TODO: Add more functions here.
-
+private:
+	Common::StringMap _map;
+};
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_NAME_VAL_XML_PARSER_H

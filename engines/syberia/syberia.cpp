@@ -31,10 +31,11 @@
 #include "graphics/palette.h"
 
 #include "syberia/game/game.h"
+#include "syberia/game/application.h"
 #include "syberia/te/te_core.h"
 #include "syberia/te/te_renderer.h"
 #include "syberia/te/te_resource_manager.h"
-//#include "syberia/te/te_s.h"
+//#include "syberia/te/te_sound_manager.h"
 
 
 namespace Syberia {
@@ -42,15 +43,24 @@ namespace Syberia {
 SyberiaEngine *g_engine;
 
 SyberiaEngine::SyberiaEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Syberia") {
+	_gameDescription(gameDesc), _randomSource("Syberia"), _resourceManager(nullptr),
+	_core(nullptr),	_application(nullptr), _game(nullptr), _renderer(nullptr),
+	_soundManager(nullptr) {
 	g_engine = this;
 }
 
 SyberiaEngine::~SyberiaEngine() {
 	delete _screen;
+	delete _application;
+	delete _renderer;
+	delete _core;
+	delete _game;
+	//delete _soundManager;
+	delete _resourceManager;
 }
 
 Application *SyberiaEngine::getApplication() {
+	// created in run()
 	return _application;
 }
 
@@ -73,8 +83,7 @@ TeSoundManager *SyberiaEngine::getSoundManager() {
 }
 
 TeRenderer *SyberiaEngine::getRenderer() {
-	if (_renderer == nullptr)
-		_renderer = new TeRenderer();
+	// created in run()
 	return _renderer;
 }
 
@@ -92,18 +101,22 @@ Common::String SyberiaEngine::getGameId() const {
 	return _gameDescription->gameId;
 }
 
+void SyberiaEngine::configureSearchPaths() {
+	const Common::FSNode gameDataDir(ConfMan.get("path"));
+	SearchMan.addSubDirectoryMatching(gameDataDir, "Resources", 0, 3);
+}
+
 Common::Error SyberiaEngine::run() {
+	configureSearchPaths();
 	// TODO (from BasicOpenGLView::prepareOpenGL)
-	/*
-	_app = new Application();
+	_application = new Application();
 	_renderer = new TeRenderer();
 	_renderer->init();
-	_app->create();
-	 */
+	_application->create();
 	
 	
-	// Initialize 320x200 paletted graphics mode
-	initGraphics(320, 200);
+	// Initialize 800x600 graphics mode
+	initGraphics(800, 600);
 	_screen = new Graphics::Screen();
 
 	// Set the engine's debugger console
@@ -116,23 +129,17 @@ Common::Error SyberiaEngine::run() {
 
 	// Draw a series of boxes on screen as a sample
 	for (int i = 0; i < 100; ++i)
-		_screen->frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
+		_screen->frameRect(Common::Rect(i, i, 800 - i, 200 - i), i);
 	_screen->update();
 
 	// Simple event handling loop
-	byte pal[256 * 3] = { 0 };
 	Common::Event e;
-	int offset = 0;
 
 	while (!shouldQuit()) {
 		while (g_system->getEventManager()->pollEvent(e)) {
 		}
 
-		// Cycle through a simple palette
-		++offset;
-		for (int i = 0; i < 256; ++i)
-			pal[i * 3 + 1] = (i + offset) % 256;
-		g_system->getPaletteManager()->setPalette(pal, 0, 256);
+		_application->run();
 		_screen->update();
 
 		// Delay for a bit. All events loops should have a delay

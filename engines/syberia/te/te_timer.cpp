@@ -23,33 +23,165 @@
 
 namespace Syberia {
 
-TeTimer::TeTimer() : _stopped(true) {
+
+/*static*/ bool TeTimer::_pausedAll;
+/*static*/ unsigned long TeTimer::_realTime;
+/*static*/ Common::Array<TeTimer *> TeTimer::_timers;
+/*static*/ Common::Array<TeTimer *> TeTimer::_pausedTimers;
+/*static*/ TeRealTimer *TeTimer::_realTimer;
+
+
+TeTimer::TeTimer() : _stopped(true), _pausable(true), _alarmTime(0),
+_startTime(0), _lastTimeElapsed(0), _startTimeOffset(0), _updated(false) {
 }
 
 void TeTimer::stop() {
-	error("TODO: Implement me");
+	pause();
+	_lastTimeElapsed = 0;
+	_startTime = 0;
+	_startTimeOffset = 0;
 }
 
 void TeTimer::start() {
-	error("TODO: Implement me");
+	if (!_stopped)
+		return;
+
+	unsigned long timeOffset = (_realTime - _startTime) + _startTimeOffset;
+	_startTimeOffset = timeOffset;
+	_startTime = _realTime;
+	_lastTimeElapsed = timeOffset;
+	_stopped = false;
+	_updated = false;
+	_timers.push_back(this);
+	if (_pausedAll && _pausable) {
+		_pausedTimers.push_back(this);
+		pause();
+	}
 }
 
 void TeTimer::pause() {
-	error("TODO: Implement me");
+	if (!_stopped) {
+		_startTime = _realTime;
+		_stopped = true;
+		for (uint i = 0; i < _timers.size(); i++) {
+			if (_timers[i] == this) {
+				_timers.remove_at(i);
+				break;
+			}
+		}
+	}
 }
 
-double TeTimer::getTimeFromStart() {
-	error("TODO: Implement me");
-	return 1.0;
+void TeTimer::update() {
+	if (!_updated) {
+		unsigned long timeOffset = (_realTime - _startTime) + _startTimeOffset;
+		_startTimeOffset = timeOffset;
+		_startTime = _realTime;
+		_lastTimeElapsed = timeOffset;
+		_updated = true;
+	}
+	if (_alarmSet) {
+		unsigned long timeOffset = _realTime;
+		if (_stopped)
+			timeOffset = _startTime;
+		timeOffset -= _startTimeOffset;
+		if (timeOffset >= _alarmTime) {
+			_alarmTime = 0;
+			_alarmSet = false;
+			_alarmSignal.call();
+		}
+	}
 }
 
-double TeTimer::timeElapsed() {
-	error("TODO: Implement me");
-	return 1.0;
+unsigned long TeTimer::getTimeFromStart() {
+	unsigned long timeNow;
+	if (!_stopped)
+		timeNow = _realTime;
+	else
+		timeNow = _startTime;
+	return timeNow - _startTimeOffset;
 }
 
-void TeTimer::setAlarmIn(long val) {
-	error("TODO: Implement me");
+unsigned long TeTimer::timeElapsed() {
+	unsigned long elapsed = _realTime - _lastTimeElapsed;
+	_lastTimeElapsed = elapsed + _lastTimeElapsed;
+	return elapsed;
+}
+
+unsigned long TeTimer::time_() {
+	return realTimer()->time_();
+}
+
+void TeTimer::pausable(bool ispausable) {
+	_pausable = ispausable;
+	if (!_pausable) {
+		for (uint i = 0; i < _pausedTimers.size(); i++) {
+			if (_pausedTimers[i] == this) {
+				_pausedTimers.remove_at(i);
+				break;
+			}
+		}
+	} else if (_pausedAll) {
+		// ensure this is paused now
+		bool add = true;
+		for (TeTimer *pausedTimer : _pausedTimers) {
+			if (pausedTimer == this) {
+				add = false;
+				break;
+			}
+		}
+		if (add)
+			_pausedTimers.push_back(this);
+		pause();
+	}
+}
+
+void TeTimer::setAlarmIn(unsigned long offset) {
+	unsigned long timeNow = _realTime;
+	if (_stopped)
+		timeNow = _startTime;
+	timeNow -= _startTimeOffset;
+	_alarmTime = timeNow + offset;
+	_alarmSet = true;
+}
+
+/*static*/ TeRealTimer *TeTimer::realTimer() {
+	if (!_realTimer)
+		_realTimer = new TeRealTimer();
+	return _realTimer;
+}
+
+/*static*/ void TeTimer::pauseAll() {
+	if (_pausedAll)
+		return;
+
+	_pausedAll = true;
+	_realTime = _realTimer->getTimeFromStart();
+	for (TeTimer *timer : _timers) {
+		if (timer->_stopped || !timer->_pausable)
+			continue;
+		_pausedTimers.push_back(timer);
+		timer->pause();
+	}
+}
+
+/*static*/ void TeTimer::resumeAll() {
+	if (!_pausedAll)
+		return;
+
+	_pausedAll = false;
+
+	_realTime = realTimer()->getTimeFromStart();
+	for (TeTimer *timer : _pausedTimers) {
+		timer->start();
+	}
+	_pausedTimers.clear();
+}
+
+/*static*/ void TeTimer::updateAll() {
+	_realTime = _realTimer->getTimeFromStart();
+	for (auto *timer : _timers)
+		timer->update();
 }
 
 } // end namespace Syberia

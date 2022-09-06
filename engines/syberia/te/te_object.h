@@ -34,7 +34,7 @@ public:
 	void deleteLater();
 	
 	/** Delete all pending objects now */
-	void deleteNow();
+	static void deleteNow();
 
 private:
 	static Common::Array<TeObject *> _pendingDeleteList;

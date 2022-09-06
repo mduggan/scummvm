@@ -61,6 +61,7 @@ private:
 protected:
 	// Engine APIs
 	Common::Error run() override;
+	
 public:
 	Graphics::Screen *_screen = nullptr;
 public:
@@ -116,6 +117,9 @@ public:
 	TeSoundManager *getSoundManager();
 	TeRenderer *getRenderer();
 	TeResourceManager *getResourceManager();
+
+private:
+	void configureSearchPaths();
 
 };
 

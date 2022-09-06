@@ -29,7 +29,7 @@
 
 namespace Syberia {
 
-template <typename T> T TeLuaTo(lua_State *L, int index) {
+template <typename T> static T TeLuaTo(lua_State *L, int index) {
 	void *ptr = lua_touserdata(L, index);
 	if (!ptr)
 		return nullptr;
@@ -37,7 +37,7 @@ template <typename T> T TeLuaTo(lua_State *L, int index) {
 	return dynamic_cast<T>(obj);
 }
 
-Common::String TeLuaToTeString(lua_State *L, int index) {
+static Common::String TeLuaToTeString(lua_State *L, int index) {
 	if (!lua_isstring(L, index)) {
 		warning("TeLuaToTeString:: not a string");
 		return "";
@@ -55,7 +55,7 @@ long TeLuaToS32(lua_State *L, int index) {
 	}
 }
 
-long TeLuaToU32(lua_State *L, int index) {
+static long TeLuaToU32(lua_State *L, int index) {
 	if (!lua_isnumber(L, index)) {
 		warning("TeLuaToU32:: not a number");
 		return 0;
@@ -64,7 +64,7 @@ long TeLuaToU32(lua_State *L, int index) {
 	}
 }
 
-float TeLuaToF32(lua_State *L, int index) {
+static float TeLuaToF32(lua_State *L, int index) {
 	if (!lua_isnumber(L, index)) {
 		warning("TeLuaToF32:: not a number");
 		return 0.0f;
@@ -73,7 +73,7 @@ float TeLuaToF32(lua_State *L, int index) {
 	}
 }
 
-bool TeLuaToBool(lua_State *L,int index) {
+static bool TeLuaToBool(lua_State *L,int index) {
   if (lua_type(L, index) != LUA_TBOOLEAN) {
 	  warning("TeLuaToBool:: not a bool");
 	  return false;
@@ -83,7 +83,7 @@ bool TeLuaToBool(lua_State *L,int index) {
 }
 
 
-TeColor TeLuaToTeColor(lua_State *L, int index) {
+static TeColor TeLuaToTeColor(lua_State *L, int index) {
 	TeColor retval(255, 255, 255, 255);
 	if (lua_type(L, index) != LUA_TTABLE) {
 		warning("TeLuaToTeColor:: not a table");
@@ -124,7 +124,7 @@ TeColor TeLuaToTeColor(lua_State *L, int index) {
 }
 
 
-TeVector3f32 TeLuaToTeVector3f32(lua_State *L, int index,TeVector3f32 defaultVal) {
+static TeVector3f32 TeLuaToTeVector3f32(lua_State *L, int index,TeVector3f32 defaultVal) {
 	TeVector3f32 retval = defaultVal;
 	if (lua_type(L, index) != LUA_TTABLE) {
 		warning("TeLuaToTeVector3f32:: not a table");

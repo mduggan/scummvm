@@ -19,34 +19,14 @@
  *
  */
 
-#include "common/hash-str.h"
-#include "common/textconsole.h"
-#include "syberia/te/te_xml_gui.h"
 #include "syberia/te/te_name_val_xml_parser.h"
 
 namespace Syberia {
 
-TeXmlGui::TeXmlGui() {
+// Parser callback methods
+bool TeNameValXmlParser::parserCallback_value(ParserNode *node) {
+	_map.setVal(node->values["name"], node->values["value"]);
+	return true;
 }
-
-Common::String TeXmlGui::value(const Common::String &key) {
-	error("TODO: TeXmlGui::value Implement me.");
-}
-
-void TeXmlGui::load(const Common::Path &path) {
-	clear();
-
-	TeNameValXmlParser parser;
-	if (!parser.loadFile(path.toString()))
-		error("LocFile::load: failed to load xml.");
-	
-	_map = parser.getMap();
-}
-
-void TeXmlGui::clear() {
-	
-}
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

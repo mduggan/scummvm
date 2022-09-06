@@ -61,14 +61,17 @@ MODULE_OBJS := \
 	te/te_lua_script.o \
 	te/te_lua_thread.o \
 	te/te_material.o \
+	te/te_matricies_stack.o \
 	te/te_matrix4x4.o \
 	te/te_mesh.o \
 	te/te_model.o \
 	te/te_model_animation.o \
 	te/te_model_vertex_animation.o \
 	te/te_music.o \
+	te/te_name_val_xml_parser.o \
 	te/te_object.o \
 	te/te_quaternion.o \
+	te/te_real_timer.o \
 	te/te_renderer.o \
 	te/te_resource.o \
 	te/te_resource_manager.o \
@@ -78,6 +81,7 @@ MODULE_OBJS := \
 	te/te_sfx.o \
 	te/te_sprite_layout.o \
 	te/te_text_layout.o \
+	te/te_tiled_texture.o \
 	te/te_timer.o \
 	te/te_trs.o \
 	te/te_variant.o \

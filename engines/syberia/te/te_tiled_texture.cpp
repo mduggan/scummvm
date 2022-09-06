@@ -19,32 +19,11 @@
  *
  */
 
-#include "common/hash-str.h"
-#include "common/textconsole.h"
-#include "syberia/te/te_xml_gui.h"
-#include "syberia/te/te_name_val_xml_parser.h"
+#include "syberia/te/te_tiled_texture.h"
 
 namespace Syberia {
 
-TeXmlGui::TeXmlGui() {
-}
-
-Common::String TeXmlGui::value(const Common::String &key) {
-	error("TODO: TeXmlGui::value Implement me.");
-}
-
-void TeXmlGui::load(const Common::Path &path) {
-	clear();
-
-	TeNameValXmlParser parser;
-	if (!parser.loadFile(path.toString()))
-		error("LocFile::load: failed to load xml.");
-	
-	_map = parser.getMap();
-}
-
-void TeXmlGui::clear() {
-	
+TeTiledTexture::TeTiledTexture() {
 }
 
 // TODO: Add more functions here.

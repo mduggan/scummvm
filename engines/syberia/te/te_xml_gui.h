@@ -23,6 +23,7 @@
 #define SYBERIA_TE_TE_XML_GUI_H
 
 #include "common/str.h"
+#include "common/path.h"
 
 namespace Syberia {
 
@@ -31,10 +32,15 @@ public:
 	TeXmlGui();
 
 	Common::String value(const Common::String &key);
+	
+	void clear();
+	
+	void load(const Common::Path &path);
 
 	// TODO add public members
 
 private:
+	Common::StringMap _map;
 	// TODO add private members
 
 };

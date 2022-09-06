@@ -19,34 +19,36 @@
  *
  */
 
-#include "common/hash-str.h"
-#include "common/textconsole.h"
-#include "syberia/te/te_xml_gui.h"
-#include "syberia/te/te_name_val_xml_parser.h"
+#ifndef SYBERIA_TE_TE_REAL_TIMER_H
+#define SYBERIA_TE_TE_REAL_TIMER_H
 
 namespace Syberia {
 
-TeXmlGui::TeXmlGui() {
-}
+/* All times in microseconds. */
+class TeRealTimer {
+public:
+	TeRealTimer();
 
-Common::String TeXmlGui::value(const Common::String &key) {
-	error("TODO: TeXmlGui::value Implement me.");
-}
+	unsigned long getTimeFromStart();
+	void pause();
+	void start();
+	void stop();
+	unsigned long systemTime();
+	unsigned long monotonicSystemTime();
+	unsigned long time_();
+	unsigned long timeElapsed();
+	unsigned long timeFromLastTimeElapsed();
 
-void TeXmlGui::load(const Common::Path &path) {
-	clear();
+private:
+	unsigned long _startTime;
+	unsigned long _startTime2;
+	unsigned long _pausedTime;
+	unsigned long _maxTimeSeen;
+	bool _paused;
+	// TODO add private members
 
-	TeNameValXmlParser parser;
-	if (!parser.loadFile(path.toString()))
-		error("LocFile::load: failed to load xml.");
-	
-	_map = parser.getMap();
-}
-
-void TeXmlGui::clear() {
-	
-}
-
-// TODO: Add more functions here.
+};
 
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_REAL_TIMER_H

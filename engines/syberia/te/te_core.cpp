@@ -24,6 +24,7 @@
 namespace Syberia {
 
 TeCore::TeCore() : _loc(nullptr), _coreNotReady(true) {
+	create();
 }
 
 void TeCore::addLoc(TeILoc *loc) {
@@ -34,8 +35,10 @@ void TeCore::addLoc(TeILoc *loc) {
 }
 
 void TeCore::create() {
+	language("en");
 	_coreNotReady = false;
-	error("TeCore::create: Implement me.");
+	_activityTrackingTimer.alarmSignal().add<TeCore>(this, &TeCore::onActivityTrackingAlarm);
+	warning("TeCore::create: Finish implementing me.");
 }
 
 const Common::String &TeCore::fileFlagSystemFlag(const Common::String &name) const {
@@ -68,6 +71,10 @@ const Common::String &TeCore::language() const {
 
 void TeCore::language(const Common::String &val) {
 	return fileFlagSystemSetFlag("language", val);
+}
+
+bool TeCore::onActivityTrackingAlarm() {
+	error("TODO: Implement me");
 }
 
 } // end namespace Syberia

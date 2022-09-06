@@ -68,6 +68,9 @@ public:
 	void freeSceneObjects();
 	void unloadSpriteLayouts();
 	
+	// Does nothing, but to keep calls from original..
+	static void updateScroll() {};
+	
 	bool findKate();
 
 	Character *_character;

@@ -30,7 +30,7 @@ void TeObject::deleteLater() {
 	_pendingDeleteList.push_back(this);
 }
 
-void TeObject::deleteNow() {
+/*static*/ void TeObject::deleteNow() {
 	uint len = _pendingDeleteList.size();
 	for (uint i = 0; i < len; i++) {
 		delete _pendingDeleteList[i];

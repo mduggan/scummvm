@@ -24,6 +24,8 @@
 
 #include "math/quat.h"
 
+#include "syberia/te/te_vector3f32.h"
+
 namespace Syberia {
 
 class TeQuaternion: public Math::Quaternion {
@@ -31,6 +33,16 @@ public:
 	TeQuaternion();
 	TeQuaternion(const Math::Quaternion &q) : Math::Quaternion(q) {};
 
+	static TeQuaternion fromAxisAndAngle(const TeVector3f32 &axis, float angle) {
+		TeQuaternion ret;
+		float f = sinf(angle * 0.5);
+		ret.w() = axis.x() * f;
+		ret.x() = axis.y() * f;
+		ret.y() = axis.z() * f;
+		ret.z() = cosf(angle * 0.5);
+		return ret;
+	}
+	
 	static void deserialize(Common::ReadStream *stream, TeQuaternion *dest) {
 		dest->value(0) = stream->readFloatLE();
 		dest->value(1) = stream->readFloatLE();

@@ -22,16 +22,19 @@
 #ifndef SYBERIA_TE_TE_I_LOC_H
 #define SYBERIA_TE_TE_I_LOC_H
 
+#include "common/str.h"
+#include "common/hash-str.h"
+
 namespace Syberia {
 
 class TeILoc {
 public:
 	TeILoc();
 
-	// TODO add public members
+	virtual Common::String *text(const Common::String &key);
 
-private:
-	// TODO add private members
+protected:
+	Common::StringMap _map;
 
 };
 

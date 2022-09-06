@@ -43,8 +43,8 @@ public:
 	TeVector3f32 directionVector() const;
 	void disable(uint lightno);
 	void enable(uint lightno);
-	void enableAll();
-	void disableAll();
+	static void enableAll();
+	static void disableAll();
 	
 	void draw(TeCamera &camera);
 	
