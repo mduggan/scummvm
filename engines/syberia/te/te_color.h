@@ -48,12 +48,22 @@ public:
 	
 	bool serialize(Common::WriteStream &stream) const;
 	bool deserialize(Common::ReadStream &stream);
+	
+	bool operator==(const TeColor &c) const {
+		return (_c[0] == c._c[0] && _c[1] == c._c[1] &&
+				_c[2] == c._c[2] && _c[3] == c._c[3]);
+	}
+	bool operator!=(const TeColor &c) {
+		return !operator==(c);
+	}
 
 private:
 	byte _c[4];
 };
 
 TeColor operator*(const TeColor &c1, const TeColor &c2);
+TeColor operator*(const TeColor &c1, double amount);
+TeColor operator+(const TeColor &c1, const TeColor &c2);
 
 } // end namespace Syberia
 

@@ -27,9 +27,15 @@
 
 namespace Syberia {
 
-template<class T1, class T2>
+template<class T> static T linearInterpolation(T &obj1, T &obj2, double amount) {
+	return (obj1 * (1.0 - amount)) + (obj2 * amount);
+};
+
+template<class T, class S>
 class TeCurveAnim2 : public TeAnimation {
 public:
+	typedef void(T::*TMethod)(S);
+
 	TeCurveAnim2() {}
 	virtual ~TeCurveAnim2() {}
 
@@ -39,14 +45,30 @@ public:
 		_interp.load(curve);
 	}
 
-	void update(double pos) {
-		error("TODO: Implement me.");
+	void update(double time) {
+		_lastUpdateTime = time;
+		
+		double amount = _interp.interpole(time, _maxTime);
+		
+		const S interpVal = linearInterpolation<S>(_firstVal, _secondVal, amount);
+		(_callbackObj->*_callbackMethod)(interpVal);
+		if (_lastUpdateTime >= _maxTime) {
+			if (_repeatCount == -1)
+				seekToStart();
+			else
+				onFinished().call();
+		}
 	}
+
+	S _firstVal;
+	S _secondVal;
+	T *_callbackObj;
+	TMethod _callbackMethod;
+	double _maxTime;
 
 private:
 	TeInterpolation _interp;
 	double _lastUpdateTime;
-
 };
 
 } // end namespace Syberia

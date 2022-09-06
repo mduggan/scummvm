@@ -20,7 +20,9 @@
  */
 
 #include "common/textconsole.h"
+#include "syberia/syberia.h"
 #include "syberia/te/te_visual_fade.h"
+#include "syberia/te/te_renderer.h"
 
 namespace Syberia {
 
@@ -40,9 +42,27 @@ void TeVisualFade::captureFrame() {
 }
 
 void TeVisualFade::init() {
-	error("TODO: Implement me.");
+	_fadeCaptureSprite.setName("fadeCaptureSprite");
+	_fadeCaptureSprite.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
+	_fadeCaptureSprite.setSize(TeVector3f32(1.0, 1.0, 0.0));
+	_fadeCaptureSprite.setVisible(false);
+
+	_blackFadeSprite.setName("blackFadeSprite");
+	_blackFadeSprite.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
+	_blackFadeSprite.setSize(TeVector3f32(2.0, 2.0, 0.0));
+	_blackFadeSprite.load("pictures/black64x64.png");
+	_blackFadeSprite.setColor(TeColor(0xff, 0xff, 0xff, 0));
+	_blackFadeSprite.setVisible(false);
+
+	_texturePtr.reset(new Te3DTexture());
+	/*	 
+	 // create an image the size of the window, no palette, format 6.
+	_image.create(windowX, windowY, nullptr, 6);
+	 */
+	//_texturePtr->load(image);
+	g_engine->getRenderer()->enableTexture();
+	//_texturePtr->load(image);
 }
 
-// TODO: Add more functions here.
 
 } // end namespace Syberia

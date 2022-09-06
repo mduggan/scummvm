@@ -40,6 +40,8 @@ const DebugChannelDef SyberiaMetaEngineDetection::debugFlagList[] = {
 
 SyberiaMetaEngineDetection::SyberiaMetaEngineDetection() : AdvancedMetaEngineDetection(Syberia::GAME_DESCRIPTIONS,
 	sizeof(ADGameDescription), Syberia::GAME_NAMES) {
+	_flags = kADFlagMatchFullPaths;
+	_maxScanDepth = 3;
 }
 
 REGISTER_PLUGIN_STATIC(SYBERIA_DETECTION, PLUGIN_TYPE_ENGINE_DETECTION, SyberiaMetaEngineDetection);

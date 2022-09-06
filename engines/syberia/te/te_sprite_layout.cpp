@@ -38,7 +38,13 @@ bool TeSpriteLayout::onParentWorldColorChanged() {
 	error("TODO: Implement me.");
 }
 
-void TeSpriteLayout::load(const Common::String &path) {
+bool TeSpriteLayout::load(const Common::String &path) {
+	if (path.empty()) {
+		_tiledTexturePtr.reset();
+		return true;
+	}
+	
+	
 	error("TODO: Implement me.");
 }
 
@@ -58,7 +64,7 @@ void TeSpriteLayout::setBufferSize(long bufsize) {
 	error("TODO: Implement me.");
 }
 
-void TeSpriteLayout::setColor(const TeColor &col) {
+void TeSpriteLayout::setColor(TeColor col) {
 	error("TODO: Implement me.");
 }
 
@@ -75,11 +81,15 @@ void TeSpriteLayout::setColorKeyTolerance(float val) {
 }
 
 bool TeSpriteLayout::setName(const Common::String &newName) {
-	error("TODO: Implement me.");
+	TeLayout::setName(newName);
+	warning("TODO: TeSpriteLayout::setName setName of tiled surface.");
+	//_tiledTexturePtr->setName(newName);
+	return true;
 }
 
 void TeSpriteLayout::setSize(const TeVector3f32 &newSize) {
-	error("TODO: Implement me.");
+	TeLayout::setSize(newSize);
+	_sizeSet = true;
 }
 
 void TeSpriteLayout::stop() {

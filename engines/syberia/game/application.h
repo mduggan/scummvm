@@ -23,18 +23,24 @@
 #define SYBERIA_GAME_APPLICATION_H
 
 #include "common/str.h"
+#include "common/ptr.h"
 
 #include "syberia/game/bonus_menu.h"
 #include "syberia/game/credits.h"
 #include "syberia/game/global_bonus_menu.h"
 #include "syberia/game/main_menu.h"
 #include "syberia/game/loc_file.h"
+#include "syberia/game/owner_error_menu.h"
+#include "syberia/game/splash_screens.h"
+#include "syberia/game/in_game_scene.h"
 
 #include "syberia/te/te_visual_fade.h"
 #include "syberia/te/te_music.h"
 #include "syberia/te/te_xml_gui.h"
 
 namespace Syberia {
+
+class TeFont3;
 
 class Application {
 public:
@@ -45,7 +51,7 @@ public:
 
 	void startGame();
 	void resume();
-	void run();
+	bool run();
 	void suspend();
 	void showNoCellIcon(bool show);
 	void showLoadingIcon(bool show);
@@ -93,17 +99,41 @@ public:
 private:
 	TeVisualFade _visFade;
 	TeMusic _music;
+	TeSpriteLayout _appSpriteLayout;
+	TeSpriteLayout _mouseCursorLayout;
+	TeButtonLayout _lockCursorButton;
+	TeButtonLayout _lockCursorFromActionButton;
+	TeSpriteLayout _autoSaveIcon1;
+	TeSpriteLayout _autoSaveIcon2;
+	
+	TeCurveAnim2<Te3DObject2, TeColor> _autoSaveIconAnim1;
+	TeCurveAnim2<Te3DObject2, TeColor> _autoSaveIconAnim2;
+	
+	TeSignal0Param _blackFadeAnimationFinishedSignal;
 
 	GlobalBonusMenu _globalBonusMenu;
 	BonusMenu _bonusMenu;
 	MainMenu _mainMenu;
 	Credits _credits;
+	OwnerErrorMenu _ownerErrorMenu;
+	SplashScreens _splashScreens;
+	InGameScene _inGameScene;
 	
+	Common::SharedPtr<TeFont3> _fontComic;
+	Common::SharedPtr<TeFont3> _fontArgh;
+	Common::SharedPtr<TeFont3> _fontArial;
+	Common::SharedPtr<TeFont3> _fontChaucer;
+	Common::SharedPtr<TeFont3> _fontColaborate;
+	Common::SharedPtr<TeFont3> _fontProDisplay;
+
 	bool _captureFade;
 	bool _created;
 	
+	bool _gameFinished;
+	int _difficulty;
+	
 	TeXmlGui _helpGui;
-
+	static bool _dontUpdateWhenApplicationPaused;
 };
 
 } // end namespace Syberia

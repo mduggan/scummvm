@@ -19,34 +19,38 @@
  *
  */
 
-#include "common/hash-str.h"
-#include "common/textconsole.h"
-#include "syberia/te/te_xml_gui.h"
-#include "syberia/te/te_name_val_xml_parser.h"
+#ifndef SYBERIA_TE_TE_MATRICIES_STACK_H
+#define SYBERIA_TE_TE_MATRICIES_STACK_H
+
+#include "common/stack.h"
+
+#include "syberia/te/te_matrix4x4.h"
+#include "syberia/te/te_quaternion.h"
 
 namespace Syberia {
 
-TeXmlGui::TeXmlGui() {
-}
+class TeMatriciesStack {
+public:
+	TeMatriciesStack();
 
-Common::String TeXmlGui::value(const Common::String &key) {
-	error("TODO: TeXmlGui::value Implement me.");
-}
+	const TeMatrix4x4 &currentMatrix() const;
+	bool isEmpty() const;
+	void loadIdentity();
+	void loadMatrix(const TeMatrix4x4 &matrix);
+	void multiplyMatrix(const TeMatrix4x4 &matrix);
+	void popMatrix();
+	void pushMatrix();
+	void rotate(const TeQuaternion &rot);
+	void rotate(float f, const TeVector3f32 &rot);
+	void scale(const TeVector3f32 &scale);
+	long size();
+	void translate(const TeVector3f32 &trans);
 
-void TeXmlGui::load(const Common::Path &path) {
-	clear();
-
-	TeNameValXmlParser parser;
-	if (!parser.loadFile(path.toString()))
-		error("LocFile::load: failed to load xml.");
+private:
+	Common::Stack<TeMatrix4x4> _stack;
 	
-	_map = parser.getMap();
-}
-
-void TeXmlGui::clear() {
-	
-}
-
-// TODO: Add more functions here.
+};
 
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_MATRICIES_STACK_H

@@ -26,6 +26,11 @@ namespace Syberia {
 TeILoc::TeILoc() {
 }
 
-// TODO: Add more functions here.
+Common::String *TeILoc::text(const Common::String &key) {
+	if (!_map.contains(key)) {
+		return nullptr;
+	}
+	return &_map.find(key)->_value;
+}
 
 } // end namespace Syberia

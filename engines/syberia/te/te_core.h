@@ -50,7 +50,7 @@ public:
 	const Common::String &language() const;
 	void language(const Common::String &val);
 	
-	void onActivityTrackingAlarm();
+	bool onActivityTrackingAlarm();
 	void enableActivityTracking(bool enable);
 	void setActivityTrackingFolder(const Common::String &path);
 

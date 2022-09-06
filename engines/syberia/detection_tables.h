@@ -23,6 +23,8 @@ namespace Syberia {
 
 const PlainGameDescriptor GAME_NAMES[] = {
 	{ "syberia", "Syberia" },
+	{ "amerzone", "Amerzone" },
+	{ "syberia2", "Syberia II" },
 	{ 0, 0 }
 };
 
@@ -30,9 +32,9 @@ const ADGameDescription GAME_DESCRIPTIONS[] = {
 	{
 		"syberia",
 		nullptr,
-		AD_ENTRY1s("file1.bin", "00000000000000000000000000000000", 11111),
+		AD_ENTRY1s("MacOS/Syberia", "6951fb8f71fe06f34684564625f73cd8", 10640592),
 		Common::EN_ANY,
-		Common::kPlatformDOS,
+		Common::kPlatformMacintosh,
 		ADGF_UNSTABLE,
 		GUIO1(GUIO_NONE)
 	},

@@ -23,15 +23,18 @@
 #define SYBERIA_GAME_LOC_FILE_H
 
 #include "common/str.h"
+#include "common/path.h"
+
+#include "syberia/te/te_i_loc.h"
 
 namespace Syberia {
 
-class LocFile {
+class LocFile : public TeILoc {
 public:
 	LocFile();
 
 	//const Common::String *avatar(const Common::String &key);
-	void load(const Common::String &path);
+	void load(const Common::Path &path);
 	const Common::String *value(const Common::String &key);
 
 private:

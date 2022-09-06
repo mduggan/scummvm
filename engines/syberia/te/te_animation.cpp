@@ -76,20 +76,20 @@ void TeAnimation::seekToStart() {
 	update(_runTimer.getTimeFromStart() / 1000.0);
 }
 
-void TeAnimation::pauseAll() {
-	// TODO: Original checks some flag on the animation timers.. pausable?
+/*static*/ void TeAnimation::pauseAll() {
 	for (auto &anim : _animations) {
-		anim->pause();
+		if (!anim->_runTimer._stopped)
+			anim->pause();
 	}
 }
 
-void TeAnimation::resumeAll() {
+/*static*/ void TeAnimation::resumeAll() {
 	for (auto &anim : _animations) {
 		anim->cont();
 	}
 }
 
-void TeAnimation::updateAll() {
+/*static*/ void TeAnimation::updateAll() {
 	for (auto &anim : _animations) {
 		if (!anim->_runTimer._stopped)
 			anim->update(anim->_runTimer.getTimeFromStart() / 1000.0);

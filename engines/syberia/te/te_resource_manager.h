@@ -45,9 +45,9 @@ public:
 	void removeResource(TeResource *resource);
 	
 	template<class T> Common::SharedPtr<T> getResource(const Common::Path &path) {
-		for (uint i = 0; i < this->_resources.size(); i++) {
-			if (_resources[i]->getAccessName() == path) {
-				return Common::SharedPtr<T>(static_cast<T *>(this->_resources[i]));
+		for (TeResource *resource : this->_resources) {
+			if (resource->getAccessName() == path) {
+				return Common::SharedPtr<T>(static_cast<T *>(resource));
 			}
 		}
 		

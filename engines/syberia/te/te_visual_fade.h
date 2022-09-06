@@ -22,9 +22,15 @@
 #ifndef SYBERIA_TE_TE_VISUAL_FADE_H
 #define SYBERIA_TE_TE_VISUAL_FADE_H
 
+#include "common/ptr.h"
+
+#include "syberia/te/te_3d_texture.h"
+#include "syberia/te/te_sprite_layout.h"
+#include "syberia/te/te_button_layout.h"
+
 namespace Syberia {
 
-class TeVisualFade {
+class TeVisualFade : public TeSpriteLayout {
 public:
 	TeVisualFade();
 
@@ -34,7 +40,13 @@ public:
 	void clear() {};
 	void init();
 
+	TeSpriteLayout _fadeCaptureSprite;
+	TeSpriteLayout _blackFadeSprite;
+	TeButtonLayout _buttonLayout;
+
 private:
+
+	Common::SharedPtr<Te3DTexture> _texturePtr;
 	// TODO add private members
 
 };

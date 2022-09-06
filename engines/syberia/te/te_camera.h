@@ -67,16 +67,25 @@ public:
 	TeVector3f32 transformPoint2Dto3D(const TeVector2f32 &pt);
 	void updateProjectionMatrix();
 
-	void viewport(int x1, int y1, uint width, uint height);
+	void viewport(int x, int y, uint width, uint height);
 
 private:
+	int _viewportX;
+	int _viewportY;
+	uint _viewportW;
+	uint _viewportH;
+	float _widthScale;
+	float _heightScale;
+	
 	int _projectionMatrixType;
 	float _orthogonalParam1;
 	float _orthogonalParam2;
 	float _orthogonalParam3;
 	float _orthogonalParam4;
 	
-	// TODO add private members
+	TeMatrix4x4 _projectionMatrix;
+	
+	TeSignal0Param _onViewportChangedSignal;
 
 };
 

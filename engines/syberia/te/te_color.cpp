@@ -66,4 +66,12 @@ TeColor operator*(const TeColor &c1, const TeColor &c2) {
 		((c2.a() * (c1.a() / 255.0)) / 255.0) * 255.0);
 }
 
+TeColor operator*(const TeColor &c, double amount) {
+	return TeColor(c.r() * amount, c.g() * amount, c.b() * amount, c.a() * amount);
+}
+
+TeColor operator+(const TeColor &c1, const TeColor &c2) {
+	return TeColor(c1.r() + c2.r(), c1.g() + c2.g(), c1.b() + c2.b(), c1.a() + c2.a());
+}
+
 } // end namespace Syberia

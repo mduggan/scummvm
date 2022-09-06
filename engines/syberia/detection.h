@@ -48,11 +48,11 @@ public:
 	~SyberiaMetaEngineDetection() override {}
 
 	const char *getEngineName() const override {
-		return "syberia";
+		return "Syberia Tetraedge Engine";
 	}
 
 	const char *getName() const override {
-		return "Syberia";
+		return "syberia";
 	}
 
 	const char *getOriginalCopyright() const override {

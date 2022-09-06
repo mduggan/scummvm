@@ -21,10 +21,21 @@
 
 #include "syberia/te/te_light.h"
 
+#include "graphics/opengl/system_headers.h"
+
 namespace Syberia {
 
 TeLight::TeLight() {
 }
+
+/*static*/ void TeLight::enableAll() {
+	glEnable(GL_LIGHTING);
+}
+
+/*static*/ void TeLight::disableAll() {
+	glDisable(GL_LIGHTING);
+}
+
 
 // TODO: Add more functions here.
 

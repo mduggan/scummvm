@@ -19,7 +19,10 @@
  *
  */
 
+#include "syberia/syberia.h"
 #include "syberia/te/te_camera.h"
+#include "syberia/te/te_matrix4x4.h"
+#include "syberia/te/te_renderer.h"
 
 namespace Syberia {
 
@@ -28,11 +31,24 @@ TeCamera::TeCamera() : _projectionMatrixType(0), _orthogonalParam1(1.0f),
 }
 
 void TeCamera::applyProjection() {
-	error("TODO: Implement me.");
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->setCurrentCamera(Common::SharedPtr<TeCamera>(this));
+	renderer->setViewport(_viewportX, _viewportY,
+						  (uint)(_viewportW * _widthScale), (uint)(_viewportH * _heightScale));
+	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
+	updateProjectionMatrix();
+	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
+	renderer->loadMatrixToGL(renderer->currentMatrix());
+	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_MODELVIEW);
 }
 
 void TeCamera::applyTransformations() {
-	error("TODO: Implement me.");
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_MODELVIEW);
+	TeMatrix4x4 matrix = transformationMatrix();
+	matrix.inverse();
+	renderer->loadMatrix(matrix);
+	renderer->loadMatrixToGL(renderer->currentMatrix());
 }
 
 void TeCamera::buildOrthoMatrix() {
@@ -68,11 +84,27 @@ void TeCamera::loadBin(const Common::ReadStream &stream) {
 }
 
 void TeCamera::orthogonalParams(float f1, float f2, float f3, float f4) {
-	error("TODO: Implement me.");
+	_orthogonalParam1 = f1;
+	_orthogonalParam2 = f2;
+	_orthogonalParam3 = f3;
+	_orthogonalParam4 = f4;
 }
 
 TeMatrix4x4 TeCamera::projectionMatrix() {
-	error("TODO: Implement me.");
+	switch(_projectionMatrixType) {
+	case 1:
+	  buildPerspectiveMatrix();
+	  break;
+	case 2:
+	  buildPerspectiveMatrix2();
+	  break;
+	case 3:
+	  buildPerspectiveMatrix3();
+	  break;
+	case 4:
+	  buildOrthoMatrix();
+	}
+	return _projectionMatrix;
 }
 
 TeVector3f32 TeCamera::projectPoint(const TeVector3f32 &pt) {
@@ -84,7 +116,9 @@ TeVector3f32 TeCamera::projectPoint3f32(const TeVector3f32 &pt) {
 }
 
 void TeCamera::restore() {
-	error("TODO: Implement me.");
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->setCurrentColor(TeColor(255, 255, 255, 255));
+	renderer->setCurrentCamera(Common::SharedPtr<TeCamera>());
 }
 
 TeMatrix4x4 TeCamera::transformationMatrix() {
@@ -100,11 +134,17 @@ TeVector3f32 TeCamera::transformPoint2Dto3D(const TeVector2f32 &pt) {
 }
 
 void TeCamera::updateProjectionMatrix() {
-	error("TODO: Implement me.");
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
+	renderer->loadProjectionMatrix(projectionMatrix());
 }
 
-void TeCamera::viewport(int x1, int y1, uint width, uint height) {
-	error("TODO: Implement me.");
+void TeCamera::viewport(int x, int y, uint w, uint h) {
+	_viewportX = x;
+	_viewportY = y;
+	_viewportW = w;
+	_viewportH = h;
+	_onViewportChangedSignal.call();
 }
 
 

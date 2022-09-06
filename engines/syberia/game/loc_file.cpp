@@ -20,22 +20,26 @@
  */
 
 #include "common/textconsole.h"
+#include "common/xmlparser.h"
 
 #include "syberia/game/loc_file.h"
+#include "syberia/te/te_name_val_xml_parser.h"
 
 namespace Syberia {
 
 LocFile::LocFile() {
 }
 
-void LocFile::load(const Common::String &path) {
-	error("TODO: implement me.");
+void LocFile::load(const Common::Path &path) {
+	TeNameValXmlParser parser;
+	if (!parser.loadFile(path.toString()))
+		error("LocFile::load: failed to load xml.");
+	
+	_map = parser.getMap();
 }
 
 const Common::String *LocFile::value(const Common::String &key) {
-	error("TODO: implement me.");
+	return text(key);
 }
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

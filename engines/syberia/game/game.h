@@ -138,6 +138,11 @@ public:
 	void update();
 
 	InventoryMenu &inventoryMenu() { return _inventoryMenu; }
+	
+	bool _running;
+	bool _returnToMainMenu;
+	bool _luaShowOwnerError;
+	
 private:
 	TeLuaGUI _gui1;
 	TeLuaGUI _gui2;
@@ -148,9 +153,7 @@ private:
 	InventoryMenu _inventoryMenu;
 	int _score;
 	
-	bool _running;
 	int _frameCounter;
-	bool _luaShowOwnerError;
 	
 	InGameScene _scene;
 	

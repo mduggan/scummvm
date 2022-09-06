@@ -105,7 +105,7 @@ public:
 	const TeVector3f32 &scale() const {
 		return _scale;
 	}
-	virtual void setColor(const TeColor &col);
+	virtual void setColor(TeColor col);
 	void setColorInheritance(bool val) {
 		_colorInheritance = val;
 	}

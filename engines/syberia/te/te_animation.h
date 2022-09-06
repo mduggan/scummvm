@@ -45,14 +45,16 @@ public:
 	void seekToStart();
 	//void staticDestroy();
 
-	void pauseAll();
-	void resumeAll();
-	void updateAll();
+	static void pauseAll();
+	static void resumeAll();
+	static void updateAll();
 
-	TeTimer _runTimer;
 	
 	TeSignal0Param &onStop() { return _onStopSignal; }
 	TeSignal0Param &onFinished() { return _onFinishedSignal; }
+
+	TeTimer _runTimer;
+	int _repeatCount;
 
 private:
 

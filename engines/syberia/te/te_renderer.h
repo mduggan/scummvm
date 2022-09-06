@@ -22,18 +22,107 @@
 #ifndef SYBERIA_TE_TE_RENDERER_H
 #define SYBERIA_TE_TE_RENDERER_H
 
+#include "common/ptr.h"
+#include "syberia/te/te_mesh.h"
+#include "syberia/te/te_color.h"
+#include "syberia/te/te_camera.h"
+#include "syberia/te/te_matricies_stack.h"
+
 namespace Syberia {
 
 class TeRenderer {
 public:
 	TeRenderer();
 
-	class TransparentMeshesArrays {};
+	enum MatrixMode {
+		MM_GL_PROJECTION = 0,
+		MM_GL_TEXTURE = 1,
+		MM_GL_MODELVIEW = 2
+	};
 	
+	enum ShadowMode {
+		ShadowMode0,
+		ShadowMode1,
+		ShadowMode2
+	};
+	
+	class TransparentMeshProperties {
+		
+	};
+	typedef uint32 Buffer;
+	
+	void addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsigned long i2, unsigned long i3);
+	void checkError(const Common::String &str) {};
+	void clearBuffer(Buffer buf);
+	void create();
+	TeMatrix4x4 currentMatrix();
 	void disableTexture();
-
+	void disableWireFrame();
+	void disableZBuffer();
+	void drawLine(const TeVector3f32 &from, const TeVector3f32 &to);
+	void enableTexture();
+	void enableWireFrame();
+	void enableZBuffer();
+	//void extractFrameBufferToImg(const TeVector2s32 &from, const TeVector2s32 &to, TeImage &output);
+	void init();
+	void loadIdentityMatrix();
+	void loadMatrix(const TeMatrix4x4 &matrix);
+	void loadMatrixToGL(const TeMatrix4x4 &matrix);
+	void loadProjectionMatrix(const TeMatrix4x4 &matrix);
+	void multiplyMatrix(const TeMatrix4x4 &matrix);
+	void optimiseTransparentMeshProperties();
+	void popMatrix();
+	void pushMatrix();
+	Common::String renderer();
+	void renderTransparentMeshes();
+	void reset();
+	void rotate(const TeQuaternion &rot);
+	void rotate(float f1, float f2, float f3, float f4);
+	void scale(float xs, float ys, float zs);
+	bool scissorEnabled() const { return _scissorEnabled; }
+	int scissorHeight() const { return _scissorHeight; }
+	int scissorWidth() const { return _scissorWidth; }
+	int scissorX() const { return _scissorX; }
+	int scissorY() const { return _scissorY; }
+	void sendModelMatrix(const TeMatrix4x4 &matrix) {}
+	void setClearColor(const TeColor &col);
+	void setCurrentCamera(const Common::SharedPtr<TeCamera> &camera) {
+		_currentCamera = camera;
+	}
+	void setCurrentColor(const TeColor &col);
+	void setMatrixMode(enum MatrixMode mode);
+	void setScissor(int x, int y, int w, int h);
+	void setScissorEnabled(bool val) { _scissorEnabled = val; }
+	void setViewport(int x, int y, int w, int h);
+	void shadowMode(enum ShadowMode mode);
+	void translate(float x, float y, float z);
+	Common::String vendor();
+	
 private:
-	// TODO add private members
+	Common::SharedPtr<TeCamera> _currentCamera;
+	TeColor _currentColor;
+	TeColor _clearColor;
+	bool _textureEnabled;
+	
+	ShadowMode _shadowMode;
+	MatrixMode _matrixMode;
+	
+	bool _scissorEnabled;
+	int _scissorHeight;
+	int _scissorWidth;
+	int _scissorX;
+	int _scissorY;
+	
+	long _numTransparentMeshes;
+	Common::Array<TeVector3f32> _transparentMeshVertexes;
+	Common::Array<TeVector3f32> _transparentMeshNormals;
+	Common::Array<TeVector2f32> _transparentMeshCoords;
+	Common::Array<TeColor> _transparentMeshColors;
+	Common::Array<unsigned short> _transparentMeshSomething;
+	
+	Common::Array<TransparentMeshProperties> _transparentMeshProperties;
+
+	TeMatriciesStack _matriciesStacks[3];  // one per matrix mode.
 
 };
 

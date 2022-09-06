@@ -23,6 +23,7 @@
 #define SYBERIA_TE_TE_SPRITE_LAYOUT_H
 
 #include "syberia/te/te_layout.h"
+#include "syberia/te/te_tiled_texture.h"
 
 namespace Syberia {
 
@@ -35,7 +36,7 @@ public:
 	
 	bool onParentWorldColorChanged() override;
 
-	void load(const Common::String &path);
+	bool load(const Common::String &path);
 	//void load(TeImage &img);
 	//void load(TeIntrusivePtr<Te3DTexture> &texture);
 
@@ -44,7 +45,7 @@ public:
 	void play();
 
 	void setBufferSize(long bufsize);
-	void setColor(const TeColor &col) override;
+	void setColor(TeColor col) override;
 
 	void setColorKey(const TeColor &col);
 	void setColorKeyActivated(bool activated);
@@ -59,6 +60,9 @@ public:
 	void updateSize() override;
 
 private:
+	bool _sizeSet;
+	
+	Common::SharedPtr<TeTiledTexture> _tiledTexturePtr;
 	// TODO add private members
 
 };
