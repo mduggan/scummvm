@@ -51,7 +51,9 @@ MODULE_OBJS := \
 	te/te_i_3d_object2.o \
 	te/te_i_layout.o \
 	te/te_i_loc.o \
+	te/te_image.o \
 	te/te_interpolation.o \
+	te/te_jpeg.o \
 	te/te_layout.o \
 	te/te_light.o \
 	te/te_list_layout.o \
@@ -70,6 +72,8 @@ MODULE_OBJS := \
 	te/te_music.o \
 	te/te_name_val_xml_parser.o \
 	te/te_object.o \
+	te/te_palette.o \
+	te/te_png.o \
 	te/te_quaternion.o \
 	te/te_real_timer.o \
 	te/te_renderer.o \
@@ -81,6 +85,9 @@ MODULE_OBJS := \
 	te/te_sfx.o \
 	te/te_sprite_layout.o \
 	te/te_text_layout.o \
+	te/te_tga.o \
+	te/te_theora.o \
+	te/te_tiled_surface.o \
 	te/te_tiled_texture.o \
 	te/te_timer.o \
 	te/te_trs.o \

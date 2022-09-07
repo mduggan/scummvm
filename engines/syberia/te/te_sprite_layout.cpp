@@ -23,11 +23,16 @@
 
 namespace Syberia {
 
-TeSpriteLayout::TeSpriteLayout() {
+TeSpriteLayout::TeSpriteLayout() : _tiledSurfacePtr(new TeTiledSurface()), _sizeSet(false) {
+}
+
+
+int TeSpriteLayout::bufferSize() {
+	return _tiledSurfacePtr->bufferSize();
 }
 
 void TeSpriteLayout::cont() {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->cont();
 }
 
 void TeSpriteLayout::draw() {
@@ -35,55 +40,71 @@ void TeSpriteLayout::draw() {
 }
 
 bool TeSpriteLayout::onParentWorldColorChanged() {
-	error("TODO: Implement me.");
+	Te3DObject2::onParentWorldColorChanged();
+	setColor(color());
 }
 
 bool TeSpriteLayout::load(const Common::String &path) {
 	if (path.empty()) {
-		_tiledTexturePtr.reset();
+		_tiledSurfacePtr.reset();
 		return true;
 	}
 	
+	stop();
+	unload();
 	
-	error("TODO: Implement me.");
+	if (_tiledSurfacePtr->load(path)) {
+		const TeVector2s32 texSize = _tiledSurfacePtr->_tiledTexture->_totalSize;
+		if (texSize._y <= 0) {
+			setRatio(1.0);
+		} else {
+			setRatio(texSize._x / texSize._y);
+		}
+		if (sizeType() == CoordinatesType::ABSOLUTE && !_sizeSet) {
+			setSize(TeVector3f32(texSize._x, texSize._y, 1.0));
+		}
+		updateMesh();
+	}
+	return true;
 }
 
 void TeSpriteLayout::play() {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->play();
 }
 
 void TeSpriteLayout::unload() {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->unload();
 }
 
 void TeSpriteLayout::pause() {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->pause();
 }
 
 void TeSpriteLayout::setBufferSize(long bufsize) {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->setBufferSize(bufsize);
 }
 
 void TeSpriteLayout::setColor(TeColor col) {
-	error("TODO: Implement me.");
+	Te3DObject2::setColor(col);
+	col = color();
+	_tiledSurfacePtr->setColor(col);
 }
 
 void TeSpriteLayout::setColorKey(const TeColor &col) {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->setColorKey(col);
 }
 
 void TeSpriteLayout::setColorKeyActivated(bool activated) {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->setColorKeyActivated(activated);
 }
 
-void TeSpriteLayout::setColorKeyTolerance(float val) {
-	error("TODO: Implement me.");
+void TeSpriteLayout::setColorKeyTolerence(float val) {
+	_tiledSurfacePtr->setColorKeyTolerence(val);
 }
 
 bool TeSpriteLayout::setName(const Common::String &newName) {
 	TeLayout::setName(newName);
-	warning("TODO: TeSpriteLayout::setName setName of tiled surface.");
-	//_tiledTexturePtr->setName(newName);
+	_tiledSurfacePtr->setName(newName);
 	return true;
 }
 
@@ -93,7 +114,7 @@ void TeSpriteLayout::setSize(const TeVector3f32 &newSize) {
 }
 
 void TeSpriteLayout::stop() {
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->stop();
 }
 
 void TeSpriteLayout::updateMesh() {

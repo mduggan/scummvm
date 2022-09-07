@@ -1,0 +1,65 @@
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#ifndef SYBERIA_TE_TE_I_CODEC_H
+#define SYBERIA_TE_TE_I_CODEC_H
+
+#include "common/path.h"
+#include "common/stream.h"
+
+#include "syberia/te/te_color.h"
+#include "syberia/te/te_image.h"
+#include "syberia/te/te_signal.h"
+
+namespace Syberia {
+
+class TeICodec {
+public:
+	TeICodec() {};
+
+	virtual ~TeICodec() {};
+	virtual bool load(const Common::Path &path) = 0;
+	virtual bool load(Common::ReadStream &stream) = 0;
+	virtual uint width() = 0;
+	virtual uint height() = 0;
+	virtual int nbFrames() = 0;
+	virtual TeImage::Format imageFormat() = 0;
+	virtual void setLeftBorderSize(uint val) = 0;
+	virtual uint leftBorderSize() = 0;
+	virtual void setRightBorderSize(uint val) = 0;
+	virtual uint rightBorderSize() = 0;
+	virtual void setBottomBorderSize(uint val) = 0;
+	virtual uint bottomBorderSize() = 0;
+	virtual void setTopBorderSize(uint val) = 0;
+	virtual uint topBorderSize() = 0;
+	virtual float frameRate() = 0;
+	virtual bool update(unsigned long i, TeImage &imgout) = 0;
+	virtual bool isAtEnd() = 0;
+	virtual TeSignal0Param &onVideoFinished() = 0;
+	virtual void setColorKeyActivated(bool val) = 0;
+	virtual void setColorKey(const TeColor &col) = 0;
+	virtual void setColorKeyTolerence(float val) = 0;
+
+};
+
+} // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_I_CODEC_H

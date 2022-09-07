@@ -25,21 +25,59 @@
 #include "common/path.h"
 #include "common/ptr.h"
 #include "common/str.h"
+
+#include "syberia/te/te_image.h"
+#include "syberia/te/te_matrix4x4.h"
 #include "syberia/te/te_resource.h"
+#include "syberia/te/te_vector2s32.h"
 
 namespace Syberia {
 
 class Te3DTexture : public TeResource {
 public:
 	Te3DTexture();
+	virtual ~Te3DTexture() {}
 
+	void bind();
+	void copyCurrentRender(uint xoffset, uint yoffset, uint x, uint y);
+	void create();
+	void destroy();
+
+	void ForceTexData(uint gltextures, uint xsize, uint ysize);
+
+	uint getFormat() { return _format; }
+	bool hasAlpha();
+
+	bool load(const Common::Path &path);
+	bool load(const TeImage &img);
 	static Common::SharedPtr<Te3DTexture> load2(const Common::Path &path, uint size);
-	
-	void load(const Common::Path &path);
-	// TODO add public members
+
+	static TeVector2s32 optimisedSize(const TeVector2s32 &size);
+
+	void unbind();
+	bool unload();
+	void update(const TeImage &img, uint xoff, uint yoff);
+
+	int _numFrames;
+	int _frameRate;
 
 private:
-	// TODO add private members
+	uint _format;
+	bool _createdTexture;
+	bool _loaded;
+	uint _glTexture;
+	uint _glPixelFormat;
+	TeMatrix4x4 _matrix;
+	
+	uint _texWidth;
+	uint _texHeight;
+	uint _translateX;
+	uint _translateY;
+	uint _width;
+	uint _height;
+	uint _somethingOffsetX;
+	uint _somethingOffsetY;
+	bool _flipY;
 
 };
 

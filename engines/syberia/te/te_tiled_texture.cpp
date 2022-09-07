@@ -19,12 +19,66 @@
  *
  */
 
+#include "syberia/syberia.h"
+
+#include "syberia/te/te_resource_manager.h"
 #include "syberia/te/te_tiled_texture.h"
+#include "syberia/te/te_tiled_surface.h"
 
 namespace Syberia {
 
-TeTiledTexture::TeTiledTexture() {
+TeTiledTexture::TeTiledTexture() : _tileSize(0x800, 0x800) {
 }
+
+uint TeTiledTexture::imageFormat() {
+	error("TODO: Implement TeTiledTexture::imageFormat");
+	//if (!_tileArray.empty())
+	//	return _tileArray[0].getFormat();
+	return TeImage::INVALID;
+}
+
+bool TeTiledTexture::isLoaded() {
+	error("TODO: Implement TeTiledTexture::isLoaded");
+}
+
+
+bool TeTiledTexture::load(const Common::Path &path) {
+	error("TODO: Implement TeTiledTexture::load");
+}
+
+bool TeTiledTexture::load(const TeImage &img) {
+	error("TODO: Implement TeTiledTexture::load");
+}
+
+bool TeTiledTexture::load(const Common::SharedPtr<Te3DTexture> &texture) {
+	error("TODO: Implement TeTiledTexture::load");
+}
+
+long TeTiledTexture::numberOfColumns() {
+	return ceilf((float)_totalSize._x / (float)_tileSize._x);
+}
+
+long TeTiledTexture::numberOfRow() {
+	return ceilf((float)_totalSize._y / (float)_tileSize._y);
+}
+
+/*static*/ TeImage *optimizedTileImage(const Common::Array<TeImage> &images, const TeVector2s32 &size,
+							  const Common::SharedPtr<TePalette> &pal, enum TeImage::Format format);
+
+void TeTiledTexture::release() {
+	_tileArray.clear();
+	_totalSize = TeVector2s32();
+	_somethingSize = TeVector2s32();
+}
+
+const TeTiledTexture::Tile *TeTiledTexture::tile(TeVector2s32 &loc) {
+	error("TODO: Implement TeTiledTexture::tile");
+}
+
+void TeTiledTexture::update(const TeImage &image) {
+	error("TODO: Implement TeTiledTexture::update");
+}
+
 
 // TODO: Add more functions here.
 
