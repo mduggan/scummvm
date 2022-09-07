@@ -34,7 +34,9 @@ namespace Syberia {
 	return _doubleValidationProtectionTimer;
 }
 
-TeButtonLayout::TeButtonLayout() {
+TeButtonLayout::TeButtonLayout() :
+_currentState(BUTTON_STATE_DISABLED), _clickPassThrough(false), _validationSoundVolume(1.0),
+_someClickFlag(false) {
 	_onMousePositionChangedMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChangedMaxPriority, FLT_MAX));
 
 	_onMousePositionChangedCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChanged));
@@ -122,7 +124,14 @@ void TeButtonLayout::setEnable(bool enable) {
 void TeButtonLayout::setPosition(const TeVector3f32 &pos) {
 	TeLayout::setPosition(pos);
 	if (_currentState != BUTTON_STATE_UP) {
-		error("TODO: Implement setPosition logic for not up.");
+		int somethingCount = 0;
+		if (!_intArr.empty()) {
+			error("TODO: Implement setPosition logic for not up.");
+
+		}
+		if (_someClickFlag) {
+			setState(somethingCount ? BUTTON_STATE_DISABLED : BUTTON_STATE_1);
+		}
 	}
 }
 

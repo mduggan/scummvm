@@ -22,7 +22,7 @@
 #include "common/textconsole.h"
 #include "common/debug.h"
 
-#include "graphics/opengl/system_headers.h"
+#include "graphics/opengl/glad.h"
 
 #include "syberia/te/te_renderer.h"
 #include "syberia/te/te_light.h"

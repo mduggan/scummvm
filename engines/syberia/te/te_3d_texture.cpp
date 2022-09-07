@@ -19,7 +19,7 @@
  *
  */
 
-#include "graphics/opengl/system_headers.h"
+#include "graphics/opengl/glad.h"
 
 #include "syberia/syberia.h"
 #include "syberia/te/te_3d_texture.h"

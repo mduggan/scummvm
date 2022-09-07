@@ -35,7 +35,7 @@ bool TeTga::load(const Common::Path &path) {
 	error("TODO: Implement load");
 }
 
-bool TeTga::load(Common::ReadStream &stream) {
+bool TeTga::load(Common::SeekableReadStream &stream) {
 	error("TODO: Implement load");
 }
 
@@ -45,10 +45,6 @@ uint TeTga::width() {
 
 uint TeTga::height() {
 	error("TODO: Implement height");
-}
-
-int TeTga::nbFrames() {
-	error("TODO: Implement nbFrames");
 }
 
 TeImage::Format TeTga::imageFormat() {
@@ -87,32 +83,8 @@ uint TeTga::topBorderSize() {
 	error("TODO: Implement topBorderSize");
 }
 
-float TeTga::frameRate() {
-	error("TODO: Implement frameRate");
-}
-
 bool TeTga::update(unsigned long i, TeImage &imgout) {
 	error("TODO: Implement update");
-}
-
-bool TeTga::isAtEnd() {
-	error("TODO: Implement isAtEnd");
-}
-
-TeSignal0Param &TeTga::onVideoFinished() {
-	error("TODO: Implement onVideoFinished");
-}
-
-void TeTga::setColorKeyActivated(bool val) {
-	error("TODO: Implement setColorKeyActivated");
-}
-
-void TeTga::setColorKey(const TeColor &col) {
-	error("TODO: Implement setColorKey");
-}
-
-void TeTga::setColorKeyTolerence(float val) {
-	error("TODO: Implement setColorKeyTolerence");
 }
 
 } // end namespace Syberia

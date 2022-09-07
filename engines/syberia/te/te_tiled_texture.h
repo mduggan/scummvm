@@ -36,14 +36,14 @@ namespace Syberia {
 class TeTiledTexture : public TeResource {
 public:
 	TeTiledTexture();
-	
+
 	typedef struct {
 		float x1;
 		float x2;
 		float y1;
 		float y2;
 	} Tile;
-	
+
 	uint imageFormat();
 	bool isLoaded();
 	bool load(const Common::Path &path);
@@ -51,7 +51,7 @@ public:
 	bool load(const Common::SharedPtr<Te3DTexture> &texture);
 	long numberOfColumns();
 	long numberOfRow();
-	
+
 	/*static*/ TeImage *optimizedTileImage(const Common::Array<TeImage> &images, const TeVector2s32 &size,
 								  const Common::SharedPtr<TePalette> &pal, enum TeImage::Format format);
 

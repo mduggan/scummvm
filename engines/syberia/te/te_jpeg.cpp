@@ -35,7 +35,7 @@ bool TeJpeg::load(const Common::Path &path) {
 	error("TODO: Implement load");
 }
 
-bool TeJpeg::load(Common::ReadStream &stream) {
+bool TeJpeg::load(Common::SeekableReadStream &stream) {
 	error("TODO: Implement load");
 }
 
@@ -45,10 +45,6 @@ uint TeJpeg::width() {
 
 uint TeJpeg::height() {
 	error("TODO: Implement height");
-}
-
-int TeJpeg::nbFrames() {
-	error("TODO: Implement nbFrames");
 }
 
 TeImage::Format TeJpeg::imageFormat() {
@@ -87,35 +83,8 @@ uint TeJpeg::topBorderSize() {
 	error("TODO: Implement topBorderSize");
 }
 
-float TeJpeg::frameRate() {
-	error("TODO: Implement frameRate");
-}
-
 bool TeJpeg::update(unsigned long i, TeImage &imgout) {
 	error("TODO: Implement update");
 }
-
-bool TeJpeg::isAtEnd() {
-	error("TODO: Implement isAtEnd");
-}
-
-TeSignal0Param &TeJpeg::onVideoFinished() {
-	error("TODO: Implement onVideoFinished");
-}
-
-void TeJpeg::setColorKeyActivated(bool val) {
-	error("TODO: Implement setColorKeyActivated");
-}
-
-void TeJpeg::setColorKey(const TeColor &col) {
-	error("TODO: Implement setColorKey");
-}
-
-void TeJpeg::setColorKeyTolerence(float val) {
-	error("TODO: Implement setColorKeyTolerence");
-}
-
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

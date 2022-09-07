@@ -35,7 +35,7 @@ bool TeTheora::load(const Common::Path &path) {
 	error("TODO: Implement load");
 }
 
-bool TeTheora::load(Common::ReadStream &stream) {
+bool TeTheora::load(Common::SeekableReadStream &stream) {
 	error("TODO: Implement load");
 }
 
@@ -97,10 +97,6 @@ bool TeTheora::update(unsigned long i, TeImage &imgout) {
 
 bool TeTheora::isAtEnd() {
 	error("TODO: Implement isAtEnd");
-}
-
-TeSignal0Param &TeTheora::onVideoFinished() {
-	error("TODO: Implement onVideoFinished");
 }
 
 void TeTheora::setColorKeyActivated(bool val) {

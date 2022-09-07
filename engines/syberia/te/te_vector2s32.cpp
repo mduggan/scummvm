@@ -23,7 +23,7 @@
 
 namespace Syberia {
 
-TeVector2s32::TeVector2s32() {
+TeVector2s32::TeVector2s32() : _x(0), _y(0) {
 }
 
 // TODO: Add more functions here.

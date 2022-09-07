@@ -164,7 +164,7 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 }
 
 void TeLuaGUI::unload() {
-	error("TODO: Implement me.");
+	error("TODO: TeLuaGUI::unload Implement me.");
 }
 
 TeVariant TeLuaGUI::value(const Common::String &path) {

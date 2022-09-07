@@ -21,7 +21,7 @@
 
 #include "syberia/te/te_light.h"
 
-#include "graphics/opengl/system_headers.h"
+#include "graphics/opengl/glad.h"
 
 namespace Syberia {
 

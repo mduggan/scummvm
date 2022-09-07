@@ -19,11 +19,20 @@
  *
  */
 
+#include "common/file.h"
+#include "image/png.h"
+#include "graphics/surface.h"
+
 #include "syberia/te/te_png.h"
 
 namespace Syberia {
 
-TePng::TePng() {
+TePng::TePng() : _loadedSurface(nullptr) {
+}
+
+TePng::~TePng() {
+	if (_loadedSurface)
+		delete _loadedSurface;
 }
 
 /*static*/
@@ -32,87 +41,46 @@ bool TePng::matchExtension(const Common::String &extn) {
 }
 
 bool TePng::load(const Common::Path &path) {
-	error("TODO: Implement load");
+	Common::File file;
+	return file.open(path) && load(file);
 }
 
-bool TePng::load(Common::ReadStream &stream) {
-	error("TODO: Implement load");
+bool TePng::load(Common::SeekableReadStream &stream) {
+	Image::PNGDecoder png;
+	if (!png.loadStream(stream))
+		return false;
+	
+	if (png.getTransparentColor() == -1) {
+		_loadedSurface = png.getSurface()->convertTo(Graphics::createPixelFormat<888>());
+	} else {
+		_loadedSurface = png.getSurface()->convertTo(Graphics::createPixelFormat<8888>());
+	}
 }
 
 uint TePng::width() {
-	error("TODO: Implement width");
+	if (_loadedSurface)
+		return _loadedSurface->w;
+	return 0;
 }
 
 uint TePng::height() {
-	error("TODO: Implement height");
-}
-
-int TePng::nbFrames() {
-	error("TODO: Implement nbFrames");
+	if (_loadedSurface)
+		return _loadedSurface->h;
+	return 0;
 }
 
 TeImage::Format TePng::imageFormat() {
-	error("TODO: Implement setLeftBorderSize");
-}
-
-void TePng::setLeftBorderSize(uint val) {
-	error("TODO: Implement setLeftBorderSize");
-}
-
-uint TePng::leftBorderSize() {
-	error("TODO: Implement leftBorderSize");
-}
-
-void TePng::setRightBorderSize(uint val) {
-	error("TODO: Implement setRightBorderSize");
-}
-
-uint TePng::rightBorderSize() {
-	error("TODO: Implement rightBorderSize");
-}
-
-void TePng::setBottomBorderSize(uint val) {
-	error("TODO: Implement setBottomBorderSize");
-}
-
-uint TePng::bottomBorderSize() {
-	error("TODO: Implement bottomBorderSize");
-}
-
-void TePng::setTopBorderSize(uint val) {
-	error("TODO: Implement setTopBorderSize");
-}
-
-uint TePng::topBorderSize() {
-	error("TODO: Implement topBorderSize");
-}
-
-float TePng::frameRate() {
-	error("TODO: Implement frameRate");
+	if (_loadedSurface) {
+		if (_loadedSurface->format == Graphics::createPixelFormat<8888>())
+			return TeImage::RGBA8;
+		else if (_loadedSurface->format == Graphics::createPixelFormat<888>())
+			return TeImage::RGB8;
+	}
+	return TeImage::INVALID;
 }
 
 bool TePng::update(unsigned long i, TeImage &imgout) {
-	error("TODO: Implement update");
-}
-
-bool TePng::isAtEnd() {
-	error("TODO: Implement isAtEnd");
-}
-
-TeSignal0Param &TePng::onVideoFinished() {
-	error("TODO: Implement onVideoFinished");
-}
-
-void TePng::setColorKeyActivated(bool val) {
-	error("TODO: Implement setColorKeyActivated");
-}
-
-void TePng::setColorKey(const TeColor &col) {
-	error("TODO: Implement setColorKey");
-}
-
-void TePng::setColorKeyTolerence(float val) {
-	error("TODO: Implement setColorKeyTolerence");
+	error("TODO: Implement TePng::update");
 }
 
 } // end namespace Syberia

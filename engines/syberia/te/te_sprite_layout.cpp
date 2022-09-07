@@ -119,11 +119,14 @@ void TeSpriteLayout::stop() {
 
 void TeSpriteLayout::updateMesh() {
 	TeLayout::updateMesh();
-	error("TODO: Implement me.");
+	_tiledSurfacePtr->setSize(TeVector3f32(xSize(), abs(ySize()), 1.0));
 }
 
 void TeSpriteLayout::updateSize() {
-	error("TODO: Implement me.");
+	if (!name().empty()) {
+		TeLayout::updateSize();
+		updatePosition();
+	}
 }
 
 } // end namespace Syberia

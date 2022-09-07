@@ -25,40 +25,42 @@
 #include "common/str.h"
 #include "syberia/te/te_i_codec.h"
 
+namespace Graphics {
+class Surface;
+};
+
 namespace Syberia {
 
 class TePng : public TeICodec {
 public:
 	TePng();
-	virtual ~TePng() {}
+	virtual ~TePng();
 
 	virtual bool load(const Common::Path &path) override;
-	virtual bool load(Common::ReadStream &stream) override;
+	virtual bool load(Common::SeekableReadStream &stream) override;
 	virtual uint width() override;
 	virtual uint height() override;
-	virtual int nbFrames() override;
+	virtual int nbFrames() override { return 1; }
 	virtual TeImage::Format imageFormat() override;
-	virtual void setLeftBorderSize(uint val) override;
-	virtual uint leftBorderSize() override;
-	virtual void setRightBorderSize(uint val) override;
-	virtual uint rightBorderSize() override;
-	virtual void setBottomBorderSize(uint val) override;
-	virtual uint bottomBorderSize() override;
-	virtual void setTopBorderSize(uint val) override;
-	virtual uint topBorderSize() override;
-	virtual float frameRate() override;
+	virtual void setLeftBorderSize(uint val) override { }
+	virtual uint leftBorderSize() override { return 0; }
+	virtual void setRightBorderSize(uint val) override  { }
+	virtual uint rightBorderSize() override { return 0; }
+	virtual void setBottomBorderSize(uint val) override  { }
+	virtual uint bottomBorderSize() override { return 0; }
+	virtual void setTopBorderSize(uint val) override  { }
+	virtual uint topBorderSize() override { return 0; }
+	virtual float frameRate() override { return 0.0; }
 	virtual bool update(unsigned long i, TeImage &imgout) override;
-	virtual bool isAtEnd() override;
-	virtual TeSignal0Param &onVideoFinished() override;
-	virtual void setColorKeyActivated(bool val) override;
-	virtual void setColorKey(const TeColor &col) override;
-	virtual void setColorKeyTolerence(float val) override;
+	virtual bool isAtEnd() override { return true; }
+	virtual void setColorKeyActivated(bool val) override { }
+	virtual void setColorKey(const TeColor &col) override { }
+	virtual void setColorKeyTolerence(float val) override { }
 
 	static bool matchExtension(const Common::String &extn);
 
 private:
-	// TODO add private members
-
+	Graphics::Surface *_loadedSurface;
 };
 
 } // end namespace Syberia
