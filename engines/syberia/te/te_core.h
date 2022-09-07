@@ -24,10 +24,12 @@
 
 #include "common/array.h"
 #include "common/str.h"
+#include "common/path.h"
 #include "common/hashmap.h"
 #include "common/hash-str.h"
 
 #include "syberia/te/te_i_loc.h"
+#include "syberia/te/te_i_codec.h"
 #include "syberia/te/te_timer.h"
 
 namespace Syberia {
@@ -39,7 +41,7 @@ public:
 	void addLoc(TeILoc *loc);
 	//void args(int argc, char **argv); // Probably not needed
 	void create();
-	void createVideoCodec(const Common::String &path);
+	TeICodec *createVideoCodec(const Common::Path &path);
 	const Common::String &fileFlagSystemFlag(const Common::String &name) const;
 	bool fileFlagSystemFlagsContains(const Common::String &name) const;
 	Common::Array<Common::String> fileFlagSystemPossibleFlags();

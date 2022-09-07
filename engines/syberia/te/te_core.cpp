@@ -21,6 +21,11 @@
 
 #include "syberia/te/te_core.h"
 
+#include "syberia/te/te_png.h"
+#include "syberia/te/te_jpeg.h"
+#include "syberia/te/te_theora.h"
+#include "syberia/te/te_tga.h"
+
 namespace Syberia {
 
 TeCore::TeCore() : _loc(nullptr), _coreNotReady(true) {
@@ -39,6 +44,26 @@ void TeCore::create() {
 	_coreNotReady = false;
 	_activityTrackingTimer.alarmSignal().add<TeCore>(this, &TeCore::onActivityTrackingAlarm);
 	warning("TeCore::create: Finish implementing me.");
+}
+
+TeICodec *TeCore::createVideoCodec(const Common::Path &path) {
+	const Common::String filename = path.getLastComponent().toString();
+	if (!filename.contains('.'))
+		return nullptr;
+	Common::String extn = filename.substr(filename.findFirstOf('.') + 1);
+	extn.toLowercase();
+	// The original engine has more formats and even checks for alpha maps,
+	// but it never uses them.
+	if (TePng::matchExtension(extn)) {
+		return new TePng();
+	} else if (TeJpeg::matchExtension(extn)) {
+		return new TeJpeg();
+	} else if (TeTheora::matchExtension(extn)) {
+		return new TeTheora();
+	} else if (TeTga::matchExtension(extn)) {
+		return new TeTga();
+	}
+	error("TTeCore::createVideoCodec: Unrecognised format %s", path.toString().c_str());
 }
 
 const Common::String &TeCore::fileFlagSystemFlag(const Common::String &name) const {

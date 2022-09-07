@@ -19,30 +19,13 @@
  *
  */
 
-#ifndef SYBERIA_TE_TE_FRAME_ANIM_H
-#define SYBERIA_TE_TE_FRAME_ANIM_H
-
-#include "syberia/te/te_signal.h"
-#include "syberia/te/te_animation.h"
+#include "syberia/te/te_palette.h"
 
 namespace Syberia {
 
-class TeFrameAnim : public TeAnimation {
-public:
-	TeFrameAnim();
+TePalette::TePalette() {
+}
 
-	void update(double amount) override;
-
-	TeSignal0Param &frameChangedSignal() { return _frameChangedSignal; };
-	
-	long _nbFrames;
-	int _frameRate;
-
-private:
-	TeSignal0Param _frameChangedSignal;
-
-};
+// TODO: Add more functions here.
 
 } // end namespace Syberia
-
-#endif // SYBERIA_TE_TE_FRAME_ANIM_H

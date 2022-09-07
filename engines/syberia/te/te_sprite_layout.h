@@ -23,7 +23,7 @@
 #define SYBERIA_TE_TE_SPRITE_LAYOUT_H
 
 #include "syberia/te/te_layout.h"
-#include "syberia/te/te_tiled_texture.h"
+#include "syberia/te/te_tiled_surface.h"
 
 namespace Syberia {
 
@@ -31,6 +31,7 @@ class TeSpriteLayout : public TeLayout {
 public:
 	TeSpriteLayout();
 
+	int bufferSize();
 	void cont();
 	void draw() override;
 	
@@ -49,7 +50,7 @@ public:
 
 	void setColorKey(const TeColor &col);
 	void setColorKeyActivated(bool activated);
-	void setColorKeyTolerance(float val);
+	void setColorKeyTolerence(float val);
 
 	bool setName(const Common::String &newName) override;
 	void setSize(const TeVector3f32 &newSize) override;
@@ -62,7 +63,7 @@ public:
 private:
 	bool _sizeSet;
 	
-	Common::SharedPtr<TeTiledTexture> _tiledTexturePtr;
+	Common::SharedPtr<TeTiledSurface> _tiledSurfacePtr;
 	// TODO add private members
 
 };

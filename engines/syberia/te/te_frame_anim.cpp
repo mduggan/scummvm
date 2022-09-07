@@ -26,6 +26,10 @@ namespace Syberia {
 TeFrameAnim::TeFrameAnim() {
 }
 
+void TeFrameAnim::update(double amount) {
+	error("TODO: Implement TeFrameAnim::update");
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

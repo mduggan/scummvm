@@ -22,16 +22,51 @@
 #ifndef SYBERIA_TE_TE_TILED_TEXTURE_H
 #define SYBERIA_TE_TE_TILED_TEXTURE_H
 
+#include "common/path.h"
+#include "common/ptr.h"
+
+#include "syberia/te/te_3d_texture.h"
+#include "syberia/te/te_image.h"
+#include "syberia/te/te_palette.h"
+#include "syberia/te/te_resource.h"
+#include "syberia/te/te_vector2s32.h"
+
 namespace Syberia {
 
-class TeTiledTexture {
+class TeTiledTexture : public TeResource {
 public:
 	TeTiledTexture();
+	
+	typedef struct {
+		float x1;
+		float x2;
+		float y1;
+		float y2;
+	} Tile;
+	
+	uint imageFormat();
+	bool isLoaded();
+	bool load(const Common::Path &path);
+	bool load(const TeImage &image);
+	bool load(const Common::SharedPtr<Te3DTexture> &texture);
+	long numberOfColumns();
+	long numberOfRow();
+	
+	/*static*/ TeImage *optimizedTileImage(const Common::Array<TeImage> &images, const TeVector2s32 &size,
+								  const Common::SharedPtr<TePalette> &pal, enum TeImage::Format format);
 
-	// TODO add public members
+	void release();
+	void save() {};
+	const Tile *tile(TeVector2s32 &loc);
+	void update(const TeImage &image);
+
+	TeVector2s32 _totalSize;
 
 private:
-	// TODO add private members
+	Common::Array<Tile> _tileArray;
+	TeVector2s32 _tileSize;
+	TeVector2s32 _somethingSize;
+	byte _somethingByte;
 
 };
 

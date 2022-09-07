@@ -28,6 +28,7 @@
 #include "syberia/te/te_timer.h"
 #include "syberia/te/te_mesh.h"
 #include "syberia/te/te_model_animation.h"
+#include "syberia/te/te_tiled_texture.h"
 
 namespace Syberia {
 
@@ -72,9 +73,12 @@ public:
 	virtual bool visible() const override;
 	void setVisible(bool vis);
 
-private:
+	Common::SharedPtr<TeTiledTexture> _tiledTexture;
+
+protected:
 	Common::Array<TeMesh> _meshes;
 	Common::Array<MeshBlender *> _meshBlenders;
+	
 	// TODO add private members
 
 };
