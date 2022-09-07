@@ -25,12 +25,16 @@
 #include "common/str.h"
 #include "syberia/te/te_i_codec.h"
 
+namespace Graphics {
+class Surface;
+};
+
 namespace Syberia {
 
 class TeJpeg : public TeICodec {
 public:
 	TeJpeg();
-	virtual ~TeJpeg() {}
+	virtual ~TeJpeg();
 
 	virtual bool load(const Common::Path &path) override;
 	virtual bool load(Common::SeekableReadStream &stream) override;
@@ -55,6 +59,8 @@ public:
 
 	static bool matchExtension(const Common::String &extn);
 
+private:
+	Graphics::Surface *_loadedSurface;
 };
 
 } // end namespace Syberia

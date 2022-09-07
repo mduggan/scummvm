@@ -78,12 +78,13 @@ public:
 
 	StringMap<TeLayout *> &layouts() { return _layouts; };
 
+	Common::Path _scriptPath;
+
 private:
 	TeLuaContext _luaContext;
 	TeLuaScript _luaScript;
 
 	bool _loaded;
-	Common::String _scriptPath;
 
 	StringMap<TeLayout *> _layouts;
 	StringMap<TeButtonLayout *> _buttonLayouts;

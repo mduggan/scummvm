@@ -21,9 +21,19 @@
 
 #include "syberia/te/te_jpeg.h"
 
+#include "common/file.h"
+#include "common/path.h"
+#include "graphics/surface.h"
+#include "image/jpeg.h"
+
 namespace Syberia {
 
-TeJpeg::TeJpeg() {
+TeJpeg::TeJpeg() : _loadedSurface(nullptr) {
+}
+
+TeJpeg::~TeJpeg() {
+	if (_loadedSurface)
+		delete _loadedSurface;
 }
 
 /*static*/
@@ -32,23 +42,39 @@ bool TeJpeg::matchExtension(const Common::String &extn) {
 }
 
 bool TeJpeg::load(const Common::Path &path) {
-	error("TODO: Implement load");
+	Common::File file;
+	return file.open(path) && load(file);
 }
 
 bool TeJpeg::load(Common::SeekableReadStream &stream) {
-	error("TODO: Implement load");
+	Image::JPEGDecoder jpg;
+
+	if (_loadedSurface)
+		delete _loadedSurface;
+	_loadedSurface = nullptr;
+
+	jpg.setOutputPixelFormat(Graphics::createPixelFormat<888>());
+	if (!jpg.loadStream(stream))
+		return false;
+	
+	_loadedSurface = jpg.getSurface()->convertTo(Graphics::createPixelFormat<888>());
+	return true;
 }
 
 uint TeJpeg::width() {
-	error("TODO: Implement width");
+	if (_loadedSurface)
+		return _loadedSurface->w;
+	return 0;
 }
 
 uint TeJpeg::height() {
-	error("TODO: Implement height");
+	if (_loadedSurface)
+		return _loadedSurface->h;
+	return 0;
 }
 
 TeImage::Format TeJpeg::imageFormat() {
-	error("TODO: Implement setLeftBorderSize");
+	return TeImage::RGB8;
 }
 
 void TeJpeg::setLeftBorderSize(uint val) {
@@ -84,7 +110,14 @@ uint TeJpeg::topBorderSize() {
 }
 
 bool TeJpeg::update(unsigned long i, TeImage &imgout) {
-	error("TODO: Implement update");
+	if (!_loadedSurface)
+		return false;
+	if (imgout.w == _loadedSurface->w && imgout.h == _loadedSurface->h && imgout.format == _loadedSurface->format) {
+		imgout.copyFrom(*_loadedSurface);
+		return true;
+	}
+	
+	error("TODO: Implement TeJpeg::update for different sizes");
 }
 
 } // end namespace Syberia

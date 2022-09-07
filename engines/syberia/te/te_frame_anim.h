@@ -36,7 +36,9 @@ public:
 	TeSignal0Param &frameChangedSignal() { return _frameChangedSignal; };
 	
 	long _nbFrames;
-	int _frameRate;
+	float _frameRate;
+	int _loopCount;
+	bool _reversed;
 
 private:
 	TeSignal0Param _frameChangedSignal;

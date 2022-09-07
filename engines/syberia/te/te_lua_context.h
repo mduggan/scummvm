@@ -69,7 +69,6 @@ public:
 	void setInRegistry(const Common::String &name, TeLuaGUI *gui);
 private:
 	lua_State *_luaState;
-	// TODO add private members
 };
 
 } // end namespace Syberia

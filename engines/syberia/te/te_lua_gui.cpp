@@ -115,7 +115,7 @@ TeTextLayout *TeLuaGUI::textLayout(const Common::String &name) {
 
 bool TeLuaGUI::load(const Common::String &pathStr) {
 	unload();
-	_scriptPath = pathStr;
+	_scriptPath = Common::Path(pathStr);
 	TeCore *core = g_engine->getCore();
 	Common::Path path(pathStr);
 	if (!core->_coreNotReady) {
@@ -164,7 +164,35 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 }
 
 void TeLuaGUI::unload() {
-	error("TODO: TeLuaGUI::unload Implement me.");
+	for (auto &iter : _layouts)
+		delete iter._value;
+	_layouts.clear();
+	for (auto &iter : _buttonLayouts)
+		delete iter._value;
+	_buttonLayouts.clear();
+	for (auto &iter : _checkboxLayouts)
+		delete iter._value;
+	_checkboxLayouts.clear();
+	for (auto &iter : _listLayouts)
+		delete iter._value;
+	_listLayouts.clear();
+	for (auto &iter : _spriteLayouts)
+		delete iter._value;
+	_spriteLayouts.clear();
+	for (auto &iter : _textLayouts)
+		delete iter._value;
+	_textLayouts.clear();
+	for (auto &iter : _scrollingLayouts)
+		delete iter._value;
+	_scrollingLayouts.clear();
+	for (auto &iter : _clipLayouts)
+		delete iter._value;
+	_clipLayouts.clear();
+	for (auto &iter : _extendedTextLayouts)
+		delete iter._value;
+	_extendedTextLayouts.clear();
+
+	warning("TODO: TeLuaGUI::unload Check implementation here.");
 }
 
 TeVariant TeLuaGUI::value(const Common::String &path) {

@@ -23,7 +23,7 @@
 
 namespace Syberia {
 
-TeFrameAnim::TeFrameAnim() {
+TeFrameAnim::TeFrameAnim() : _loopCount(-1), _nbFrames(1), _frameRate(25.0), _reversed(false) {
 }
 
 void TeFrameAnim::update(double amount) {

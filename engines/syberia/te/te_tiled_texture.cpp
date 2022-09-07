@@ -43,15 +43,15 @@ bool TeTiledTexture::isLoaded() {
 
 
 bool TeTiledTexture::load(const Common::Path &path) {
-	error("TODO: Implement TeTiledTexture::load");
+	error("TODO: Implement TeTiledTexture::load(path)");
 }
 
 bool TeTiledTexture::load(const TeImage &img) {
-	error("TODO: Implement TeTiledTexture::load");
+	error("TODO: Implement TeTiledTexture::load(img)");
 }
 
 bool TeTiledTexture::load(const Common::SharedPtr<Te3DTexture> &texture) {
-	error("TODO: Implement TeTiledTexture::load");
+	error("TODO: Implement TeTiledTexture::load(texture)");
 }
 
 long TeTiledTexture::numberOfColumns() {

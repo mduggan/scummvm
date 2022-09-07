@@ -81,10 +81,9 @@ public:
 	void updateSurface();
 	void updateVideoProperties();
 
-	// TODO add public members
+	TeFrameAnim _frameAnim;
 
 private:
-	TeFrameAnim _frameAnim;
 	float _bottomCrop;
 	float _leftCrop;
 	float _rightCrop;

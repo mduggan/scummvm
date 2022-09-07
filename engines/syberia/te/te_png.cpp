@@ -46,6 +46,10 @@ bool TePng::load(const Common::Path &path) {
 }
 
 bool TePng::load(Common::SeekableReadStream &stream) {
+	if (_loadedSurface)
+		delete _loadedSurface;
+	_loadedSurface = nullptr;
+
 	Image::PNGDecoder png;
 	if (!png.loadStream(stream))
 		return false;
@@ -55,6 +59,7 @@ bool TePng::load(Common::SeekableReadStream &stream) {
 	} else {
 		_loadedSurface = png.getSurface()->convertTo(Graphics::createPixelFormat<8888>());
 	}
+	return true;
 }
 
 uint TePng::width() {
@@ -80,7 +85,14 @@ TeImage::Format TePng::imageFormat() {
 }
 
 bool TePng::update(unsigned long i, TeImage &imgout) {
-	error("TODO: Implement TePng::update");
+	if (!_loadedSurface)
+		return false;
+	if (imgout.w == _loadedSurface->w && imgout.h == _loadedSurface->h && imgout.format == _loadedSurface->format) {
+		imgout.copyFrom(*_loadedSurface);
+		return true;
+	}
+	
+	error("TODO: Implement TePng::update for different sizes");
 }
 
 } // end namespace Syberia
