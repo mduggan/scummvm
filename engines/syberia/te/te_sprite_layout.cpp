@@ -42,9 +42,10 @@ void TeSpriteLayout::draw() {
 bool TeSpriteLayout::onParentWorldColorChanged() {
 	Te3DObject2::onParentWorldColorChanged();
 	setColor(color());
+	return false;
 }
 
-bool TeSpriteLayout::load(const Common::String &path) {
+bool TeSpriteLayout::load(const Common::Path &path) {
 	if (path.empty()) {
 		_tiledSurfacePtr.reset();
 		return true;

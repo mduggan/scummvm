@@ -27,19 +27,24 @@ TeImage::TeImage() {
 }
 
 void TeImage::copy(TeVector2s32 &vec1, const TeVector2s32 &vec2, const TeVector2s32 &vec3) {
-	error("TODO: TeImage: Implement me.");
+	error("TODO: TeImage::copy Implement me.");
 }
+
 unsigned long TeImage::countPixelsOfColor(const TeColor &col) {
 	error("TODO: TeImage: Implement me.");
 }
 
 void TeImage::create() {
-	error("TODO: TeImage: Implement me.");
+	_format = INVALID;
+	Graphics::Surface::free();
 }
 
 void TeImage::create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &pal,
 			Format format, uint bufxsize, uint bufysize) {
-   error("TODO: TeImage: Implement me.");
+	Graphics::PixelFormat pxformat = ((format == TeImage::RGB8) ?
+		Graphics::createPixelFormat<888>() : Graphics::createPixelFormat<8888>());
+	
+	Graphics::Surface::create(xsize, ysize, pxformat);
 }
 
 void TeImage::deSerialize(Common::ReadStream &stream) {
@@ -71,19 +76,19 @@ bool TeImage::isExtensionSupported(const Common::Path &path)  {
 }
 
 bool TeImage::load(const Common::Path &path)  {
-	error("TODO: TeImage: Implement me.");
+	error("TODO: TeImage::load Implement me.");
 }
 
 bool TeImage::load(Common::ReadStream &stream, const Common::Path &path)  {
-	error("TODO: TeImage: Implement me.");
+	error("TODO: TeImage::load Implement me.");
 }
 
 bool TeImage::save(const Common::Path &path, enum Type type)  {
-	error("TODO: TeImage: Implement me.");
+	error("TODO: TeImage::save Implement me.");
 }
 
 int TeImage::serialize(Common::WriteStream &stream)  {
-	error("TODO: TeImage: Implement me.");
+	error("TODO: TeImage::serialize Implement me.");
 }
 
 } // end namespace Syberia

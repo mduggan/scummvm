@@ -28,6 +28,8 @@
 
 namespace Syberia {
 
+//static lua_State *globalState = nullptr;
+
 static int luaPanicFunction(lua_State *state) {
 	const char *msg = lua_tolstring(state, -1, nullptr);
 	warning("Lua: %s\n",msg);
@@ -35,7 +37,10 @@ static int luaPanicFunction(lua_State *state) {
 	return 1;
 }
 
-TeLuaContext::TeLuaContext() {
+TeLuaContext::TeLuaContext() : _luaState(nullptr) {
+	_luaState = lua_open();
+	luaL_openlibs(_luaState);
+	lua_atpanic(_luaState, luaPanicFunction);
 }
 
 void TeLuaContext::addBindings(void(*fn)(lua_State *)) {
@@ -43,7 +48,7 @@ void TeLuaContext::addBindings(void(*fn)(lua_State *)) {
 }
 
 void TeLuaContext::create() {
-	_luaState = luaL_newstate();
+	_luaState = lua_open();
 	luaL_openlibs(_luaState);
 	lua_atpanic(_luaState, luaPanicFunction);
 }
@@ -93,13 +98,14 @@ void TeLuaContext::removeGlobal(const Common::String &name) {
 }
 
 void TeLuaContext::registerCFunction(const Common::String &name, int(*fn)(lua_State *)) {
-	error("TODO: implement me TeLuaContext::registerCFunction");
+	lua_pushcclosure(_luaState, fn, 0);
+	lua_setglobal(_luaState, name.c_str());
 }
 
 void TeLuaContext::setInRegistry(const Common::String &name, TeLuaGUI *gui) {
 	lua_pushstring(_luaState, name.c_str());
 	lua_pushlightuserdata(_luaState, gui);
-	lua_settable(_luaState, -1001000);
+	lua_settable(_luaState, LUA_REGISTRYINDEX);
 }
 
 

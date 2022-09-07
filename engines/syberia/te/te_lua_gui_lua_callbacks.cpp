@@ -215,8 +215,8 @@ int layoutBindings(lua_State *L) {
 	if (layout->name().empty()) {
 		layout->setName(Common::String::format("%p", (void *)layout));
 	}
-	lua_pushstring(L,"__TeLuaGUIThis");
-    lua_gettable(L,-1001000);
+	lua_pushstring(L, "__TeLuaGUIThis");
+    lua_gettable(L, LUA_REGISTRYINDEX);
 	TeLuaGUI *gui = TeLuaTo<TeLuaGUI*>(L,-1);
 	TeLuaGUI::StringMap<TeLayout *> &layouts = gui->layouts();
 	TeLuaGUI::StringMap<TeLayout *>::iterator current = layouts.find(layout->name());
@@ -237,7 +237,91 @@ int listLayoutBindings(lua_State *L) {
 }
 
 int spriteLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("buttonLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	lua_pushstring(L, "__TeLuaGUIThis");
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	TeLuaGUI *gui = TeLuaTo<TeLuaGUI*>(L, -1);
+	lua_settop(L, -2);
+	TeSpriteLayout *layout = new TeSpriteLayout();
+	lua_pushnil(L);
+	
+	bool playNow = !layout->_tiledSurfacePtr->_frameAnim._runTimer._stopped;
+	int startingFrame = 0;
+	int endingFrame = -1;
+	Common::Path imgFullPath;
+	while (lua_next(L, -2) != 0) {
+		int type = lua_type(L, -2);
+		if (type == LUA_TSTRING) {
+			const char *s = lua_tolstring(L, -2, 0);
+			if (!strcmp(s, "name")) {
+				layout->setName(s);
+			} else if (!strcmp(s, "sizeType")) {
+				layout->setSizeType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
+			} else if (!strcmp(s, "size")) {
+				TeVector3f32 lastSize = layout->userSize();
+				TeVector3f32 size = TeLuaToTeVector3f32(L, -1, lastSize);
+				layout->setSize(size);
+			} else if (!strcmp(s, "ratio")) {
+				layout->setRatio(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "ratioMode")) {
+				layout->setRatioMode(static_cast<TeILayout::RatioMode>(TeLuaToS32(L, -1)));
+			} else if (!strcmp(s, "safeAreaRatio")) {
+				layout->setSafeAreaRatio(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "anchor")) {
+				TeVector3f32 lastAnchor = layout->anchor();
+				TeVector3f32 anchor = TeLuaToTeVector3f32(L, -1, lastAnchor);
+				layout->setAnchor(anchor);
+			} else if (!strcmp(s, "positionType")) {
+				layout->setPositionType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
+			} else if (!strcmp(s, "position")) {
+				TeVector3f32 lastPos = layout->userPosition();
+				TeVector3f32 pos = TeLuaToTeVector3f32(L, -1, lastPos);
+				layout->setPosition(pos);
+			} else if (!strcmp(s, "image")) {
+				Common::String imgPath = TeLuaToTeString(L, -1);
+				if (imgPath.substr(0, 2) == "./")
+					imgPath = imgPath.substr(0, 2);
+				imgFullPath = gui->_scriptPath.getParent().join(imgPath);
+			} else if (!strcmp(s, "visible")) {
+				layout->setVisible(TeLuaToBool(L, -1));
+			} else if (!strcmp(s, "color")) {
+				layout->setColor(TeLuaToTeColor(L, -1));
+			} else if (!strcmp(s, "leftCropping")) {
+				layout->_tiledSurfacePtr->setLeftCropping(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "rightCropping")) {
+				layout->_tiledSurfacePtr->setRightCropping(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "topCropping")) {
+				layout->_tiledSurfacePtr->setTopCropping(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "bottomCropping")) {
+				layout->_tiledSurfacePtr->setBottomCropping(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "loopCount")) {
+				layout->_tiledSurfacePtr->_frameAnim._loopCount = TeLuaToS32(L, -1);
+			} else if (!strcmp(s, "play")) {
+				playNow = TeLuaToBool(L, -1);
+			} else if (!strcmp(s, "reversed")) {
+				layout->_tiledSurfacePtr->_frameAnim._reversed = TeLuaToBool(L, -1);
+			} else if (!strcmp(s, "startingFrame")) {
+				startingFrame = TeLuaToU32(L, -1);
+			} else if (!strcmp(s, "endingFrame")) {
+				endingFrame = TeLuaToU32(L, -1);
+			} else if (!strcmp(s, "consoleNoStretch")) {
+				warning("TODO: Handle _g_bWidescreen");
+				if (_g_bWidescreen) {
+					layout->setScale(TeVector3f32(0.7500001,1.0,1.0));
+				}
+			} else {
+				warning("[TeLuaGUI.layoutBindings] Unreconized attribute : %s\n", s);
+			}
+		}
+		lua_settop(L, -2);
+	}
+	if (!imgFullPath.empty())
+		layout->load(imgFullPath);
+	error("TODO: Finish spriteLayoutBindings.");
 }
 
 int buttonLayoutBindings(lua_State *L) {

@@ -35,9 +35,9 @@ public:
 	void cont();
 	void draw() override;
 	
-	bool onParentWorldColorChanged() override;
+	virtual bool onParentWorldColorChanged() override;
 
-	bool load(const Common::String &path);
+	bool load(const Common::Path &path);
 	//void load(TeImage &img);
 	//void load(TeIntrusivePtr<Te3DTexture> &texture);
 
@@ -60,10 +60,11 @@ public:
 	void updateMesh() override;
 	void updateSize() override;
 
+	Common::SharedPtr<TeTiledSurface> _tiledSurfacePtr;
+
 private:
 	bool _sizeSet;
 	
-	Common::SharedPtr<TeTiledSurface> _tiledSurfacePtr;
 	// TODO add private members
 
 };
