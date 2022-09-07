@@ -37,7 +37,7 @@ public:
 
 	virtual ~TeICodec() {};
 	virtual bool load(const Common::Path &path) = 0;
-	virtual bool load(Common::ReadStream &stream) = 0;
+	virtual bool load(Common::SeekableReadStream &stream) = 0;
 	virtual uint width() = 0;
 	virtual uint height() = 0;
 	virtual int nbFrames() = 0;
@@ -53,10 +53,13 @@ public:
 	virtual float frameRate() = 0;
 	virtual bool update(unsigned long i, TeImage &imgout) = 0;
 	virtual bool isAtEnd() = 0;
-	virtual TeSignal0Param &onVideoFinished() = 0;
+	virtual TeSignal0Param &onVideoFinished() { return _finishedSignal; };
 	virtual void setColorKeyActivated(bool val) = 0;
 	virtual void setColorKey(const TeColor &col) = 0;
 	virtual void setColorKeyTolerence(float val) = 0;
+
+private:
+	TeSignal0Param _finishedSignal;
 
 };
 

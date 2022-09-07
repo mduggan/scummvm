@@ -69,18 +69,18 @@ public:
 	}
 
 	virtual void setBufferSize(long size) {}; // unused?
-	
+
 	void setColorKey(const TeColor &col);
 	void setColorKeyActivated(bool val);
 	void setColorKeyTolerence(float val);
 	void setTiledTexture(const Common::SharedPtr<TeTiledTexture> &texture);
-	
+
 	void stop();
 	void unload();
 	void update(const TeImage &image);
 	void updateSurface();
 	void updateVideoProperties();
-	
+
 	// TODO add public members
 
 private:
@@ -89,7 +89,7 @@ private:
 	float _leftCrop;
 	float _rightCrop;
 	float _topCrop;
-	
+
 	TeColor _colorKey;
 	bool _colorKeyActive;
 	float _colorKeyTolerence;
@@ -97,7 +97,7 @@ private:
 	TeImage::Format _imgFormat;
 
 	Common::Path _path;
-	
+
 	TeICodec *_codec;
 	// TODO add private members
 

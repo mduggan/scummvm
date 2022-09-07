@@ -34,10 +34,10 @@ public:
 	TeButtonLayout();
 
 	enum State {
-		BUTTON_STATE_DISABLED,
-		BUTTON_STATE_1,
-		BUTTON_STATE_UP,
-		BUTTON_STATE_3
+		BUTTON_STATE_DISABLED = 0,
+		BUTTON_STATE_1 = 1,
+		BUTTON_STATE_UP = 2,
+		BUTTON_STATE_3 = 3
 	};
 
 	long doubleValidationProtectionTimeoutTime() { return 500; }
@@ -91,6 +91,7 @@ private:
 
 	State _currentState;
 	bool _clickPassThrough;
+	bool _someClickFlag;
 	Common::String _validationSound;
 	float _validationSoundVolume;
 

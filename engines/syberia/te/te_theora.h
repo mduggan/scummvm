@@ -33,7 +33,7 @@ public:
 	virtual ~TeTheora() {}
 
 	virtual bool load(const Common::Path &path) override;
-	virtual bool load(Common::ReadStream &stream) override;
+	virtual bool load(Common::SeekableReadStream &stream) override;
 	virtual uint width() override;
 	virtual uint height() override;
 	virtual int nbFrames() override;
@@ -49,7 +49,6 @@ public:
 	virtual float frameRate() override;
 	virtual bool update(unsigned long i, TeImage &imgout) override;
 	virtual bool isAtEnd() override;
-	virtual TeSignal0Param &onVideoFinished() override;
 	virtual void setColorKeyActivated(bool val) override;
 	virtual void setColorKey(const TeColor &col) override;
 	virtual void setColorKeyTolerence(float val) override;
@@ -57,8 +56,6 @@ public:
 	static bool matchExtension(const Common::String &extn);
 	// TODO add public members
 
-private:
-	// TODO add private members
 
 };
 

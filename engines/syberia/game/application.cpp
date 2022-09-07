@@ -23,7 +23,7 @@
 #include "common/file.h"
 #include "common/util.h"
 
-#include "graphics/opengl/system_headers.h"
+#include "graphics/opengl/glad.h"
 
 #include "syberia/syberia.h"
 #include "syberia/game/game.h"
