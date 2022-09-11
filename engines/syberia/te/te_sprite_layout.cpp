@@ -19,11 +19,16 @@
  *
  */
 
+#include "syberia/syberia.h"
+#include "syberia/te/te_matrix4x4.h"
+#include "syberia/te/te_renderer.h"
 #include "syberia/te/te_sprite_layout.h"
 
 namespace Syberia {
 
-TeSpriteLayout::TeSpriteLayout() : _tiledSurfacePtr(new TeTiledSurface()), _sizeSet(false) {
+TeSpriteLayout::TeSpriteLayout() : _tiledSurfacePtr(new TeTiledSurface()), _sizeSet(false), _noRoundZ(false) {
+	_tiledSurfacePtr->setColor(TeColor(255, 255, 255, 255));
+	updateMesh();
 }
 
 
@@ -36,7 +41,23 @@ void TeSpriteLayout::cont() {
 }
 
 void TeSpriteLayout::draw() {
-	error("TODO: Implement me.");
+	if (!visible() || !worldVisible())
+		return;
+	
+	debug("Drawing TeSpriteLayout %p (%s)", this, name().c_str());
+	TeMatrix4x4 matrix = worldTransformationMatrix();
+	
+	if (!_noRoundZ) {
+		matrix(3, 0) = (int)matrix(3, 0);
+		matrix(3, 1) = (int)matrix(3, 1);
+	}
+	
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->pushMatrix();
+	renderer->loadMatrix(matrix);
+	_tiledSurfacePtr->draw();
+	renderer->popMatrix();
+	TeLayout::draw();
 }
 
 bool TeSpriteLayout::onParentWorldColorChanged() {
@@ -47,7 +68,7 @@ bool TeSpriteLayout::onParentWorldColorChanged() {
 
 bool TeSpriteLayout::load(const Common::Path &path) {
 	if (path.empty()) {
-		_tiledSurfacePtr.reset();
+		_tiledSurfacePtr.reset(new TeTiledSurface());
 		return true;
 	}
 	
@@ -69,6 +90,46 @@ bool TeSpriteLayout::load(const Common::Path &path) {
 	return true;
 }
 
+bool TeSpriteLayout::load(TeIntrusivePtr<Te3DTexture> &texture) {
+	unload();
+
+	if (_tiledSurfacePtr->load(texture)) {
+		const TeVector2s32 tiledTexSize = _tiledSurfacePtr->_tiledTexture->_totalSize;
+		if (tiledTexSize._y <= 0) {
+			setRatio(1.0);
+		} else {
+			setRatio((float)tiledTexSize._y / tiledTexSize._x);
+		}
+
+		if (sizeType() == CoordinatesType::ABSOLUTE && !_sizeSet) {
+			setSize(TeVector3f32(tiledTexSize._x, tiledTexSize._y, 1.0));
+		}
+		updateMesh();
+		return true;
+	}
+	return false;
+}
+
+bool TeSpriteLayout::load(TeImage &img) {
+	unload();
+
+	if (_tiledSurfacePtr->load(img)) {
+		const TeVector2s32 tiledTexSize = _tiledSurfacePtr->_tiledTexture->_totalSize;
+		if (tiledTexSize._y <= 0) {
+			setRatio(1.0);
+		} else {
+			setRatio((float)tiledTexSize._y / tiledTexSize._x);
+		}
+
+		if (sizeType() == CoordinatesType::ABSOLUTE && !_sizeSet) {
+			setSize(TeVector3f32(tiledTexSize._x, tiledTexSize._y, 1.0));
+		}
+		updateMesh();
+		return true;
+	}
+	return false;
+}
+
 void TeSpriteLayout::play() {
 	_tiledSurfacePtr->play();
 }
@@ -85,10 +146,9 @@ void TeSpriteLayout::setBufferSize(long bufsize) {
 	_tiledSurfacePtr->setBufferSize(bufsize);
 }
 
-void TeSpriteLayout::setColor(TeColor col) {
+void TeSpriteLayout::setColor(const TeColor &col) {
 	Te3DObject2::setColor(col);
-	col = color();
-	_tiledSurfacePtr->setColor(col);
+	_tiledSurfacePtr->setColor(color());
 }
 
 void TeSpriteLayout::setColorKey(const TeColor &col) {

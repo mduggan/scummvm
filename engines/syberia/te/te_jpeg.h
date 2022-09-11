@@ -61,6 +61,7 @@ public:
 
 private:
 	Graphics::Surface *_loadedSurface;
+	Common::Path _path;
 };
 
 } // end namespace Syberia

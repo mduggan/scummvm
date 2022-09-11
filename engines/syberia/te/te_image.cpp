@@ -23,14 +23,18 @@
 
 namespace Syberia {
 
-TeImage::TeImage() {
+TeImage::TeImage() : Surface(), _format(INVALID) {
 }
 
-void TeImage::copy(TeVector2s32 &vec1, const TeVector2s32 &vec2, const TeVector2s32 &vec3) {
+TeImage::TeImage(const TeImage &other) {
+	error("TODO: TeImage:: copy constructor Implement me.");
+}
+
+void TeImage::copy(TeImage &dest, const TeVector2s32 &vec1, const TeVector2s32 &vec2, const TeVector2s32 &vec3) const {
 	error("TODO: TeImage::copy Implement me.");
 }
 
-unsigned long TeImage::countPixelsOfColor(const TeColor &col) {
+unsigned long TeImage::countPixelsOfColor(const TeColor &col) const {
 	error("TODO: TeImage: Implement me.");
 }
 
@@ -41,6 +45,7 @@ void TeImage::create() {
 
 void TeImage::create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &pal,
 			Format format, uint bufxsize, uint bufysize) {
+	_format = format;
 	Graphics::PixelFormat pxformat = ((format == TeImage::RGB8) ?
 		Graphics::createPixelFormat<888>() : Graphics::createPixelFormat<8888>());
 	

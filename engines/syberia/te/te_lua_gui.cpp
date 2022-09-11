@@ -67,6 +67,40 @@ TeLayout *TeLuaGUI::layout(const Common::String &name) {
 	StringMap<TeLayout *>::iterator iter = _layouts.find(name);
 	if (iter != _layouts.end())
 		return iter->_value;
+
+	TeLayout *layout;
+	layout = buttonLayout(name);
+	if (layout)
+		return layout;
+
+	layout = spriteLayout(name);
+	if (layout)
+		return layout;
+
+	layout = textLayout(name);
+	if (layout)
+		return layout;
+
+	layout = checkboxLayout(name);
+	if (layout)
+		return layout;
+
+	layout = listLayout(name);
+	if (layout)
+		return layout;
+
+	layout = scrollingLayout(name);
+	if (layout)
+		return layout;
+
+	layout = clipLayout(name);
+	if (layout)
+		return layout;
+	
+	layout = extendedTextLayout(name);
+	if (layout)
+		return layout;
+
 	return nullptr;
 }
 
@@ -164,35 +198,34 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 }
 
 void TeLuaGUI::unload() {
-	for (auto &iter : _layouts)
-		delete iter._value;
+	warning("TeLuaGUI::unload: Fix the leaks!!");
+	//for (auto &iter : _layouts)
+	//	delete iter._value;
 	_layouts.clear();
-	for (auto &iter : _buttonLayouts)
-		delete iter._value;
+	//for (auto &iter : _buttonLayouts)
+	//	delete iter._value;
 	_buttonLayouts.clear();
-	for (auto &iter : _checkboxLayouts)
-		delete iter._value;
+	//for (auto &iter : _checkboxLayouts)
+	//	delete iter._value;
 	_checkboxLayouts.clear();
-	for (auto &iter : _listLayouts)
-		delete iter._value;
+	//for (auto &iter : _listLayouts)
+	//	delete iter._value;
 	_listLayouts.clear();
-	for (auto &iter : _spriteLayouts)
-		delete iter._value;
+	//for (auto &iter : _spriteLayouts)
+	//	delete iter._value;
 	_spriteLayouts.clear();
-	for (auto &iter : _textLayouts)
-		delete iter._value;
+	//for (auto &iter : _textLayouts)
+	//	delete iter._value;
 	_textLayouts.clear();
-	for (auto &iter : _scrollingLayouts)
-		delete iter._value;
+	//for (auto &iter : _scrollingLayouts)
+	//	delete iter._value;
 	_scrollingLayouts.clear();
-	for (auto &iter : _clipLayouts)
-		delete iter._value;
+	//for (auto &iter : _clipLayouts)
+	//	delete iter._value;
 	_clipLayouts.clear();
-	for (auto &iter : _extendedTextLayouts)
-		delete iter._value;
+	//for (auto &iter : _extendedTextLayouts)
+	//	delete iter._value;
 	_extendedTextLayouts.clear();
-
-	warning("TODO: TeLuaGUI::unload Check implementation here.");
 }
 
 TeVariant TeLuaGUI::value(const Common::String &path) {

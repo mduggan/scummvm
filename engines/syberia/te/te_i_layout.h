@@ -32,7 +32,9 @@ public:
 		ABSOLUTE, // use User Position?
 		RELATIVE_TO_PARENT // scale based on parent size
 	};
-	enum DrawMode {};
+	enum DrawMode {
+		DrawMode0
+	};
 	enum RatioMode {
 		RATIO_MODE_NONE,
 		RATIO_MODE_1,

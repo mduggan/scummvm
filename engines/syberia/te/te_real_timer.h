@@ -39,12 +39,13 @@ public:
 	unsigned long timeElapsed();
 	unsigned long timeFromLastTimeElapsed();
 
+	bool _paused;
+
 private:
 	unsigned long _startTime;
 	unsigned long _startTime2;
 	unsigned long _pausedTime;
 	unsigned long _maxTimeSeen;
-	bool _paused;
 	// TODO add private members
 
 };

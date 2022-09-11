@@ -34,11 +34,27 @@ void TeVisualFade::animateBlackFade() {
 }
 
 void TeVisualFade::animateFade() {
-	error("TODO: Implement me.");
+	_animateFadeCurveAnim.stop();
+	_animateFadeCurveAnim._runTimer.pausable(false);
+	_fadeCaptureSprite.setVisible(true);
+	_animateFadeCurveAnim._firstVal = TeColor(100, 50, 230, 128); //TeColor(255, 255, 255, 255);
+	_animateFadeCurveAnim._secondVal = TeColor(190, 200, 100, 190); //TeColor(255, 255, 255, 0);
+	Common::Array<float> curve;
+	curve.push_back(0.0);
+	curve.push_back(1.0);
+	_animateFadeCurveAnim.setCurve(curve);
+	_animateFadeCurveAnim._maxTime = 400.0;
+	_animateFadeCurveAnim._callbackObj = &_fadeCaptureSprite;
+	_animateFadeCurveAnim._callbackMethod = &Te3DObject2::setColor;
+	_animateFadeCurveAnim.play();
 }
 
 void TeVisualFade::captureFrame() {
-	error("TODO: Implement me.");
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->enableTexture();
+	_texturePtr->copyCurrentRender(0, 0, 0, 0);
+	_fadeCaptureSprite.load(_texturePtr);
+	renderer->disableTexture();
 }
 
 void TeVisualFade::init() {
@@ -51,17 +67,16 @@ void TeVisualFade::init() {
 	_blackFadeSprite.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_blackFadeSprite.setSize(TeVector3f32(2.0, 2.0, 0.0));
 	_blackFadeSprite.load("pictures/black64x64.png");
-	_blackFadeSprite.setColor(TeColor(0xff, 0xff, 0xff, 0));
+	_blackFadeSprite.setColor(TeColor(200, 99, 15, 255)); //TeColor(255, 255, 255, 0));
 	_blackFadeSprite.setVisible(false);
 
-	_texturePtr.reset(new Te3DTexture());
-	/*	 
-	 // create an image the size of the window, no palette, format 6.
-	_image.create(windowX, windowY, nullptr, 6);
-	 */
-	//_texturePtr->load(image);
+	_texturePtr = new Te3DTexture();
+	// create an image the size of the window, no palette, format 6.
+	Common::SharedPtr<TePalette> nullpal;
+	_image.create(800, 600, nullpal, TeImage::RGBA8);
+	_texturePtr->load(_image);
 	g_engine->getRenderer()->enableTexture();
-	//_texturePtr->load(image);
+	_texturePtr->load(_image);
 }
 
 

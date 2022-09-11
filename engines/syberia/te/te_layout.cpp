@@ -30,7 +30,9 @@ TeLayout::TeLayout() : Te3DObject2(), _updatingZ(false), _updatingZSize(false),
 	_updatingPosition(false), _updatingWorldMatrix(false), _updatingSize(false),
 	_autoz(true), _childOrParentChanged(true), _childChanged(true),
 	_sizeChanged(true), _positionChanged(true), _worldMatrixChanged(true),
-	_sizeType(CoordinatesType::ABSOLUTE), _userSize(_size)
+	_sizeType(CoordinatesType::ABSOLUTE), _userSize(_size), _anchor(0.5, 0.5, 0.5),
+	_ratio(1.0), _drawMode(TeILayout::DrawMode0), _safeAreaRatio(1.3333334),
+	_ratioMode(RATIO_MODE_NONE), _positionType(CoordinatesType::RELATIVE_TO_PARENT)
 {
 	_onChildSizeChangedCallback.reset(
 		new TeCallback0Param<TeLayout>(this, &TeLayout::onChildSizeChanged));
@@ -92,6 +94,7 @@ bool TeLayout::isAutoZEnabled() {
 
 void TeLayout::draw() {
 	if (visible() && worldVisible()) {
+		debug("Drawing TeLayout %p", this);
 		// Ensure world transform is up-to-date.
 		worldTransformationMatrix();
 		for (auto &child : childList()) {
@@ -203,7 +206,7 @@ void TeLayout::setParent(Te3DObject2 *parent) {
 }
 
 void TeLayout::setPosition(const TeVector3f32 &pos) {
-	TeVector3f32 pos3d(pos.x(), pos.y(), _zPos);
+	TeVector3f32 pos3d(pos.x(), pos.y(), _userPosition.z());
 	if (_userPosition != pos3d) {
 		_userPosition.x() = pos.x();
 		_userPosition.y() = pos.y();
@@ -257,7 +260,7 @@ void TeLayout::setScale(const TeVector3f32 &scale) {
 }
 
 void TeLayout::setSize(const TeVector3f32 &size) {
-	TeVector3f32 size3d(size.x(), size.y(), _zSize);
+	TeVector3f32 size3d(size.x(), size.y(), _userSize.z());
 	if (_userSize != size3d) {
 		_userSize.x() = size.x();
 		_userSize.y() = size.y();
@@ -276,8 +279,8 @@ void TeLayout::setSizeType(CoordinatesType coordtype) {
 }
 
 void TeLayout::setZPosition(float zpos) {
-	if (_zPos != zpos) {
-	  _zPos = zpos;
+	if (_userPosition.z() != zpos) {
+	  _userPosition.z() = zpos;
 	  _positionChanged = true;
 	  _worldMatrixChanged = true;
 	}
@@ -306,12 +309,12 @@ void TeLayout::updatePosition() {
 	_positionChanged = false;
 	_updatingPosition = true;
 	TeVector3f32 oldpos = _position;
-	if (_positionType == RELATIVE_TO_PARENT) {
+	Te3DObject2 *parentObj = parent();
+	if (_positionType == RELATIVE_TO_PARENT && parentObj) {
 		static const TeVector3f32 halfPixel(0.5, 0.5, 0.5);
 		const TeVector3f32 offsetUserPos = _userPosition - halfPixel;
-		Te3DObject2 *parentObj = parent();
 		const TeVector3f32 parentSize(parentObj->xSize(), parentObj->ySize(), 0.0);
-		const TeVector3f32 offsetAnchor = _anchor - halfPixel;
+		const TeVector3f32 offsetAnchor =  halfPixel - _anchor;
 		const TeVector3f32 thisSize(xSize(), ySize(), 0.0);
 		_position = (offsetUserPos * parentSize) + (offsetAnchor * thisSize);
 	} else if (_positionType == ABSOLUTE) {
@@ -449,10 +452,11 @@ TeMatrix4x4 TeLayout::worldTransformationMatrix() {
 }
 
 bool TeLayout::worldVisible() {
-	if (Te3DObject2::visible() && parent()) {
+	bool visible = Te3DObject2::visible();
+	if (visible && parent()) {
 		return parent()->visible();
 	}
-	return false;
+	return visible;
 }
 
 float TeLayout::xSize() {

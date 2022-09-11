@@ -27,6 +27,7 @@
 #include "common/str.h"
 
 #include "syberia/te/te_image.h"
+#include "syberia/te/te_intrusive_ptr.h"
 #include "syberia/te/te_matrix4x4.h"
 #include "syberia/te/te_resource.h"
 #include "syberia/te/te_vector2s32.h"
@@ -45,12 +46,12 @@ public:
 
 	void ForceTexData(uint gltextures, uint xsize, uint ysize);
 
-	uint getFormat() { return _format; }
-	bool hasAlpha();
+	TeImage::Format getFormat() const { return _format; }
+	bool hasAlpha() const;
 
 	bool load(const Common::Path &path);
 	bool load(const TeImage &img);
-	static Common::SharedPtr<Te3DTexture> load2(const Common::Path &path, uint size);
+	static TeIntrusivePtr<Te3DTexture> load2(const Common::Path &path, uint size);
 
 	static TeVector2s32 optimisedSize(const TeVector2s32 &size);
 
@@ -60,9 +61,11 @@ public:
 
 	int _numFrames;
 	int _frameRate;
+	uint _width;
+	uint _height;
 
 private:
-	uint _format;
+	TeImage::Format _format;
 	bool _createdTexture;
 	bool _loaded;
 	uint _glTexture;
@@ -73,8 +76,6 @@ private:
 	uint _texHeight;
 	uint _translateX;
 	uint _translateY;
-	uint _width;
-	uint _height;
 	uint _somethingOffsetX;
 	uint _somethingOffsetY;
 	bool _flipY;

@@ -117,8 +117,6 @@ private:
 	float _ratio;
 	RatioMode _ratioMode;
 	float _safeAreaRatio;
-	float _zPos;
-	float _zSize;
 
 	TeICallback0ParamPtr _onChildSizeChangedCallback;
 	TeICallback0ParamPtr _onParentSizeChangedCallback;

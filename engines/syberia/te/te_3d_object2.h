@@ -66,7 +66,7 @@ public:
 	static void deserialize(Common::ReadStream *stream, Te3DObject2 *dest);
 	static void serialize(Common::WriteStream *stream, Te3DObject2 *src);
 
-	virtual void draw() {};
+	virtual void draw() = 0;
 	const Common::String &name() const {
 		return _name;
 	}
@@ -105,7 +105,7 @@ public:
 	const TeVector3f32 &scale() const {
 		return _scale;
 	}
-	virtual void setColor(TeColor col);
+	virtual void setColor(const TeColor &col);
 	void setColorInheritance(bool val) {
 		_colorInheritance = val;
 	}

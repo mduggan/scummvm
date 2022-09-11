@@ -43,7 +43,11 @@ bool TeJpeg::matchExtension(const Common::String &extn) {
 
 bool TeJpeg::load(const Common::Path &path) {
 	Common::File file;
-	return file.open(path) && load(file);
+	if (file.open(path) && load(file)) {
+		_path = path;
+		return true;
+	}
+	return false;
 }
 
 bool TeJpeg::load(Common::SeekableReadStream &stream) {
@@ -112,6 +116,10 @@ uint TeJpeg::topBorderSize() {
 bool TeJpeg::update(unsigned long i, TeImage &imgout) {
 	if (!_loadedSurface)
 		return false;
+
+	if (!_path.empty())
+		imgout.setAccessName(_path);
+
 	if (imgout.w == _loadedSurface->w && imgout.h == _loadedSurface->h && imgout.format == _loadedSurface->format) {
 		imgout.copyFrom(*_loadedSurface);
 		return true;

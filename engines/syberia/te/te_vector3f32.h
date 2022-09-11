@@ -34,6 +34,10 @@ public:
 		set(x_, y_, z_);
 	}
 	TeVector3f32(const Math::Vector3d &v) : Math::Vector3d(v) {}
+	TeVector3f32 &operator=(const TeVector3f32 &other) {
+		Math::Vector3d::operator=(other);
+		return *this;
+	}
 
 	static void deserialize(Common::ReadStream *stream, TeVector3f32 *dest) {
 		dest->x() = stream->readFloatLE();
@@ -45,6 +49,10 @@ public:
 		stream->writeFloatLE(src->x());
 		stream->writeFloatLE(src->y());
 		stream->writeFloatLE(src->z());
+	}
+	
+	float squaredLength() const {
+		return (x() * x() + y() * y() + z() * z());
 	}
 
 	/*

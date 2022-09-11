@@ -34,6 +34,8 @@ public:
 	TeMatrix4x4(const Math::Matrix<4, 4> &matrix);
 
 	void scale(const TeVector3f32 &vec);
+	TeVector3f32 mult3x3(const TeVector3f32 &vec) const;
+	TeVector3f32 mult4x3(const TeVector3f32 &vec) const;
 	// TODO add public members
 
 private:

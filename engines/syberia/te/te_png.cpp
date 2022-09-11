@@ -42,7 +42,12 @@ bool TePng::matchExtension(const Common::String &extn) {
 
 bool TePng::load(const Common::Path &path) {
 	Common::File file;
-	return file.open(path) && load(file);
+	if (file.open(path) && load(file)) {
+		_path = path;
+		return true;
+	}
+	warning("Failed to load png %s", path.toString().c_str());
+	return false;
 }
 
 bool TePng::load(Common::SeekableReadStream &stream) {
@@ -87,6 +92,10 @@ TeImage::Format TePng::imageFormat() {
 bool TePng::update(unsigned long i, TeImage &imgout) {
 	if (!_loadedSurface)
 		return false;
+
+	if (!_path.empty())
+		imgout.setAccessName(_path);
+
 	if (imgout.w == _loadedSurface->w && imgout.h == _loadedSurface->h && imgout.format == _loadedSurface->format) {
 		imgout.copyFrom(*_loadedSurface);
 		return true;

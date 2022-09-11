@@ -20,8 +20,14 @@
  */
 
 #include "common/textconsole.h"
+#include "graphics/opengl/glad.h"
+
+#include "syberia/syberia.h"
+
+#include "syberia/te/te_light.h"
 #include "syberia/te/te_material.h"
 #include "syberia/te/te_model.h"
+#include "syberia/te/te_renderer.h"
 
 namespace Syberia {
 
@@ -30,14 +36,101 @@ TeMaterial::TeMaterial() {
 	_mode = Mode1;
 }
 
-TeMaterial::TeMaterial(Common::SharedPtr<Te3DTexture> texture, Mode mode) {
+TeMaterial::TeMaterial(TeIntrusivePtr<Te3DTexture> texture, Mode mode) {
 	defaultValues();
 	_texture = texture;
 	_mode = mode;
 }
 
 void TeMaterial::apply() {
-	error("TODO: implement me.");
+	static const float constColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	TeRenderer *renderer = g_engine->getRenderer();
+	if (renderer->shadowMode() == TeRenderer::ShadowMode0) {
+		if (_enableLights)
+			TeLight::enableAll();
+		else
+			TeLight::disableAll();
+
+		if (_texture) {
+			renderer->enableTexture();
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			_texture->bind();
+		}
+
+		glDisable(GL_ALPHA_TEST);
+		if (_mode == Mode0) {
+			glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, constColor);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_CONSTANT);
+			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+		} else {
+			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			if (_mode == Mode1) {
+				glEnable(GL_ALPHA_TEST);
+				glAlphaFunc(GL_GREATER, 0.5);
+			}
+		}
+		const float ambient[4] = { _ambientColor.r() / 255.0f, _ambientColor.g() / 255.0f,
+			_ambientColor.b() / 255.0f, _ambientColor.a() / 255.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+
+		const float specular[4] = { _specularColor.r() / 255.0f, _specularColor.g() / 255.0f,
+			_specularColor.b() / 255.0f, _specularColor.a() / 255.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+
+		const float emission[4] = { _emissionColor.r() / 255.0f, _emissionColor.g() / 255.0f,
+			_emissionColor.b() / 255.0f, _emissionColor.a() / 255.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
+		
+		glMaterialf(GL_FRONT, GL_SHININESS, _shininess);
+		
+		const float diffuse[4] = { _diffuseColor.r() / 255.0f, _diffuseColor.g() / 255.0f,
+			_diffuseColor.b() / 255.0f, _diffuseColor.a() / 255.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+		
+		renderer->setCurrentColor(_diffuseColor);
+	} else if (renderer->shadowMode() == TeRenderer::ShadowMode1) {
+			static const float fullColor[4] = { 255.0f, 255.0f, 255.0f, 255.0f };
+			TeLight::disableAll();
+			glDisable(GL_ALPHA_TEST);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, fullColor);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, fullColor);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, fullColor);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, fullColor);
+	}
+
+	warning("TODO: Work out what TeMaterial::_enableSomethingDefault0 actually is.");
+	bool _enableSomethingDefault0 = false;
+	if (_enableSomethingDefault0 == false) {
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
+		glDisable(GL_TEXTURE_GEN_R);
+		glDisable(GL_TEXTURE_GEN_Q);
+	} else {
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
+		glEnable(GL_TEXTURE_GEN_R);
+		glEnable(GL_TEXTURE_GEN_Q);
+		glEnable(GL_TEXTURE_2D);
+		TeLight::disableAll();
+		glDisable(GL_ALPHA_TEST);
+		renderer->enableTexture();
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		const float diffuse[4] = { _diffuseColor.r() / 255.0f, _diffuseColor.g() / 255.0f,
+			_diffuseColor.b() / 255.0f, _diffuseColor.a() / 255.0f };
+
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, diffuse);
+	}
 }
 
 void TeMaterial::defaultValues() {
@@ -47,6 +140,30 @@ void TeMaterial::defaultValues() {
 	_emissionColor = TeColor(0, 0, 0, 255);
 	_shininess = 0.0;
 	_enableLights = false;
+}
+
+bool TeMaterial::operator==(const TeMaterial &other) const {
+	return (_texture == other._texture) && (_ambientColor == other._ambientColor)
+		&& (_diffuseColor == other._diffuseColor) && (_specularColor == other._specularColor)
+		&& (_emissionColor == other._emissionColor) && (_enableLights == other._enableLights)
+		&& (_shininess == other._shininess) && (_mode == other._mode);
+}
+
+TeMaterial &TeMaterial::operator=(const TeMaterial &other) {
+	if (&other == this)
+		return *this;
+	
+	_texture = other._texture;
+	_ambientColor = other._ambientColor;
+	_diffuseColor = other._diffuseColor;
+	_specularColor = other._specularColor;
+	_emissionColor = other._emissionColor;
+	_enableLights = other._enableLights;
+	_shininess = other._shininess;
+	_mode = other._mode;
+	_enableLights = other._enableLights;
+	
+	return *this;
 }
 
 /*static*/ void TeMaterial::deserialize(Common::SeekableReadStream &stream, TeMaterial &material, const Common::Path &texPath) {

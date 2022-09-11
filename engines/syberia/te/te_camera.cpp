@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/util.h"
+
 #include "syberia/syberia.h"
 #include "syberia/te/te_camera.h"
 #include "syberia/te/te_matrix4x4.h"
@@ -27,14 +29,16 @@
 namespace Syberia {
 
 TeCamera::TeCamera() : _projectionMatrixType(0), _orthogonalParam1(1.0f),
-	_orthogonalParam2(0.0f), _orthogonalParam3(1.0f), _orthogonalParam4(0.0f) {
+	_orthogonalParam2(0.0f), _orthogonalParam3(1.0f), _orthogonalParam4(0.0f),
+	_zsomething1(10.0), _zsomething2(4000.0), _transformA(0), _transformB(0)
+{
 }
 
 void TeCamera::applyProjection() {
 	TeRenderer *renderer = g_engine->getRenderer();
-	renderer->setCurrentCamera(Common::SharedPtr<TeCamera>(this));
+	renderer->setCurrentCamera(this);
 	renderer->setViewport(_viewportX, _viewportY,
-						  (uint)(_viewportW * _widthScale), (uint)(_viewportH * _heightScale));
+						  (uint)(_viewportW * _scale.x()), (uint)(_viewportH * _scale.y()));
 	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
 	updateProjectionMatrix();
 	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
@@ -52,7 +56,39 @@ void TeCamera::applyTransformations() {
 }
 
 void TeCamera::buildOrthoMatrix() {
-	error("TODO: Implement me.");
+	// TODO: Fix these variable names.
+	float fVar5 = FLT_MAX;
+	if ((_orthogonalParam2 - _orthogonalParam1) != 0.0) {
+	  fVar5 = 1.0 / (_orthogonalParam2 - _orthogonalParam1);
+	}
+	float fVar4 = FLT_MAX;
+	if ((_zsomething2 - _zsomething1) != 0.0) {
+	  fVar4 = 1.0 / (_zsomething2 - _zsomething1);
+	}
+	float fVar6 = FLT_MAX;
+	if (_orthogonalParam4 - _orthogonalParam3 != 0.0) {
+	  fVar6 = 1.0 / (_orthogonalParam4 - _orthogonalParam3);
+	}
+	_projectionMatrix.setValue(0, 0, fVar5 + fVar5);
+	_projectionMatrix.setValue(0, 1, 0.0);
+	_projectionMatrix.setValue(0, 2, 0.0);
+	_projectionMatrix.setValue(0, 3, 0.0);
+
+	_projectionMatrix.setValue(1, 0, 0.0);
+	_projectionMatrix.setValue(1, 1, fVar6 + fVar6);
+	_projectionMatrix.setValue(1, 2, 0.0);
+	_projectionMatrix.setValue(1, 3, 0.0);
+
+	_projectionMatrix.setValue(2, 0, 0.0);
+	_projectionMatrix.setValue(2, 1, 0.0);
+	_projectionMatrix.setValue(2, 2, fVar4 * -2.0);
+	_projectionMatrix.setValue(2, 3, 0.0);
+
+	_projectionMatrix.setValue(3, 0, abs((_orthogonalParam2 + _orthogonalParam1) * fVar5));
+	_projectionMatrix.setValue(3, 1, abs((_orthogonalParam4 + _orthogonalParam3) * fVar6));
+	_projectionMatrix.setValue(3, 2, abs((_zsomething2 + _zsomething1) * fVar4));
+	_projectionMatrix.setValue(3, 3, 1.0);
+
 }
 
 void TeCamera::buildPerspectiveMatrix() {
@@ -118,19 +154,28 @@ TeVector3f32 TeCamera::projectPoint3f32(const TeVector3f32 &pt) {
 void TeCamera::restore() {
 	TeRenderer *renderer = g_engine->getRenderer();
 	renderer->setCurrentColor(TeColor(255, 255, 255, 255));
-	renderer->setCurrentCamera(Common::SharedPtr<TeCamera>());
+	renderer->setCurrentCamera(nullptr);
 }
 
 TeMatrix4x4 TeCamera::transformationMatrix() {
-	error("TODO: Implement me.");
+	if (!_transformA)
+		return Te3DObject2::transformationMatrix();
+	
+	TeMatrix4x4 retval;
+	warning("TODO: TeCamera::transformationMatrix Implement me.");
+
+	retval.setToIdentity();
+	return retval;
 }
 
 TeVector3f32 TeCamera::transformCoord(const TeVector3f32 &pt) {
-	error("TODO: Implement me.");
+	warning("TODO: TeCamera::transformCoord Implement me.");
+	return pt;
 }
 
 TeVector3f32 TeCamera::transformPoint2Dto3D(const TeVector2f32 &pt) {
-	error("TODO: Implement me.");
+	warning("TODO: TeCamera::transformPoint2Dto3D Implement me.");
+	return TeVector3f32(pt.getX(), pt.getY(), 0.0);
 }
 
 void TeCamera::updateProjectionMatrix() {

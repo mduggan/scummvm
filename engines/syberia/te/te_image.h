@@ -52,8 +52,9 @@ public:
 		PNG,
 	};
 
-	void copy(TeVector2s32 &vec1, const TeVector2s32 &vec2, const TeVector2s32 &vec3);
-	unsigned long countPixelsOfColor(const TeColor &col);
+	void copy(TeImage &dest, const TeVector2s32 &vec1, const TeVector2s32 &vec2,
+			  const TeVector2s32 &vec3) const;
+	unsigned long countPixelsOfColor(const TeColor &col) const;
 	void create();
 	void create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &palette, Format format) {
 		create(xsize, ysize, palette, format, xsize, ysize);
@@ -75,11 +76,12 @@ public:
 	bool save(const Common::Path &path, enum Type type);
 	int serialize(Common::WriteStream &stream);
 	TeVector2s32 bufSize() const {
-		return TeVector2s32(pitch, h);
+		return TeVector2s32(pitch / format.bytesPerPixel, h);
 	}
 
-private:
 	Format _format;
+
+private:
 	
 	// TODO add private members
 

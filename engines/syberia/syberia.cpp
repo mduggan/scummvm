@@ -112,6 +112,7 @@ Common::Error SyberiaEngine::run() {
 	_application = new Application();
 	_renderer = new TeRenderer();
 	_renderer->init();
+	_renderer->reset();
 	_application->create();
 	
 	

@@ -47,8 +47,33 @@ public:
 	};
 	
 	class TransparentMeshProperties {
+	public:
+		TeIntrusivePtr<Te3DTexture> _texture;
+		TeCamera *_camera;
+		int _triangleCount;
+		TeMatrix4x4 _matrix;
+		bool _enableLights;
 		
+		enum TeMaterial::Mode _materialMode;
+		
+		TeColor _ambientColor;
+		TeColor _diffuseColor;
+		TeColor _specularColor;
+		TeColor _emissionColor;
+		float _shininess;
+
+		uint _glTexEnvMode;
+		uint _sourceTransparentMesh;
+		bool _hasColor;
+		float _zLength;
+		bool _scissorEnabled;
+		int _scissorX;
+		int _scissorY;
+		int _scissorWidth;
+		int _scissorHeight;
+		bool _shouldDraw;
 	};
+
 	typedef uint32 Buffer;
 	
 	void addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsigned long i2, unsigned long i3);
@@ -86,7 +111,7 @@ public:
 	int scissorY() const { return _scissorY; }
 	void sendModelMatrix(const TeMatrix4x4 &matrix) {}
 	void setClearColor(const TeColor &col);
-	void setCurrentCamera(const Common::SharedPtr<TeCamera> &camera) {
+	void setCurrentCamera(TeCamera *camera) {
 		_currentCamera = camera;
 	}
 	void setCurrentColor(const TeColor &col);
@@ -95,11 +120,12 @@ public:
 	void setScissorEnabled(bool val) { _scissorEnabled = val; }
 	void setViewport(int x, int y, int w, int h);
 	void shadowMode(enum ShadowMode mode);
+	enum ShadowMode shadowMode() const { return _shadowMode; }
 	void translate(float x, float y, float z);
 	Common::String vendor();
 	
 private:
-	Common::SharedPtr<TeCamera> _currentCamera;
+	TeCamera *_currentCamera;
 	TeColor _currentColor;
 	TeColor _clearColor;
 	bool _textureEnabled;
@@ -118,8 +144,9 @@ private:
 	Common::Array<TeVector3f32> _transparentMeshNormals;
 	Common::Array<TeVector2f32> _transparentMeshCoords;
 	Common::Array<TeColor> _transparentMeshColors;
-	Common::Array<unsigned short> _transparentMeshSomething;
+	Common::Array<unsigned short> _transparentMeshTriangleNums;
 	
+	int _pendingTransparentMeshProperties;
 	Common::Array<TransparentMeshProperties> _transparentMeshProperties;
 
 	TeMatriciesStack _matriciesStacks[3];  // one per matrix mode.

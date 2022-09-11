@@ -25,6 +25,7 @@
 #include "common/ptr.h"
 
 #include "syberia/te/te_3d_texture.h"
+#include "syberia/te/te_curve_anim2.h"
 #include "syberia/te/te_sprite_layout.h"
 #include "syberia/te/te_button_layout.h"
 
@@ -46,7 +47,9 @@ public:
 
 private:
 
-	Common::SharedPtr<Te3DTexture> _texturePtr;
+	TeIntrusivePtr<Te3DTexture> _texturePtr;
+	TeCurveAnim2<Te3DObject2, TeColor> _animateFadeCurveAnim;
+	TeImage _image;
 	// TODO add private members
 
 };

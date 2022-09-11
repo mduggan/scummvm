@@ -29,6 +29,19 @@ public:
 	TeVector2s32();
 	TeVector2s32(int x_, int y_) : _x(x_), _y(y_) {};
 
+	bool operator!=(const TeVector2s32 &other) const {
+		return _x != other._x || _y != other._y;
+	}
+	bool operator==(const TeVector2s32 &other) const {
+		return _x == other._x && _y == other._y;
+	}
+	
+	TeVector2s32 &operator+=(const TeVector2s32 &other) {
+		_x += other._x;
+		_y += other._y;
+		return *this;
+	}
+	
 public:
 	int _x;
 	int _y;

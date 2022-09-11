@@ -77,6 +77,14 @@ public:
 	template <typename T> using StringMap = Common::HashMap<Common::String, T>;
 
 	StringMap<TeLayout *> &layouts() { return _layouts; };
+	StringMap<TeButtonLayout *> &buttonLayouts() { return _buttonLayouts; };
+	StringMap<TeCheckboxLayout *> &checkboxLayouts() { return _checkboxLayouts; };
+	StringMap<TeListLayout *> &listLayouts() { return _listLayouts; };
+	StringMap<TeSpriteLayout *> &spriteLayouts() { return _spriteLayouts; };
+	StringMap<TeTextLayout *> &textLayouts() { return _textLayouts; };
+	StringMap<TeScrollingLayout *> &scrollingLayouts() { return _scrollingLayouts; };
+	StringMap<TeClipLayout *> &clipLayouts() { return _clipLayouts; };
+	StringMap<TeExtendedTextLayout *> &extendedTextLayouts() { return _extendedTextLayouts; };
 
 	Common::Path _scriptPath;
 

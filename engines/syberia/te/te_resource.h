@@ -24,12 +24,14 @@
 
 #include "common/path.h"
 #include "engines/syberia/te/te_object.h"
+#include "engines/syberia/te/te_references_counter.h"
 
 namespace Syberia {
 
-class TeResource : public TeObject {
+class TeResource : public TeObject, public TeReferencesCounter {
 public:
 	TeResource();
+	virtual ~TeResource();
 
 	void generateAccessName();
 	

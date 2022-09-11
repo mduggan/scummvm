@@ -34,7 +34,7 @@ template<class T> static T linearInterpolation(T &obj1, T &obj2, double amount) 
 template<class T, class S>
 class TeCurveAnim2 : public TeAnimation {
 public:
-	typedef void(T::*TMethod)(S);
+	typedef void(T::*TMethod)(const S &);
 
 	TeCurveAnim2() {}
 	virtual ~TeCurveAnim2() {}

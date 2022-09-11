@@ -144,6 +144,8 @@ public:
 	bool _luaShowOwnerError;
 	
 private:
+	bool _entered;
+
 	TeLuaGUI _gui1;
 	TeLuaGUI _gui2;
 	TeLuaGUI _gui3;

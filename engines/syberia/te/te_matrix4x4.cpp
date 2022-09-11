@@ -38,4 +38,28 @@ void TeMatrix4x4::scale(const TeVector3f32 &vec) {
 	*this = result;
 }
 
+TeVector3f32 TeMatrix4x4::mult4x3(const TeVector3f32 &vec) const {
+	const float f1 = vec.x();
+	const float f2 = vec.y();
+	const float f3 = vec.z();
+	const float *data = getData();
+
+	return TeVector3f32(data[0] * f1 + data[4] * f2 + data[8] * f3 + data[12],
+						data[1] * f1 + data[5] * f2 + data[9] * f3 + data[13],
+						data[2] * f1 + data[6] * f2 + data[10] * f3 + data[14]);
+
+}
+
+TeVector3f32 TeMatrix4x4::mult3x3(const TeVector3f32 &vec) const {
+	const float f1 = vec.x();
+	const float f2 = vec.y();
+	const float f3 = vec.z();
+	const float *data = getData();
+
+	return TeVector3f32(data[0] * f1 + data[4] * f2 + data[8] * f3,
+						data[1] * f1 + data[5] * f2 + data[9] * f3,
+						data[2] * f1 + data[6] * f2 + data[10] * f3);
+
+}
+
 } // end namespace Syberia

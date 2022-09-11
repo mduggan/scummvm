@@ -141,7 +141,7 @@ void Te3DObject2::rotate(const TeQuaternion &rot) {
 	setRotation(newRot);
 }
 
-void Te3DObject2::setColor(TeColor col) {
+void Te3DObject2::setColor(const TeColor &col) {
 	_color = col;
 	_onParentWorldColorChangedSignal.call();
 }

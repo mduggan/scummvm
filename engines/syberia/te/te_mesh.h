@@ -23,8 +23,12 @@
 #define SYBERIA_TE_TE_MESH_H
 
 #include "common/array.h"
+#include "common/ptr.h"
+
 #include "syberia/te/te_3d_object2.h"
+#include "syberia/te/te_3d_texture.h"
 #include "syberia/te/te_color.h"
+#include "syberia/te/te_intrusive_ptr.h"
 #include "syberia/te/te_vector2f32.h"
 #include "syberia/te/te_vector3f32.h"
 #include "syberia/te/te_matrix4x4.h"
@@ -37,6 +41,69 @@ class TeMesh : public Te3DObject2 {
 public:
 	TeMesh();
 
+	enum Mode {
+		MeshMode0 = 0,
+		MeshMode1,
+		MeshMode2,
+		MeshMode3,
+		MeshMode4,
+		MeshMode5,
+		MeshMode6,
+		MeshMode7
+	};
+
+	void attachMaterial(uint index, const TeMaterial &material);
+	void boundingBox(TeVector3f32 &boxmin, TeVector3f32 boxmax);
+	void checkArrays() {};
+	void clearColors() { _colors.clear(); }
+	TeColor color(uint index) const { return _colors[index]; }
+	void copy(const TeMesh &other);
+	void create();
+	void defaultMaterial(const TeIntrusivePtr<Te3DTexture> &texture);
+	void destroy();
+	void draw() override;
+	void facesPerMaterial(uint index, ushort value);
+	ushort facesPerMaterial(uint index) const { return _faceCounts[index]; }
+	void forceMatrix(const TeMatrix4x4 &matrix);
+	byte getFaceMaterial(uint index);
+	TeMesh::Mode getMode() const;
+	bool hasAlpha(uint index);
+	bool hasColor() const { return !_colors.empty(); }
+	bool hasUvs() const { return !_uvs.empty(); }
+	bool index(uint num) const { return _indexes[num]; }
+	TeMaterial *material(uint index);
+	const TeMaterial *material(uint index) const;
+	void materialIndex(uint index, byte val);
+	byte materialIndex(uint index) const { return _materialIndexes[index]; }
+	void matrixIndex(uint num, unsigned short val);
+	unsigned short matrixIndex(uint num) const { return _matricies[num]; }
+	TeVector3f32 normal(uint index) const;
+	
+	TeMesh &operator=(const TeMesh &other);
+	
+	void optimizeVerticies();
+	void resizeUpdatedTables(unsigned long newSize);
+
+	void setColor(const TeColor &col) override;
+	void setColor(uint index, const TeColor &col);
+	void setConf(unsigned long vertexCount, unsigned long indexCount, enum Mode mode, unsigned int materialCount, unsigned int materialIndexCount);
+	void setIndex(unsigned int index, unsigned int val);
+	void setNormal(unsigned int index, const TeVector3f32 &val);
+	void setTextureUV(unsigned int index, const TeVector2f32 &val);
+	void setVertex(unsigned int index, const TeVector3f32 &val);
+	void sortFaces();
+	
+	TeVector2f32 textureUV(uint index) const { return _uvs[index]; }
+	TeVector3f32 vertex(uint index) const;
+	
+	
+	uint numIndexes() const { return _indexes.size(); }
+	uint numVerticies() const { return _verticies.size(); }
+	bool shouldDrawMaybe() const { return _shouldDrawMaybe; }
+	uint glTexenvMode() const { return _glTexEnvMode; }
+	
+	void setShouldDrawMaybe(bool val) { _shouldDrawMaybe = val; }
+
 private:
 	Common::Array<unsigned char> _materialIndexes;
 	Common::Array<TeVector3f32> _verticies;
@@ -46,10 +113,20 @@ private:
 	Common::Array<TeVector2f32> _uvs;
 	Common::Array<unsigned short> _indexes;
 	Common::Array<unsigned short> _faceCounts;
+	Common::Array<unsigned short> _matricies;
 	Common::Array<TeColor> _colors;
+	Common::Array<TeMaterial> _materials;
+	
+	Mode _mode;
 	
 	bool _matrixForced;
 	TeMatrix4x4 _forceMatrix;
+	bool _hasAlpha;
+	uint _initialMaterialIndexCount;
+	bool _drawWires;
+	bool _shouldDrawMaybe;
+	
+	uint _glTexEnvMode;
 
 	// TODO add private members
 

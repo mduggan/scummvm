@@ -38,15 +38,15 @@ public:
 	virtual bool onParentWorldColorChanged() override;
 
 	bool load(const Common::Path &path);
-	//void load(TeImage &img);
-	//void load(TeIntrusivePtr<Te3DTexture> &texture);
+	bool load(TeImage &img);
+	bool load(TeIntrusivePtr<Te3DTexture> &texture);
 
 	void unload();
 	void pause();
 	void play();
 
 	void setBufferSize(long bufsize);
-	void setColor(TeColor col) override;
+	void setColor(const TeColor &col) override;
 
 	void setColorKey(const TeColor &col);
 	void setColorKeyActivated(bool activated);
@@ -64,6 +64,7 @@ public:
 
 private:
 	bool _sizeSet;
+	bool _noRoundZ;
 	
 	// TODO add private members
 

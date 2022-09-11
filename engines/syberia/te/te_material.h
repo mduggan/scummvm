@@ -25,8 +25,10 @@
 #include "common/ptr.h"
 #include "common/path.h"
 #include "common/stream.h"
+
 #include "syberia/te/te_color.h"
 #include "syberia/te/te_3d_texture.h"
+#include "syberia/te/te_intrusive_ptr.h"
 
 namespace Syberia {
 
@@ -40,15 +42,21 @@ public:
 	};
 
 	TeMaterial();
-	TeMaterial(Common::SharedPtr<Te3DTexture> texture, Mode mode);
+	TeMaterial(TeIntrusivePtr<Te3DTexture> texture, Mode mode);
 
 	void apply();
 	void defaultValues();
 	static void deserialize(Common::SeekableReadStream &stream, TeMaterial &material, const Common::Path &path);
 	static void serialize(Common::SeekableWriteStream &stream, TeMaterial &material);
+	
+	bool operator==(const TeMaterial &other) const;
+	bool operator!=(const TeMaterial &other) const {
+		return !operator==(other);
+	}
+	
+	TeMaterial &operator=(const TeMaterial &other);
 
-private:
-	Common::SharedPtr<Te3DTexture> _texture;
+	TeIntrusivePtr<Te3DTexture> _texture;
 	Mode _mode;
 	TeColor _ambientColor;
 	TeColor _diffuseColor;
@@ -56,6 +64,7 @@ private:
 	TeColor _emissionColor;
 	float _shininess;
 	bool _enableLights;
+private:
 };
 
 } // end namespace Syberia
