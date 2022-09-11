@@ -52,32 +52,32 @@ public:
 		MeshMode7
 	};
 
-	void attachMaterial(uint index, const TeMaterial &material);
+	void attachMaterial(uint idx, const TeMaterial &material);
 	void boundingBox(TeVector3f32 &boxmin, TeVector3f32 boxmax);
 	void checkArrays() {};
 	void clearColors() { _colors.clear(); }
-	TeColor color(uint index) const { return _colors[index]; }
+	TeColor color(uint idx) const { return _colors[idx]; }
 	void copy(const TeMesh &other);
 	void create();
 	void defaultMaterial(const TeIntrusivePtr<Te3DTexture> &texture);
 	void destroy();
 	void draw() override;
-	void facesPerMaterial(uint index, ushort value);
-	ushort facesPerMaterial(uint index) const { return _faceCounts[index]; }
+	void facesPerMaterial(uint idx, ushort value);
+	ushort facesPerMaterial(uint idx) const { return _faceCounts[idx]; }
 	void forceMatrix(const TeMatrix4x4 &matrix);
-	byte getFaceMaterial(uint index);
+	byte getFaceMaterial(uint idx);
 	TeMesh::Mode getMode() const;
-	bool hasAlpha(uint index);
+	bool hasAlpha(uint idx);
 	bool hasColor() const { return !_colors.empty(); }
 	bool hasUvs() const { return !_uvs.empty(); }
 	bool index(uint num) const { return _indexes[num]; }
-	TeMaterial *material(uint index);
-	const TeMaterial *material(uint index) const;
-	void materialIndex(uint index, byte val);
-	byte materialIndex(uint index) const { return _materialIndexes[index]; }
+	TeMaterial *material(uint idx);
+	const TeMaterial *material(uint idx) const;
+	void materialIndex(uint idx, byte val);
+	byte materialIndex(uint idx) const { return _materialIndexes[idx]; }
 	void matrixIndex(uint num, unsigned short val);
 	unsigned short matrixIndex(uint num) const { return _matricies[num]; }
-	TeVector3f32 normal(uint index) const;
+	TeVector3f32 normal(uint idx) const;
 	
 	TeMesh &operator=(const TeMesh &other);
 	
@@ -85,16 +85,16 @@ public:
 	void resizeUpdatedTables(unsigned long newSize);
 
 	void setColor(const TeColor &col) override;
-	void setColor(uint index, const TeColor &col);
+	void setColor(uint idx, const TeColor &col);
 	void setConf(unsigned long vertexCount, unsigned long indexCount, enum Mode mode, unsigned int materialCount, unsigned int materialIndexCount);
-	void setIndex(unsigned int index, unsigned int val);
-	void setNormal(unsigned int index, const TeVector3f32 &val);
-	void setTextureUV(unsigned int index, const TeVector2f32 &val);
-	void setVertex(unsigned int index, const TeVector3f32 &val);
+	void setIndex(unsigned int idx, unsigned int val);
+	void setNormal(unsigned int idx, const TeVector3f32 &val);
+	void setTextureUV(unsigned int idx, const TeVector2f32 &val);
+	void setVertex(unsigned int idx, const TeVector3f32 &val);
 	void sortFaces();
 	
-	TeVector2f32 textureUV(uint index) const { return _uvs[index]; }
-	TeVector3f32 vertex(uint index) const;
+	TeVector2f32 textureUV(uint idx) const { return _uvs[idx]; }
+	TeVector3f32 vertex(uint idx) const;
 	
 	
 	uint numIndexes() const { return _indexes.size(); }

@@ -217,7 +217,7 @@ TeMesh::Mode TeMesh::getMode() const {
 	}
 }
 
-bool TeMesh::hasAlpha(uint index) {
+bool TeMesh::hasAlpha(uint idx) {
 	// TODO: this logic is a bit sketchy.  Check it again.
 	bool retval = _hasAlpha && !_colors.empty();
 	for (const TeMaterial &material : _materials) {
@@ -229,11 +229,11 @@ bool TeMesh::hasAlpha(uint index) {
 	return retval;
 }
 
-TeVector3f32 TeMesh::normal(uint index) const {
+TeVector3f32 TeMesh::normal(uint idx) const {
 	if (!_updatedNormals.empty())
-		return _updatedNormals[index];
+		return _updatedNormals[idx];
 	else
-		return _normals[index];
+		return _normals[idx];
 }
 
 void TeMesh::resizeUpdatedTables(unsigned long newSize) {
@@ -256,12 +256,12 @@ void TeMesh::setColor(const TeColor &col) {
 	}
 }
 
-void TeMesh::setColor(uint index, const TeColor &col) {
+void TeMesh::setColor(uint idx, const TeColor &col) {
 	if (col.a() != 255) {
 		_hasAlpha = true;
 	}
 	_colors.resize(_verticies.size());
-	_colors[index] = col;
+	_colors[idx] = col;
 }
 
 void TeMesh::setConf(unsigned long vertexCount, unsigned long indexCount, enum Mode mode, unsigned int materialCount, unsigned int materialIndexCount) {
@@ -315,11 +315,11 @@ void TeMesh::setVertex(unsigned int index, const TeVector3f32 &val) {
 	_verticies[index] = val;
 }
 
-TeVector3f32 TeMesh::vertex(uint index) const {
+TeVector3f32 TeMesh::vertex(uint idx) const {
 	if (!_updatedVerticies.empty())
-		return _updatedVerticies[index];
+		return _updatedVerticies[idx];
 	else
-		return _verticies[index];
+		return _verticies[idx];
 }
 
 // TODO: Add more functions here.

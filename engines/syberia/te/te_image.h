@@ -56,8 +56,8 @@ public:
 			  const TeVector2s32 &vec3) const;
 	unsigned long countPixelsOfColor(const TeColor &col) const;
 	void create();
-	void create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &palette, Format format) {
-		create(xsize, ysize, palette, format, xsize, ysize);
+	void create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &palette, Format newformat) {
+		create(xsize, ysize, palette, newformat, xsize, ysize);
 	}
 	void create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &pal,
 				Format format, uint bufxsize, uint bufysize);

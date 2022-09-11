@@ -30,6 +30,7 @@ namespace Syberia {
 class TeILoc {
 public:
 	TeILoc();
+	virtual ~TeILoc() {};
 
 	virtual Common::String *text(const Common::String &key);
 
