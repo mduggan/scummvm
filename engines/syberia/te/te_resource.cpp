@@ -19,13 +19,21 @@
  *
  */
 
+#include "syberia/syberia.h"
+
 #include "syberia/te/te_resource.h"
+#include "syberia/te/te_resource_manager.h"
 
 namespace Syberia {
 
 uint32 TeResource::_idCounter = 1;
 
 TeResource::TeResource() {
+	generateAccessName();
+}
+
+TeResource::~TeResource() {
+	g_engine->getResourceManager()->removeResource(this);
 }
 
 void TeResource::generateAccessName() {

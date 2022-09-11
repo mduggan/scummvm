@@ -64,16 +64,18 @@ public:
 	void blendMesh(const Common::String &s1, const Common::String &s2, float amount);
 
 	int checkFileType(Common::SeekableReadStream &instream);
+	
+	void draw() override;
+	virtual void setColor(const TeColor &col) override;
 
 	/* Align the stream to the nearest 4 byte boudary*/
 	static void loadAlign(Common::SeekableReadStream &stream);
 	static void saveAlign(Common::SeekableWriteStream &stream);
 
 	void update();
-	virtual bool visible() const override;
-	void setVisible(bool vis);
+	void setVisibleByName(const Common::String &name, bool vis);
 
-	Common::SharedPtr<TeTiledTexture> _tiledTexture;
+	TeIntrusivePtr<TeTiledTexture> _tiledTexture;
 
 protected:
 	Common::Array<TeMesh> _meshes;

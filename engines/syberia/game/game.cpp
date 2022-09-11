@@ -35,7 +35,10 @@
 
 namespace Syberia {
 
-Game::Game() : _objectsTakenVal(0), _objectsTakenBits{false, false, false, false, false}, _score(0) {
+Game::Game() : _objectsTakenVal(0), _score(0), _entered(false) {
+	for (int i = 0; i < NUM_OBJECTS_TAKEN_IDS; i++) {
+		_objectsTakenBits[i] = false;
+	}
 }
 
 /*static*/ const char *Game::OBJECTS_TAKEN_IDS[5] = {
@@ -170,7 +173,8 @@ void Game::draw() {
 }
 
 void Game::enter(bool newgame) {
-	warning("TODO: set 2 fields true here");
+	warning("TODO: set field_0x42f0 true here");
+	_entered = true;
 	_luaShowOwnerError = false;
 	_score = 0;
 	Application *app = g_engine->getApplication();
@@ -538,7 +542,9 @@ bool Game::unloadPlayerCharacter(const Common::String &character) {
 }
 
 void Game::update() {
-	error("TODO: Implemet me");
+	if (!_entered)
+		return;
+		error("TODO: Implemet me");
 }
 
 } // end namespace Syberia

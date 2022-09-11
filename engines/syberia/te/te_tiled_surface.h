@@ -31,6 +31,7 @@
 #include "syberia/te/te_3d_texture.h"
 #include "syberia/te/te_tiled_texture.h"
 #include "syberia/te/te_i_codec.h"
+#include "syberia/te/te_intrusive_ptr.h"
 
 namespace Syberia {
 
@@ -45,7 +46,7 @@ public:
 	byte isLoaded();
 	bool load(const Common::Path &path);
 	bool load(const TeImage &image);
-	bool load(const Common::SharedPtr<Te3DTexture> &texture);
+	bool load(const TeIntrusivePtr<Te3DTexture> &texture);
 
 	bool onFrameAnimCurrentFrameChanged();
 	void pause();
@@ -73,7 +74,7 @@ public:
 	void setColorKey(const TeColor &col);
 	void setColorKeyActivated(bool val);
 	void setColorKeyTolerence(float val);
-	void setTiledTexture(const Common::SharedPtr<TeTiledTexture> &texture);
+	void setTiledTexture(const TeIntrusivePtr<TeTiledTexture> &texture);
 
 	void stop();
 	void unload();
@@ -92,6 +93,8 @@ private:
 	TeColor _colorKey;
 	bool _colorKeyActive;
 	float _colorKeyTolerence;
+	
+	bool _shouldDraw;
 
 	TeImage::Format _imgFormat;
 

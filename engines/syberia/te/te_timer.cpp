@@ -33,6 +33,10 @@ namespace Syberia {
 
 TeTimer::TeTimer() : _stopped(true), _pausable(true), _alarmTime(0),
 _startTime(0), _lastTimeElapsed(0), _startTimeOffset(0), _updated(false) {
+	if (realTimer()->_paused) {
+		realTimer()->start();
+		_realTime = realTimer()->getTimeFromStart();
+	}
 }
 
 void TeTimer::stop() {
@@ -156,7 +160,7 @@ void TeTimer::setAlarmIn(unsigned long offset) {
 		return;
 
 	_pausedAll = true;
-	_realTime = _realTimer->getTimeFromStart();
+	_realTime = realTimer()->getTimeFromStart();
 	for (TeTimer *timer : _timers) {
 		if (timer->_stopped || !timer->_pausable)
 			continue;
@@ -179,7 +183,7 @@ void TeTimer::setAlarmIn(unsigned long offset) {
 }
 
 /*static*/ void TeTimer::updateAll() {
-	_realTime = _realTimer->getTimeFromStart();
+	_realTime = realTimer()->getTimeFromStart();
 	for (auto *timer : _timers)
 		timer->update();
 }

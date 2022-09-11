@@ -219,11 +219,9 @@ int layoutBindings(lua_State *L) {
     lua_gettable(L, LUA_REGISTRYINDEX);
 	TeLuaGUI *gui = TeLuaTo<TeLuaGUI*>(L,-1);
 	TeLuaGUI::StringMap<TeLayout *> &layouts = gui->layouts();
-	TeLuaGUI::StringMap<TeLayout *>::iterator current = layouts.find(layout->name());
-	TeLuaGUI::StringMap<TeLayout *>::iterator end = layouts.end();
-	if (current == end) {
+	if (!layouts.contains(layout->name())) {
 		layouts.setVal(layout->name(), layout);
-		lua_pushlightuserdata(L, layout);
+		lua_pushlightuserdata(L, static_cast<Te3DObject2*>(layout));
 		return true;
 	} else {
 		warning("layoutBindings:: multiple objects with name %s\n", layout->name().c_str());
@@ -283,9 +281,12 @@ int spriteLayoutBindings(lua_State *L) {
 				layout->setPosition(pos);
 			} else if (!strcmp(s, "image")) {
 				Common::String imgPath = TeLuaToTeString(L, -1);
-				if (imgPath.substr(0, 2) == "./")
+				if (imgPath.substr(0, 2) == "./") {
 					imgPath = imgPath.substr(0, 2);
-				imgFullPath = gui->_scriptPath.getParent().join(imgPath);
+					imgFullPath = gui->_scriptPath.getParent().join(imgPath);
+				} else {
+					imgFullPath = imgPath;
+				}
 			} else if (!strcmp(s, "visible")) {
 				layout->setVisible(TeLuaToBool(L, -1));
 			} else if (!strcmp(s, "color")) {
@@ -321,7 +322,62 @@ int spriteLayoutBindings(lua_State *L) {
 	}
 	if (!imgFullPath.empty())
 		layout->load(imgFullPath);
-	error("TODO: Finish spriteLayoutBindings.");
+
+	lua_pushnil(L);
+	while (lua_next(L, -2) != 0) {
+		if (lua_type(L, -2) == 3) {
+			Te3DObject2 *object = TeLuaTo<Te3DObject2*>(L, -1);
+			layout->addChild(object);
+		}
+		lua_settop(L, -2);
+	}
+
+	if (layout->name().empty()) {
+		layout->setName(Common::String::format("%p", (void *)layout));
+	}
+
+	if (playNow) {
+		layout->play();
+	} else {
+		layout->stop();
+	}
+	
+	warning("Finish codec bit of spriteLayoutBindings to make movies work.");
+	/*
+	TeICodec *codec = layout->_tiledSurfacePtr->_codec;
+	if (codec) {
+	  fVar15 = (float)(*(code *)(pTVar3->vptr).vptr[0x10])();
+	  pTVar6 = layout;
+	  (((pTVar5->tiledSurfacePtr).ptr)->frameAnim).field_0x70 =
+		   (double)(((float)startingFrame / fVar15) * 1000.0) * 1000.0;
+	  pTVar4 = (layout->tiledSurfacePtr).ptr;
+	  if (endingFrame == 0xffffffffffffffff) {
+		(pTVar4->frameAnim).field_0x78 = 0x488f3fffe0c00000;
+	  }
+	  else {
+		fVar15 = (float)(*(code *)(pTVar4->codec->vptr).vptr[0x10])();
+		if ((long)endingFrame < 0) {
+		  fVar16 = (float)(endingFrame & 1 | endingFrame >> 1);
+		  fVar16 = fVar16 + fVar16;
+		}
+		else {
+		  fVar16 = (float)endingFrame;
+		}
+		(((pTVar6->tiledSurfacePtr).ptr)->frameAnim).field_0x78 =
+			 (double)((fVar16 / fVar15) * 1000.0) * 1000.0;
+	  }
+	}*/
+	
+	if (!gui->spriteLayout(layout->name())) {
+		TeLuaGUI::StringMap<TeSpriteLayout *> &spriteLayouts = gui->spriteLayouts();
+		spriteLayouts.setVal(layout->name(), layout);
+		lua_pushlightuserdata(L, static_cast<Te3DObject2*>(layout));
+		return true;
+	} else {
+		warning("layoutBindings:: multiple objects with name %s\n", layout->name().c_str());
+		delete layout;
+		return false;
+	}
 }
 
 int buttonLayoutBindings(lua_State *L) {
@@ -397,7 +453,28 @@ int buttonLayoutBindings(lua_State *L) {
 		lua_settop(L, -2);
 	}
 
-	error("TODO: Finish implementation of buttonLayoutBindings.");
+	lua_pushnil(L);
+	while (lua_next(L, -2) != 0) {
+		if (lua_type(L, -2) == 3) {
+			Te3DObject2 *object = TeLuaTo<Te3DObject2*>(L, -1);
+			layout->addChild(object);
+		}
+		lua_settop(L, -2);
+	}
+
+	lua_pushstring(L, "__TeLuaGUIThis");
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	TeLuaGUI *gui = TeLuaTo<TeLuaGUI*>(L,-1);
+	TeLuaGUI::StringMap<TeButtonLayout *> &blayouts = gui->buttonLayouts();
+	if (!blayouts.contains(layout->name())) {
+		blayouts.setVal(layout->name(), layout);
+		lua_pushlightuserdata(L, static_cast<Te3DObject2*>(layout));
+		return true;
+	} else {
+		warning("buttonLayoutBindings:: multiple objects with name %s\n", layout->name().c_str());
+		delete layout;
+		return false;
+	}
 }
 
 int checkboxLayoutBindings(lua_State *L) {

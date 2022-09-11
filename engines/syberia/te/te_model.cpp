@@ -19,7 +19,10 @@
  *
  */
 
+#include "syberia/syberia.h"
+#include "syberia/te/te_light.h"
 #include "syberia/te/te_model.h"
+#include "syberia/te/te_renderer.h"
 
 namespace Syberia {
 
@@ -43,12 +46,30 @@ void TeModel::blendMesh(const Common::String &s1, const Common::String &s2, floa
 	_meshBlenders.push_back(new MeshBlender(s1, s2, amount, this));
 }
 
-bool TeModel::visible() const {
-	error("TODO: Implement me.");
+void TeModel::draw() {
+	TeRenderer *renderer = g_engine->getRenderer();
+	
+	if (worldVisible()) {
+		TeMatrix4x4 transform = worldTransformationMatrix();
+		renderer->sendModelMatrix(transform);
+		renderer->pushMatrix();
+		renderer->multiplyMatrix(transform);
+		if (!_meshes.empty()) {
+			for (TeMesh &mesh : _meshes) {
+				// TODO: Set some value in the mesh here to this->field_0x158??
+				mesh.draw();
+			}
+		}
+		renderer->popMatrix();
+		TeLight::disableAll();
+	}
 }
 
-void TeModel::setVisible(bool vis) {
-	error("TODO: Implement me.");
+void TeModel::setColor(const TeColor &col) {
+	Te3DObject2::setColor(col);
+	for (TeMesh &mesh : _meshes) {
+		mesh.setColor(col);
+	}
 }
 
 void TeModel::update() {

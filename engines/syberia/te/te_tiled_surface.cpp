@@ -33,7 +33,7 @@ static void getRangeIntersection(float start1,float end1,float start2,float end2
 }
 
 TeTiledSurface::TeTiledSurface() : _colorKeyActive(false), _colorKeyTolerence(0),
-_bottomCrop(0), _topCrop(0), _leftCrop(0), _rightCrop(0), _codec(nullptr), _imgFormat(TeImage::INVALID) {
+_bottomCrop(0), _topCrop(0), _leftCrop(0), _rightCrop(0), _codec(nullptr), _imgFormat(TeImage::INVALID), _shouldDraw(true) {
 	_frameAnim.frameChangedSignal().add<TeTiledSurface>(this, &TeTiledSurface::onFrameAnimCurrentFrameChanged);
 }
 
@@ -51,14 +51,15 @@ byte TeTiledSurface::isLoaded() {
 }
 
 bool TeTiledSurface::load(const Common::Path &path) {
-	//(**(code **)((long)(this->super).vptr + 0x1c0))(this);
+	unload();
 
 	TeResourceManager *resmgr = g_engine->getResourceManager();
 	_path = path;
 
-	Common::SharedPtr<TeTiledTexture> texture;
+	TeIntrusivePtr<TeTiledTexture> texture;
 	if (resmgr->exists(path.append(".tt"))) {
 		texture = resmgr->getResource<TeTiledTexture>(path.append(".tt"));
+		// we don't own this one..
 	}
 
 	if (!texture) {
@@ -68,7 +69,7 @@ bool TeTiledSurface::load(const Common::Path &path) {
 		if (!_codec)
 			return false;
 
-		texture.reset(new TeTiledTexture());
+		texture = new TeTiledTexture();
 
 		if (_codec->load(path)) {
 			texture->setAccessName(path);
@@ -83,11 +84,11 @@ bool TeTiledSurface::load(const Common::Path &path) {
 			TeVector2s32 newSize = Te3DTexture::optimisedSize(TeVector2s32(_codec->width(), _codec->height()));
 			int bufy = _codec->height() + 4;
 			if (newSize._y < (int)_codec->height() + 4) {
-			  bufy = newSize._y;
+				bufy = newSize._y;
 			}
 			int bufx = _codec->width() + 4;
 			if (newSize._x < (int)_codec->width() + 4) {
-			  bufx = newSize._x;
+				bufx = newSize._x;
 			}
 
 			Common::SharedPtr<TePalette> nullpal;
@@ -104,11 +105,30 @@ bool TeTiledSurface::load(const Common::Path &path) {
 }
 
 bool TeTiledSurface::load(const TeImage &image) {
-	error("TODO: Implement me TeTiledSurface::load");
+	error("TODO: Implement me TeTiledSurface::load(image)");
 }
 
-bool TeTiledSurface::load(const Common::SharedPtr<Te3DTexture> &texture) {
-	error("TODO: Implement me TeTiledSurface::load");
+bool TeTiledSurface::load(const TeIntrusivePtr<Te3DTexture> &texture) {
+	unload();
+
+	TeResourceManager *resmgr = g_engine->getResourceManager();
+	TeIntrusivePtr<TeTiledTexture> tiledTexture;
+
+	const Common::Path ttPath = texture->getAccessName().append(".tt");
+
+	if (resmgr->exists(ttPath)) {
+		tiledTexture = resmgr->getResource<TeTiledTexture>(ttPath);
+	}
+
+	if (!tiledTexture) {
+		tiledTexture = new TeTiledTexture();
+		tiledTexture->load(texture);
+		tiledTexture->setAccessName(ttPath);
+		resmgr->addResource(tiledTexture.get());
+	}
+
+	setTiledTexture(tiledTexture);
+	return true;
 }
 
 bool TeTiledSurface::onFrameAnimCurrentFrameChanged() {
@@ -145,7 +165,7 @@ void TeTiledSurface::setColorKeyTolerence(float val) {
 		_codec->setColorKeyTolerence(val);
 }
 
-void TeTiledSurface::setTiledTexture(const Common::SharedPtr<TeTiledTexture> &texture) {
+void TeTiledSurface::setTiledTexture(const TeIntrusivePtr<TeTiledTexture> &texture) {
 	_tiledTexture = texture;
 	if (texture) {
 		_meshes.resize(texture->numberOfColumns() * texture->numberOfRow());
@@ -166,7 +186,7 @@ void TeTiledSurface::unload() {
 		delete _codec;
 		_codec = nullptr;
 	}
-	setTiledTexture(Common::SharedPtr<TeTiledTexture>());
+	setTiledTexture(TeIntrusivePtr<TeTiledTexture>());
 }
 
 void TeTiledSurface::update(const TeImage &image) {
@@ -180,10 +200,54 @@ void TeTiledSurface::updateSurface() {
 
 	const long cols = _tiledTexture->numberOfColumns();
 	const long rows = _tiledTexture->numberOfRow();
+	int meshno = 0;
 	for (long row = 0; row < rows; row++) {
 		for (long col = 0; col < cols; col++) {
+			TeMesh &mesh = _meshes[meshno];
+			mesh.setConf(4, 4, (TeMesh::Mode)6, 0, 0);
+			
+			mesh.setShouldDrawMaybe(_shouldDraw);
+			//*(byte *)(lVar3 + 0x122 + ptrOffset) = this->field_0x2c0;
+			
+			TeTiledTexture::Tile *tile = _tiledTexture->tile(TeVector2s32(col, row));
+			mesh.defaultMaterial(tile->_texture);
 
-			error("TODO: Implement me TeTiledSurface::updateSurface (%ld, %ld)", rows, cols);
+			TeColor meshcol = color();
+			
+			float top, bottom, left, right;
+			getRangeIntersection(_leftCrop, 1.0 - _rightCrop, tile->_vec1.x(), tile->_vec2.x() + tile->_vec1.x(), &top, &bottom);
+			getRangeIntersection(_bottomCrop, 1.0 - _topCrop, tile->_vec1.y(), tile->_vec2.y() + tile->_vec1.y(), &left, &right);
+			if (bottom < top)
+			  bottom = top;
+			if (right < left)
+			  right = left;
+			
+			const float fVar6 = (top - tile->_vec1.x()) / tile->_vec2.x();
+			const float fVar4 = (left - tile->_vec1.y()) / tile->_vec2.y();
+			const float fVar5 = (bottom - tile->_vec1.x()) / tile->_vec2.x();
+			const float fVar7 = (right - tile->_vec1.y()) / tile->_vec2.y();
+
+			mesh.setVertex(0, TeVector3f32(top + -0.5, left + -0.5, 0.0));
+			mesh.setTextureUV(0, TeVector2f32(fVar6, fVar4));
+			mesh.setNormal(0, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setColor(0, meshcol);
+			mesh.setVertex(1, TeVector3f32(bottom + -0.5, left + -0.5, 0.0));
+			mesh.setTextureUV(1, TeVector2f32(fVar5, fVar4));
+			mesh.setNormal(1, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setColor(1, meshcol);
+			mesh.setVertex(2, TeVector3f32(bottom + -0.5, right + -0.5, 0.0));
+			mesh.setTextureUV(2, TeVector2f32(fVar5, fVar7));
+			mesh.setNormal(2, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setColor(2, meshcol);
+			mesh.setVertex(3, TeVector3f32(top + -0.5, right + -0.5, 0.0));
+			mesh.setTextureUV(3, TeVector2f32(fVar6, fVar7));
+			mesh.setNormal(3, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setColor(3, meshcol);
+			mesh.setIndex(0, 0);
+			mesh.setIndex(1, 1);
+			mesh.setIndex(2, 3);
+			mesh.setIndex(3, 2);
+			meshno++;
 		}
 	}
 }

@@ -69,15 +69,19 @@ public:
 
 	void viewport(int x, int y, uint width, uint height);
 
+	int _projectionMatrixType;
+	float _zsomething1;
+	float _zsomething2;
+
 private:
 	int _viewportX;
 	int _viewportY;
 	uint _viewportW;
 	uint _viewportH;
-	float _widthScale;
-	float _heightScale;
 	
-	int _projectionMatrixType;
+	int _transformA;
+	int _transformB;
+
 	float _orthogonalParam1;
 	float _orthogonalParam2;
 	float _orthogonalParam3;

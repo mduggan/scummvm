@@ -37,10 +37,9 @@
 #include "syberia/te/te_visual_fade.h"
 #include "syberia/te/te_music.h"
 #include "syberia/te/te_xml_gui.h"
+#include "syberia/te/te_font3.h"
 
 namespace Syberia {
-
-class TeFont3;
 
 class Application {
 public:
@@ -78,7 +77,7 @@ public:
 	void loadOptions(const Common::String &fname);
 	void saveOptions(const Common::String &fname);
 
-	const Common::String &getHelpText(const Common::String &key);
+	Common::String getHelpText(const Common::String &key);
 
 	const char *inAppUnlockFullVersionID();
 	
@@ -105,11 +104,15 @@ private:
 	TeButtonLayout _lockCursorFromActionButton;
 	TeSpriteLayout _autoSaveIcon1;
 	TeSpriteLayout _autoSaveIcon2;
-	
+
+
 	TeCurveAnim2<Te3DObject2, TeColor> _autoSaveIconAnim1;
 	TeCurveAnim2<Te3DObject2, TeColor> _autoSaveIconAnim2;
-	
+
 	TeSignal0Param _blackFadeAnimationFinishedSignal;
+
+	Common::SharedPtr<TeCamera> _mainWindowCamera; // TODO: should be part of TeMainWindow.
+	TeLayout _mainWindow; // TODO: should be a specialised class.
 
 	GlobalBonusMenu _globalBonusMenu;
 	BonusMenu _bonusMenu;
@@ -118,20 +121,20 @@ private:
 	OwnerErrorMenu _ownerErrorMenu;
 	SplashScreens _splashScreens;
 	InGameScene _inGameScene;
-	
-	Common::SharedPtr<TeFont3> _fontComic;
-	Common::SharedPtr<TeFont3> _fontArgh;
-	Common::SharedPtr<TeFont3> _fontArial;
-	Common::SharedPtr<TeFont3> _fontChaucer;
-	Common::SharedPtr<TeFont3> _fontColaborate;
-	Common::SharedPtr<TeFont3> _fontProDisplay;
+
+	TeIntrusivePtr<TeFont3> _fontComic;
+	TeIntrusivePtr<TeFont3> _fontArgh;
+	TeIntrusivePtr<TeFont3> _fontArial;
+	TeIntrusivePtr<TeFont3> _fontChaucer;
+	TeIntrusivePtr<TeFont3> _fontColaborate;
+	TeIntrusivePtr<TeFont3> _fontProDisplay;
 
 	bool _captureFade;
 	bool _created;
-	
+
 	bool _gameFinished;
 	int _difficulty;
-	
+
 	TeXmlGui _helpGui;
 	static bool _dontUpdateWhenApplicationPaused;
 };

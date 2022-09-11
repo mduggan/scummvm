@@ -30,7 +30,9 @@ namespace Syberia {
 
 static const uint NO_TEXTURE = 0xffffffff;
 
-Te3DTexture::Te3DTexture() : _glTexture(NO_TEXTURE), _createdTexture(false), _numFrames(1), _frameRate(0) {
+Te3DTexture::Te3DTexture() : _glTexture(NO_TEXTURE), _createdTexture(false),
+_numFrames(1), _frameRate(0), _format(TeImage::INVALID), _glPixelFormat(GL_INVALID_ENUM) {
+	create();
 }
 
 void Te3DTexture::bind() {
@@ -44,7 +46,20 @@ void Te3DTexture::bind() {
 }
 
 void Te3DTexture::copyCurrentRender(uint xoffset, uint yoffset, uint x, uint y) {
-	error("TODO: Implmement Te3DTexture::copyCurrentRender");
+	// TODO: Get some better variable names here.
+	_matrix.setToIdentity();
+	TeVector3f32 local_40((float)_width / _texWidth, (float)_height / _texHeight, 1.0);
+	_matrix.scale(local_40);
+	TeVector3f32 local_50((float)_translateX / _width, (float)_translateY / _height, 0.0);
+	_matrix.translate(local_50);
+	TeVector3f32 local_60(
+			   1.0 - (float)(_somethingOffsetX + _translateX) /
+					 (float)_width,
+			   1.0 - (float)(_somethingOffsetY + _translateY) /
+					 (float)_height, 1.0);
+	_matrix.scale(local_60);
+	bind();
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, _texWidth, _texHeight);
 }
 
 void Te3DTexture::create() {
@@ -80,18 +95,19 @@ void Te3DTexture::ForceTexData(uint gltextures, uint xsize, uint ysize) {
 	error("TODO: Implement me");
 }
 
-bool Te3DTexture::hasAlpha() {
-	uint format = getFormat();
-	return (format == 6 || format == 9 || format == 0xb || format == 1 || format == 0);
+bool Te3DTexture::hasAlpha() const {
+	TeImage::Format format = getFormat();
+	return (format == TeImage::RGBA8 || format == 9
+			|| format == 0xb || format == 1 || format == 0);
 }
 
 /*static*/
-Common::SharedPtr<Te3DTexture> Te3DTexture::load2(const Common::Path &path, uint size) {
+TeIntrusivePtr<Te3DTexture> Te3DTexture::load2(const Common::Path &path, uint size) {
 	Common::Path fullPath = path.append(".3dtex");
 	
 	TeResourceManager *resMgr = g_engine->getResourceManager();
 	if (!resMgr->exists(fullPath)) {
-		Common::SharedPtr<Te3DTexture> retval(new Te3DTexture());
+		TeIntrusivePtr<Te3DTexture> retval(new Te3DTexture());
 		retval->load(fullPath);
 		retval->setAccessName(fullPath);
 		resMgr->addResource(retval.get());
@@ -103,7 +119,7 @@ Common::SharedPtr<Te3DTexture> Te3DTexture::load2(const Common::Path &path, uint
 
 bool Te3DTexture::load(const Common::Path &path) {
 	TeResourceManager *resmgr = g_engine->getResourceManager();
-	Common::SharedPtr<TeImage> img = resmgr->getResource<TeImage>(path);
+	TeIntrusivePtr<TeImage> img = resmgr->getResource<TeImage>(path);
 	load(*img);
 	setAccessName(path.append(".3dtex"));
 	return true;
@@ -115,8 +131,17 @@ bool Te3DTexture::load(const TeImage &img) {
 	
 	_width = img.w;
 	_height = img.h;
-	warning("set some other fields from the image here.");
-	
+	_format = img._format;
+
+	warning("TODO: set some other fields from the image here.");
+	// for now just set some good defaults.
+	_flipY = false;
+	_translateX = 0;
+	_translateY = 0;
+
+
+	_somethingOffsetX = _translateX + 4;
+	_somethingOffsetY = _translateY + 4;
 	TeVector2s32 optimizedSz = optimisedSize(img.bufSize());
 	_texWidth = optimizedSz._x;
 	_texHeight = optimizedSz._y;
@@ -130,22 +155,22 @@ bool Te3DTexture::load(const TeImage &img) {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	const void *imgdata = img.getPixels();
-	if (_format == 5) {
+	if (_format == TeImage::RGB8) {
 		GLenum glpxformat = GL_RGB;
 		if (_glPixelFormat != GL_INVALID_ENUM) {
 			glpxformat = _glPixelFormat;
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, glpxformat, _texWidth, _texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.pitch, img.h,
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.w, img.h,
 						GL_RGB, GL_UNSIGNED_BYTE, imgdata);
 		glpxformat = GL_RGB;
-	} else if (_format == 6) {
+	} else if (_format == TeImage::RGBA8) {
 		GLenum glpxformat = GL_RGBA;
 		if (_glPixelFormat != GL_INVALID_ENUM) {
 			glpxformat = _glPixelFormat;
 		}
 	  	glTexImage2D(GL_TEXTURE_2D, 0, glpxformat, _texWidth, _texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.pitch, img.h,
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.w, img.h,
 						GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 	} else {
 		warning("Te3DTexture::load can't send image format %d to GL.", _format);
@@ -167,8 +192,28 @@ bool Te3DTexture::load(const TeImage &img) {
 
 /*static*/
 TeVector2s32 Te3DTexture::optimisedSize(const TeVector2s32 &size) {
-	warning("TODO: Te3DTexture::optimizedSize. Returning original size for now.");
-	return size;
+	/* The maths here is a bit funky but it just picks the nearest power of 2 (up) */
+	int xsize = size._x - 1;
+	int ysize = size._y - 1;
+
+	xsize = (int)xsize >> 1 | xsize;
+	xsize = (int)xsize >> 2 | xsize;
+	xsize = (int)xsize >> 4 | xsize;
+	xsize = (int)xsize >> 8 | xsize;
+	int v1 = ((int)xsize >> 0x10 | xsize) + 1;
+	if (v1 < 8) {
+		v1 = 8;
+	}
+
+	ysize = (int)ysize >> 1 | ysize;
+	ysize = (int)ysize >> 2 | ysize;
+	ysize = (int)ysize >> 4 | ysize;
+	ysize = (int)ysize >> 8 | ysize;
+	int v2 = ((int)ysize >> 0x10 | ysize) + 1;
+	if (v2 < 8) {
+		v2 = 8;
+	}
+	return TeVector2s32(v1, v2);
 }
 
 void Te3DTexture::unbind() {
@@ -203,10 +248,10 @@ void Te3DTexture::update(const TeImage &img, uint xoff, uint yoff) {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	
 	const void *imgdata = img.getPixels();
-	if (_format == 5) {
-		glTexSubImage2D(GL_TEXTURE_2D, 0, xoff, yoff, img.pitch, img.h, GL_RGB, GL_UNSIGNED_BYTE, imgdata);
-	} else if (_format == 6) {
-		glTexSubImage2D(GL_TEXTURE_2D, 0, xoff, yoff, img.pitch, img.h, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
+	if (_format == TeImage::RGB8) {
+		glTexSubImage2D(GL_TEXTURE_2D, 0, xoff, yoff, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, imgdata);
+	} else if (_format == TeImage::RGBA8) {
+		glTexSubImage2D(GL_TEXTURE_2D, 0, xoff, yoff, img.w, img.h, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 	} else {
 		warning("Te3DTexture::update can't send image format %d to GL.", _format);
 	}

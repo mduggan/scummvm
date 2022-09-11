@@ -27,8 +27,12 @@ namespace Syberia {
 TeResourceManager::TeResourceManager() {
 }
 
-void TeResourceManager::addResource(TeResource *resource) {
+void TeResourceManager::addResource(const TeIntrusivePtr<TeResource> &resource) {
 	_resources.insert_at(0, resource);
+}
+
+void TeResourceManager::addResource(TeResource *resource) {
+	_resources.insert_at(0, TeIntrusivePtr<TeResource>(resource));
 }
 
 bool TeResourceManager::exists(const Common::Path &path) {
@@ -40,7 +44,7 @@ bool TeResourceManager::exists(const Common::Path &path) {
 	return false;
 }
 
-void TeResourceManager::removeResource(TeResource *resource) {
+void TeResourceManager::removeResource(const TeIntrusivePtr<TeResource> &resource) {
 	for (uint i = 0; i < _resources.size(); i++) {
 		if (_resources[i] == resource) {
 			_resources.remove_at(i);
@@ -49,6 +53,13 @@ void TeResourceManager::removeResource(TeResource *resource) {
 	}
 }
 
-// TODO: Add more functions here.
+void TeResourceManager::removeResource(const TeResource *resource) {
+	for (uint i = 0; i < _resources.size(); i++) {
+		if (_resources[i].get() == resource) {
+			_resources.remove_at(i);
+			break;
+		}
+	}
+}
 
 } // end namespace Syberia

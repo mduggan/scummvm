@@ -30,6 +30,7 @@
 #include "syberia/te/te_palette.h"
 #include "syberia/te/te_resource.h"
 #include "syberia/te/te_vector2s32.h"
+#include "syberia/te/te_vector3f32.h"
 
 namespace Syberia {
 
@@ -38,26 +39,25 @@ public:
 	TeTiledTexture();
 
 	typedef struct {
-		float x1;
-		float x2;
-		float y1;
-		float y2;
+		TeVector3f32 _vec1;
+		TeVector3f32 _vec2;
+		TeIntrusivePtr<Te3DTexture> _texture;
 	} Tile;
 
 	uint imageFormat();
 	bool isLoaded();
 	bool load(const Common::Path &path);
 	bool load(const TeImage &image);
-	bool load(const Common::SharedPtr<Te3DTexture> &texture);
-	long numberOfColumns();
-	long numberOfRow();
+	bool load(const TeIntrusivePtr<Te3DTexture> &texture);
+	long numberOfColumns() const;
+	long numberOfRow() const;
 
-	/*static*/ TeImage *optimizedTileImage(const Common::Array<TeImage> &images, const TeVector2s32 &size,
+	/*static*/ TeImage *optimisedTileImage(Common::Array<TeImage> &images, const TeVector2s32 &size,
 								  const Common::SharedPtr<TePalette> &pal, enum TeImage::Format format);
 
 	void release();
 	void save() {};
-	const Tile *tile(TeVector2s32 &loc);
+	Tile *tile(const TeVector2s32 &loc);
 	void update(const TeImage &image);
 
 	TeVector2s32 _totalSize;
@@ -66,7 +66,7 @@ private:
 	Common::Array<Tile> _tileArray;
 	TeVector2s32 _tileSize;
 	TeVector2s32 _somethingSize;
-	byte _somethingByte;
+	bool _skipBlank;  // note: not clear if this can ever get set?
 
 };
 

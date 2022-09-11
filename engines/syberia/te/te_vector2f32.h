@@ -35,11 +35,12 @@ public:
 
 	TeVector2f32(const TeVector2s32 &other);
 
+	TeVector2f32(float x_, float y_) : Math::Vector2d(x_, y_) {};
+
 	/*
 	TODO: do we need anything that isn't already in Vector2d here?
 	TeVector2f32(const TeVector2f32 &other);
 	TeVector2f32(const TeVector3f32 &other);
-	TeVector2f32(float x, float y);
 	TeVector2f32(float *vals);
 
 	float crossProduct(const TeVector2f32 &other) const;

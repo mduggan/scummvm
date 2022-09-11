@@ -31,6 +31,7 @@
 #include "syberia/syberia.h"
 #include "syberia/te/te_resource.h"
 #include "syberia/te/te_core.h"
+#include "syberia/te/te_intrusive_ptr.h"
 
 namespace Syberia {
 
@@ -39,37 +40,39 @@ class TeResource;
 class TeResourceManager {
 public:
 	TeResourceManager();
-	
+
+	void addResource(const TeIntrusivePtr<TeResource> &resource);
 	void addResource(TeResource *resource);
 	bool exists(const Common::Path &path);
-	void removeResource(TeResource *resource);
+	void removeResource(const TeIntrusivePtr<TeResource> &resource);
+	void removeResource(const TeResource *resource);
 	
-	template<class T> Common::SharedPtr<T> getResource(const Common::Path &path) {
-		for (TeResource *resource : this->_resources) {
+	template<class T> TeIntrusivePtr<T> getResource(const Common::Path &path) {
+		for (TeIntrusivePtr<TeResource> &resource : this->_resources) {
 			if (resource->getAccessName() == path) {
-				return Common::SharedPtr<T>(static_cast<T *>(resource));
+				return TeIntrusivePtr<T>(dynamic_cast<T *>(resource.get()));
 			}
 		}
 		
-		Common::SharedPtr<T> retval;
+		TeIntrusivePtr<T> retval;
 		TeCore *core = g_engine->getCore();
 		if (!core->_coreNotReady) {
 			if (Common::File::exists(path)) {
-				retval.reset(new T());
+				retval = new T();
 			} else {
 				// Try path with langs
 				Common::Path parentPath = path.getParent();
 				Common::Path pathWithLang = parentPath.join(core->language()).joinInPlace(path.getLastComponent());
 				if (Common::File::exists(pathWithLang)) {
-					retval.reset(new T());
+					retval = new T();
 				}
 				Common::Path pathWithEn = parentPath.join("en").joinInPlace(path.getLastComponent());
 				if (Common::File::exists(pathWithEn)) {
-					retval.reset(new T());
+					retval = new T();
 				}
 			}
 		} else {
-			retval.reset(new T());
+			retval = new T();
 		}
 		if (retval.get())
 			addResource(retval.get());
@@ -77,8 +80,7 @@ public:
 	}
 
 private:
-	Common::Array<TeResource *> _resources;
-	// TODO add private members
+	Common::Array<TeIntrusivePtr<TeResource>> _resources;
 
 };
 

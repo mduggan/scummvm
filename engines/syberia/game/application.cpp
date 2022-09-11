@@ -47,6 +47,17 @@ Application::Application() : _finishedGame(false), _finishedFremium(false), _cap
 }
 
 void Application::create() {
+	warning("TODO: Move mainWindowCamera to mainWindow");
+	_mainWindowCamera.reset(new TeCamera());
+	_mainWindowCamera->_projectionMatrixType = 4;
+	int winWidth = 800;
+	int winHeight = 600;
+	_mainWindowCamera->viewport(0, 0, winWidth, winHeight);
+	_mainWindowCamera->orthogonalParams(winWidth * -0.5, winWidth * 0.5, winHeight * 0.5, winHeight * -0.5);
+	
+	_mainWindow.setSize(TeVector3f32(winWidth, winHeight, 0.0));
+	_mainWindow.setSizeType(TeILayout::ABSOLUTE);
+
 	TeResourceManager *resmgr = g_engine->getResourceManager();
 	_fontComic = resmgr->getResource<TeFont3>("Common/Fonts/ComicRelief.ttf");
 	_fontArgh = resmgr->getResource<TeFont3>("Common/Fonts/Argh.ttf");
@@ -126,22 +137,23 @@ void Application::create() {
 	_backLayout.setName("layoutBack");
 	_backLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_backLayout.setSize(TeVector3f32(1.0, 1.0, 0.0));
-	warning("TODO: call some mainwindow virtual function with _backLayout here..");
+	_mainWindow.addChild(&_backLayout);
 	
 	_frontOrientationLayout.setName("orientationLayoutFront");
 	_frontOrientationLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_frontOrientationLayout.setSize(TeVector3f32(1.0, 1.0, 0.0));
-	warning("TODO: call some mainwindow virtual function with _frontOrientationLayout here..");
+	_mainWindow.addChild(&_frontOrientationLayout);
 	
 	_frontLayout.setName("layoutFront");
 	_frontLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_frontLayout.setSize(TeVector3f32(1.0, 1.0, 0.0));
+	_frontOrientationLayout.addChild(&_frontLayout);
 	
 	_visFade.init();
 	
-	_backLayout.addChild(&_visFade._fadeCaptureSprite);
-	_backLayout.addChild(&_visFade._blackFadeSprite);
-	_backLayout.addChild(&_visFade._buttonLayout);
+	_frontOrientationLayout.addChild(&_visFade._fadeCaptureSprite);
+	_frontOrientationLayout.addChild(&_visFade._blackFadeSprite);
+	_frontOrientationLayout.addChild(&_visFade._buttonLayout);
 
 	_frontLayout.addChild(&_appSpriteLayout);
 	_appSpriteLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
@@ -162,26 +174,26 @@ void Application::create() {
 	
 	_mouseCursorLayout.load("pictures/cursor.png");
 	_mouseCursorLayout.setAnchor(TeVector3f32(0.3, 0.1, 0.0));
-	_backLayout.addChild(&_mouseCursorLayout);
+	_frontOrientationLayout.addChild(&_mouseCursorLayout);
 	
 	_lockCursorButton.setName("lockCursorButton");
 	_lockCursorButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorButton.setSize(TeVector3f32(2.0, 0.095, 0.0));
 	_lockCursorButton.setPositionType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorButton.setPosition(TeVector3f32(0.95, 0.95, 0.0));
-	_backLayout.addChild(&_lockCursorButton);
+	_frontOrientationLayout.addChild(&_lockCursorButton);
 	
 	_lockCursorFromActionButton.setName("lockCursorFromActionButton");
 	_lockCursorFromActionButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorFromActionButton.setSize(TeVector3f32(2.0, 2.0, 0.0));
-	_backLayout.addChild(&_lockCursorFromActionButton);
+	_frontOrientationLayout.addChild(&_lockCursorFromActionButton);
 
 	_autoSaveIcon1.setName("autosaveIcon");
 	_autoSaveIcon1.setAnchor(TeVector3f32(0.5, 0.5, 0.0));
 	_autoSaveIcon1.setPosition(TeVector3f32(0.2, 0.9, 0.0));
 	_autoSaveIcon1.setSize(TeVector3f32(128.0, 64.0, 0.0));
 	_autoSaveIcon1.load("menus/inGame/autosave_icon.png");
-	_backLayout.addChild(&_autoSaveIcon1);
+	_frontOrientationLayout.addChild(&_autoSaveIcon1);
 	
 	_autoSaveIconAnim1._runTimer.pausable(false);
 	_autoSaveIconAnim1.pause();
@@ -202,7 +214,7 @@ void Application::create() {
 	_autoSaveIcon2.setPosition(TeVector3f32(0.2, 0.7, 0.0));
 	_autoSaveIcon2.setSize(TeVector3f32(68.0, 86.0, 0.0));
 	_autoSaveIcon2.load("menus/inGame/NoCel.png");
-	_backLayout.addChild(&_autoSaveIcon2);
+	_frontOrientationLayout.addChild(&_autoSaveIcon2);
 
 	_autoSaveIconAnim2._runTimer.pausable(false);
 	_autoSaveIconAnim2.pause();
@@ -238,7 +250,7 @@ bool Application::run() {
 	if (_created) {
 		TeTimer::updateAll();
 		if (!_dontUpdateWhenApplicationPaused) {
-			error("TODO: finish commented-out bits.");
+			warning("TODO: Application::run: finish commented-out bits.");
 			//_inputmgr->update();
 			TeAnimation::updateAll();
 			//TeVideo::updateAll();
@@ -297,14 +309,14 @@ void Application::saveCorrupted(const Common::String &fname) {
 }
 
 void Application::drawBack() {
-	warning("TODO: apply main window camera.");
+	_mainWindowCamera->apply();
 	_backLayout.draw();
 	TeCamera::restore();
 	g_engine->getRenderer()->loadIdentityMatrix();
 }
 
 void Application::drawFront() {
-	warning("TODO: apply main window camera.");
+	_mainWindowCamera->apply();
 	_frontOrientationLayout.draw();
 	TeCamera::restore();
 	g_engine->getRenderer()->loadIdentityMatrix();
@@ -343,7 +355,7 @@ void Application::performRender() {
 	drawFront();
 	renderer->renderTransparentMeshes();
 	// What gets called here??
-	//_inGameScene.removeModel(<#const Common::String &name#>)
+	//_inGameScene.removeModel(const Common::String &name)
 }
 
 //void Application::preloadTextrue(); does nothing..
@@ -413,7 +425,7 @@ void Application::saveOptions(const Common::String &fname) {
 	error("TODO: Implement me.");
 }
 
-const Common::String &Application::getHelpText(const Common::String &key) {
+Common::String Application::getHelpText(const Common::String &key) {
 	return _helpGui.value(key);
 }
 

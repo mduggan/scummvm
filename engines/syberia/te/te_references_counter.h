@@ -19,19 +19,36 @@
  *
  */
 
-#include "syberia/game/main_menu.h"
+#ifndef SYBERIA_TE_TE_REFERENCES_COUNTER_H
+#define SYBERIA_TE_TE_REFERENCES_COUNTER_H
 
 namespace Syberia {
 
-MainMenu::MainMenu() {
-}
+class TeReferencesCounter {
+public:
+	TeReferencesCounter() : _refCount(0) {};
+	virtual ~TeReferencesCounter() {};
 
-void MainMenu::enter() {
-	error("TODO: Implement MainMenu::enter.");
-}
+	bool decrementCounter() {
+		if (_refCount) {
+			_refCount--;
+			return _refCount == 0;
+		}
+		return false;
+	}
 
-void MainMenu::leave() {
-	error("TODO: Implement MainMenu::leave.");
-}
+	void incrementCounter() {
+		_refCount++;
+	}
+
+	void resetCounter() {
+		_refCount = 0;
+	}
+
+private:
+	int _refCount;
+};
 
 } // end namespace Syberia
+
+#endif // SYBERIA_TE_TE_REFERENCES_COUNTER_H
