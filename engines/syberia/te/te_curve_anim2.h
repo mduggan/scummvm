@@ -29,7 +29,7 @@ namespace Syberia {
 
 template<class T> static T linearInterpolation(T &obj1, T &obj2, double amount) {
 	return (obj1 * (1.0 - amount)) + (obj2 * amount);
-};
+}
 
 template<class T, class S>
 class TeCurveAnim2 : public TeAnimation {

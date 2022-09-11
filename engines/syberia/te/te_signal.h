@@ -46,16 +46,16 @@ public:
 
 	void call() {
 		typename Common::Array<TeICallback0ParamPtr>::iterator i = this->begin();
-		typename Common::Array<TeICallback0ParamPtr>::iterator end = this->end();
-		for (; i < end; i++) {
+		typename Common::Array<TeICallback0ParamPtr>::iterator end_ = this->end();
+		for (; i < end_; i++) {
 			(*i)->call();
 		}
 	}
 
 	void remove(const TeICallback0ParamPtr &item) {
 		typename Common::Array<TeICallback0ParamPtr>::iterator i = this->begin();
-		typename Common::Array<TeICallback0ParamPtr>::iterator end = this->end();
-		for (; i < end; i++) {
+		typename Common::Array<TeICallback0ParamPtr>::iterator end_ = this->end();
+		for (; i < end_; i++) {
 			if ((*i)->equals(item.get())) {
 				this->erase(i);
 				break;
@@ -82,16 +82,16 @@ public:
 
 	void call() {
 		typename Common::Array<TeICallback1ParamPtr<T>>::iterator i = this->begin();
-		typename Common::Array<TeICallback1ParamPtr<T>>::iterator end = this->end();
-		for (; i < end; i++) {
+		typename Common::Array<TeICallback1ParamPtr<T>>::iterator end_ = this->end();
+		for (; i < end_; i++) {
 			i->call();
 		}
 	}
 
 	void remove(const TeICallback1ParamPtr<T> &item) {
 		typename Common::Array<TeICallback1ParamPtr<T>>::iterator i = this->begin();
-		typename Common::Array<TeICallback1ParamPtr<T>>::iterator end = this->end();
-		for (; i < end; i++) {
+		typename Common::Array<TeICallback1ParamPtr<T>>::iterator end_ = this->end();
+		for (; i < end_; i++) {
 			if (i->equals(item)) {
 				this->erase(i);
 				break;

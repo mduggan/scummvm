@@ -36,13 +36,11 @@ bool TeMatriciesStack::isEmpty() const {
 }
 
 void TeMatriciesStack::loadIdentity() {
-	_stack.clear();
-	_stack.push(TeMatrix4x4());
+	_stack.top() = TeMatrix4x4();
 }
 
 void TeMatriciesStack::loadMatrix(const TeMatrix4x4 &matrix) {
-	_stack.clear();
-	_stack.push(matrix);
+	_stack.top() = matrix;
 }
 
 void TeMatriciesStack::multiplyMatrix(const TeMatrix4x4 &matrix) {
@@ -50,11 +48,12 @@ void TeMatriciesStack::multiplyMatrix(const TeMatrix4x4 &matrix) {
 }
 
 void TeMatriciesStack::popMatrix() {
-	_stack.pop();
+	if (_stack.size() > 1)
+		_stack.pop();
 }
 
 void TeMatriciesStack::pushMatrix() {
-	_stack.push(TeMatrix4x4());
+	_stack.push(_stack.top());
 }
 
 void TeMatriciesStack::rotate(const TeQuaternion &rot) {

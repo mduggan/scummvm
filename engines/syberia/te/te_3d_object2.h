@@ -38,14 +38,14 @@ public:
 	virtual ~Te3DObject2() {};
 
 	// note, probably should be Te*I*3DObject2 args here
-	virtual void addChild(Te3DObject2 *child);
+	virtual void addChild(Te3DObject2 *newChild);
 	virtual void addChildBefore(Te3DObject2 *newChild, const Te3DObject2 *ref);
 	virtual Te3DObject2 *child(long offset);
 	long childCount() {
 		return _children.size();
 	}
 
-	long childIndex(Te3DObject2 *child);
+	long childIndex(Te3DObject2 *childToFind);
 
 	Common::Array<Te3DObject2 *> &childList() {
 		return _children;
@@ -96,7 +96,7 @@ public:
 	virtual TeVector3f32 position() {
 		return _position;
 	}
-	virtual void removeChild(Te3DObject2 *child);
+	virtual void removeChild(Te3DObject2 *toRemove);
 	void removeChildren();
 	void rotate(const TeQuaternion &rot);
 	const TeQuaternion &rotation() {
@@ -116,8 +116,8 @@ public:
 	virtual void setParent(Te3DObject2 *newparent);  // note, probably should be Te*I*3DObject2 arg
 	virtual void setPosition(const TeVector3f32 &pos);
 	virtual void setRotation(const TeQuaternion &rot);
-	virtual void setScale(const TeVector3f32 &scale);
-	virtual void setSize(const TeVector3f32 &size);
+	virtual void setScale(const TeVector3f32 &newScale);
+	virtual void setSize(const TeVector3f32 &newSize);
 	void setVisible(bool visible);
 	virtual void setZPosition(float zpos);
 	virtual TeVector3f32 size() {

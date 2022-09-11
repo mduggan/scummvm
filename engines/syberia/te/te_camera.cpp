@@ -19,7 +19,7 @@
  *
  */
 
-#include "common/util.h"
+#include "common/math.h"
 
 #include "syberia/syberia.h"
 #include "syberia/te/te_camera.h"
