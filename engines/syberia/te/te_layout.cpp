@@ -94,7 +94,7 @@ bool TeLayout::isAutoZEnabled() {
 
 void TeLayout::draw() {
 	if (visible() && worldVisible()) {
-		debug("Drawing TeLayout %p", this);
+		debug("Drawing TeLayout %p (%s)", this, name().empty() ? "no name" : name().c_str());
 		// Ensure world transform is up-to-date.
 		worldTransformationMatrix();
 		for (auto &child : childList()) {
@@ -271,6 +271,7 @@ void TeLayout::setSize(const TeVector3f32 &size) {
 }
 
 void TeLayout::setSizeType(CoordinatesType coordtype) {
+	assert(coordtype == RELATIVE_TO_PARENT || coordtype == ABSOLUTE);
 	if (_sizeType != coordtype) {
 		_sizeType = coordtype;
 		_sizeChanged = true;

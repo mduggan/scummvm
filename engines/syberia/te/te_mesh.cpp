@@ -117,7 +117,7 @@ void TeMesh::draw() {
 	if (!_colors.empty()) {
 		glColorPointer(4, GL_UNSIGNED_BYTE,4, _colors.data());
 	}
-	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, _glTexEnvMode);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, _glTexEnvMode);
 	if (renderer->scissorEnabled()) {
 		glEnable(GL_SCISSOR_TEST);
 		uint scissorx = renderer->scissorX();
@@ -297,22 +297,22 @@ void TeMesh::setConf(unsigned long vertexCount, unsigned long indexCount, enum M
 	}
 }
 
-void TeMesh::setIndex(unsigned int index, unsigned int val) {
-	_indexes[index] = val;
+void TeMesh::setIndex(unsigned int idx, unsigned int val) {
+	_indexes[idx] = val;
 }
 
-void TeMesh::setNormal(unsigned int index, const TeVector3f32 &val) {
+void TeMesh::setNormal(unsigned int idx, const TeVector3f32 &val) {
 	_normals.resize(_verticies.size());
-	_normals[index] = val;
+	_normals[idx] = val;
 }
 
-void TeMesh::setTextureUV(unsigned int index, const TeVector2f32 &val) {
+void TeMesh::setTextureUV(unsigned int idx, const TeVector2f32 &val) {
 	_uvs.resize(_verticies.size());
-	_uvs[index] = val;
+	_uvs[idx] = val;
 }
 
-void TeMesh::setVertex(unsigned int index, const TeVector3f32 &val) {
-	_verticies[index] = val;
+void TeMesh::setVertex(unsigned int idx, const TeVector3f32 &val) {
+	_verticies[idx] = val;
 }
 
 TeVector3f32 TeMesh::vertex(uint idx) const {

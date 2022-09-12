@@ -42,6 +42,16 @@ TeMaterial::TeMaterial(TeIntrusivePtr<Te3DTexture> texture, Mode mode) {
 	_mode = mode;
 }
 
+void TeMaterial::defaultValues() {
+	_ambientColor = TeColor(0, 0, 0, 255);
+	_diffuseColor = TeColor(255, 255, 255, 255);
+	_specularColor = TeColor(0, 0, 0, 255);
+	_emissionColor = TeColor(0, 0, 0, 255);
+	_shininess = 0.0;
+	_enableLights = false;
+	_enableSomethingDefault0 = false;
+}
+
 void TeMaterial::apply() {
 	static const float constColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	TeRenderer *renderer = g_engine->getRenderer();
@@ -104,8 +114,7 @@ void TeMaterial::apply() {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, fullColor);
 	}
 
-	warning("TODO: Work out what TeMaterial::_enableSomethingDefault0 actually is.");
-	bool _enableSomethingDefault0 = false;
+	//warning("TODO: Work out what TeMaterial::_enableSomethingDefault0 actually is.");
 	if (_enableSomethingDefault0 == false) {
 		glDisable(GL_TEXTURE_GEN_S);
 		glDisable(GL_TEXTURE_GEN_T);
@@ -131,15 +140,6 @@ void TeMaterial::apply() {
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, diffuse);
 	}
-}
-
-void TeMaterial::defaultValues() {
-	_ambientColor = TeColor(0, 0, 0, 255);
-	_diffuseColor = TeColor(255, 255, 255, 255);
-	_specularColor = TeColor(0, 0, 0, 255);
-	_emissionColor = TeColor(0, 0, 0, 255);
-	_shininess = 0.0;
-	_enableLights = false;
 }
 
 bool TeMaterial::operator==(const TeMaterial &other) const {

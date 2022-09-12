@@ -204,44 +204,43 @@ void TeTiledSurface::updateSurface() {
 	for (long row = 0; row < rows; row++) {
 		for (long col = 0; col < cols; col++) {
 			TeMesh &mesh = _meshes[meshno];
-			mesh.setConf(4, 4, (TeMesh::Mode)6, 0, 0);
+			mesh.setConf(4, 4, TeMesh::MeshMode6, 0, 0);
 			
 			mesh.setShouldDrawMaybe(_shouldDraw);
-			//*(byte *)(lVar3 + 0x122 + ptrOffset) = this->field_0x2c0;
 			
 			TeTiledTexture::Tile *tile = _tiledTexture->tile(TeVector2s32(col, row));
 			mesh.defaultMaterial(tile->_texture);
 
-			TeColor meshcol = color();
+			const TeColor meshcol = color();
 			
-			float top, bottom, left, right;
-			getRangeIntersection(_leftCrop, 1.0 - _rightCrop, tile->_vec1.x(), tile->_vec2.x() + tile->_vec1.x(), &top, &bottom);
-			getRangeIntersection(_bottomCrop, 1.0 - _topCrop, tile->_vec1.y(), tile->_vec2.y() + tile->_vec1.y(), &left, &right);
-			if (bottom < top)
-			  bottom = top;
+			float left, right, top, bottom;
+			getRangeIntersection(_leftCrop, 1.0 - _rightCrop, tile->_vec1.x(), tile->_vec2.x() + tile->_vec1.x(), &left, &right);
+			getRangeIntersection(_bottomCrop, 1.0 - _topCrop, tile->_vec1.y(), tile->_vec2.y() + tile->_vec1.y(), &top, &bottom);
 			if (right < left)
 			  right = left;
+			if (bottom < top)
+			  bottom = top;
 			
-			const float fVar6 = (top - tile->_vec1.x()) / tile->_vec2.x();
-			const float fVar4 = (left - tile->_vec1.y()) / tile->_vec2.y();
-			const float fVar5 = (bottom - tile->_vec1.x()) / tile->_vec2.x();
-			const float fVar7 = (right - tile->_vec1.y()) / tile->_vec2.y();
+			const float scaled_l = (left - tile->_vec1.x()) / tile->_vec2.x();
+			const float scaled_r = (right - tile->_vec1.x()) / tile->_vec2.x();
+			const float scaled_t = (top - tile->_vec1.y()) / tile->_vec2.y();
+			const float scaled_b = (bottom - tile->_vec1.y()) / tile->_vec2.y();
 
-			mesh.setVertex(0, TeVector3f32(top + -0.5, left + -0.5, 0.0));
-			mesh.setTextureUV(0, TeVector2f32(fVar6, fVar4));
-			mesh.setNormal(0, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setVertex(0, TeVector3f32(left - 0.5f, top - 0.5f, 0.0f));
+			mesh.setTextureUV(0, TeVector2f32(scaled_l, scaled_t));
+			mesh.setNormal(0, TeVector3f32(0.0f, 0.0f, 1.0f));
 			mesh.setColor(0, meshcol);
-			mesh.setVertex(1, TeVector3f32(bottom + -0.5, left + -0.5, 0.0));
-			mesh.setTextureUV(1, TeVector2f32(fVar5, fVar4));
-			mesh.setNormal(1, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setVertex(1, TeVector3f32(right - 0.5f, top - 0.5f, 0.0f));
+			mesh.setTextureUV(1, TeVector2f32(scaled_r, scaled_t));
+			mesh.setNormal(1, TeVector3f32(0.0f, 0.0f, 1.0f));
 			mesh.setColor(1, meshcol);
-			mesh.setVertex(2, TeVector3f32(bottom + -0.5, right + -0.5, 0.0));
-			mesh.setTextureUV(2, TeVector2f32(fVar5, fVar7));
-			mesh.setNormal(2, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setVertex(2, TeVector3f32(right - 0.5f, bottom - 0.5f, 0.0f));
+			mesh.setTextureUV(2, TeVector2f32(scaled_r, scaled_b));
+			mesh.setNormal(2, TeVector3f32(0.0f, 0.0f, 1.0f));
 			mesh.setColor(2, meshcol);
-			mesh.setVertex(3, TeVector3f32(top + -0.5, right + -0.5, 0.0));
-			mesh.setTextureUV(3, TeVector2f32(fVar6, fVar7));
-			mesh.setNormal(3, TeVector3f32(0.0, 0.0, 1.0));
+			mesh.setVertex(3, TeVector3f32(left - 0.5f, bottom - 0.5f, 0.0f));
+			mesh.setTextureUV(3, TeVector2f32(scaled_l, scaled_b));
+			mesh.setNormal(3, TeVector3f32(0.0f, 0.0f, 1.0f));
 			mesh.setColor(3, meshcol);
 			mesh.setIndex(0, 0);
 			mesh.setIndex(1, 1);

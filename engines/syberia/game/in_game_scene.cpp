@@ -27,7 +27,7 @@
 
 namespace Syberia {
 
-InGameScene::InGameScene() {
+InGameScene::InGameScene() : _character(nullptr) {
 }
 
 void InGameScene::draw() {

@@ -62,8 +62,8 @@ public:
 	void defaultMaterial(const TeIntrusivePtr<Te3DTexture> &texture);
 	void destroy();
 	void draw() override;
-	void facesPerMaterial(uint idx, ushort value);
-	ushort facesPerMaterial(uint idx) const { return _faceCounts[idx]; }
+	void facesPerMaterial(uint idx, unsigned short value);
+	unsigned short facesPerMaterial(uint idx) const { return _faceCounts[idx]; }
 	void forceMatrix(const TeMatrix4x4 &matrix);
 	byte getFaceMaterial(uint idx);
 	TeMesh::Mode getMode() const;

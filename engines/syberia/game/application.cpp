@@ -38,7 +38,7 @@ namespace Syberia {
 
 bool Application::_dontUpdateWhenApplicationPaused = false;
 
-Application::Application() : _finishedGame(false), _finishedFremium(false), _captureFade(false), _difficulty(1) {
+Application::Application() : _finishedGame(false), _finishedFremium(false), _captureFade(false), _difficulty(1), _created(false) {
 	TeCore *core = g_engine->getCore();
 	core->_coreNotReady = true;
 	core->fileFlagSystemSetFlag("platform", "MacOSX");
@@ -48,13 +48,17 @@ Application::Application() : _finishedGame(false), _finishedFremium(false), _cap
 
 void Application::create() {
 	warning("TODO: Move mainWindowCamera to mainWindow");
+	
+	// See TeMainWindowBase::initCamera
 	_mainWindowCamera.reset(new TeCamera());
 	_mainWindowCamera->_projectionMatrixType = 4;
 	int winWidth = 800;
 	int winHeight = 600;
 	_mainWindowCamera->viewport(0, 0, winWidth, winHeight);
 	_mainWindowCamera->orthogonalParams(winWidth * -0.5, winWidth * 0.5, winHeight * 0.5, winHeight * -0.5);
-	
+	_mainWindowCamera->_zsomething1 = -2048.0f;
+	_mainWindowCamera->_zsomething2 = 2048.0f;
+
 	_mainWindow.setSize(TeVector3f32(winWidth, winHeight, 0.0));
 	_mainWindow.setSizeType(TeILayout::ABSOLUTE);
 
@@ -128,7 +132,7 @@ void Application::create() {
 
 	_helpGui.load(helpMenuFilePath);
 	
-	warning("TODO: set some TeCore flags here..");
+	debug("TODO: set TeCore flags here? Do they do anything?");
 
 	// Game calls these here but does nothing with result?
 	//TeGetDeviceDPI();
@@ -136,28 +140,29 @@ void Application::create() {
 
 	_backLayout.setName("layoutBack");
 	_backLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_backLayout.setSize(TeVector3f32(1.0, 1.0, 0.0));
+	_backLayout.setSize(TeVector3f32(1.0f, 1.0f, 0.0f));
 	_mainWindow.addChild(&_backLayout);
 	
 	_frontOrientationLayout.setName("orientationLayoutFront");
 	_frontOrientationLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_frontOrientationLayout.setSize(TeVector3f32(1.0, 1.0, 0.0));
+	_frontOrientationLayout.setSize(TeVector3f32(1.0f, 1.0f, 0.0f));
 	_mainWindow.addChild(&_frontOrientationLayout);
 	
 	_frontLayout.setName("layoutFront");
 	_frontLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_frontLayout.setSize(TeVector3f32(1.0, 1.0, 0.0));
+	_frontLayout.setSize(TeVector3f32(1.0f, 1.0f, 0.0f));
 	_frontOrientationLayout.addChild(&_frontLayout);
 	
 	_visFade.init();
 	
-	_frontOrientationLayout.addChild(&_visFade._fadeCaptureSprite);
-	_frontOrientationLayout.addChild(&_visFade._blackFadeSprite);
-	_frontOrientationLayout.addChild(&_visFade._buttonLayout);
+	warning("TODO: *** Re-enable adding the fade sprites once we can see something.");
+	//_frontOrientationLayout.addChild(&_visFade._fadeCaptureSprite);
+	//_frontOrientationLayout.addChild(&_visFade._blackFadeSprite);
+	//_frontOrientationLayout.addChild(&_visFade._buttonLayout);
 
-	_frontLayout.addChild(&_appSpriteLayout);
+	//_frontLayout.addChild(&_appSpriteLayout);
 	_appSpriteLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_appSpriteLayout.setSize(TeVector3f32(1.0, 1.0, 1.0));
+	_appSpriteLayout.setSize(TeVector3f32(1.0f, 1.0f, 1.0f));
 	
 	// Note: The games do some loading of a "version.ver" file here to add a
 	// watermark to the backLayout, but that file doesn't exist in any of the
@@ -173,55 +178,55 @@ void Application::create() {
 	//mainWindow->setNativeCursorVisible(false);
 	
 	_mouseCursorLayout.load("pictures/cursor.png");
-	_mouseCursorLayout.setAnchor(TeVector3f32(0.3, 0.1, 0.0));
-	_frontOrientationLayout.addChild(&_mouseCursorLayout);
+	_mouseCursorLayout.setAnchor(TeVector3f32(0.3f, 0.1f, 0.0f));
+	//_frontOrientationLayout.addChild(&_mouseCursorLayout);
 	
 	_lockCursorButton.setName("lockCursorButton");
 	_lockCursorButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_lockCursorButton.setSize(TeVector3f32(2.0, 0.095, 0.0));
+	_lockCursorButton.setSize(TeVector3f32(2.0f, 0.095f, 0.0f));
 	_lockCursorButton.setPositionType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_lockCursorButton.setPosition(TeVector3f32(0.95, 0.95, 0.0));
-	_frontOrientationLayout.addChild(&_lockCursorButton);
+	_lockCursorButton.setPosition(TeVector3f32(0.95f, 0.95f, 0.0f));
+	//_frontOrientationLayout.addChild(&_lockCursorButton);
 	
 	_lockCursorFromActionButton.setName("lockCursorFromActionButton");
 	_lockCursorFromActionButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
-	_lockCursorFromActionButton.setSize(TeVector3f32(2.0, 2.0, 0.0));
-	_frontOrientationLayout.addChild(&_lockCursorFromActionButton);
+	_lockCursorFromActionButton.setSize(TeVector3f32(2.0f, 2.0f, 0.0f));
+	//_frontOrientationLayout.addChild(&_lockCursorFromActionButton);
 
 	_autoSaveIcon1.setName("autosaveIcon");
-	_autoSaveIcon1.setAnchor(TeVector3f32(0.5, 0.5, 0.0));
-	_autoSaveIcon1.setPosition(TeVector3f32(0.2, 0.9, 0.0));
-	_autoSaveIcon1.setSize(TeVector3f32(128.0, 64.0, 0.0));
+	_autoSaveIcon1.setAnchor(TeVector3f32(0.5f, 0.5f, 0.0f));
+	_autoSaveIcon1.setPosition(TeVector3f32(0.2f, 0.9f, 0.0f));
+	_autoSaveIcon1.setSize(TeVector3f32(128.0f, 64.0f, 0.0f));
 	_autoSaveIcon1.load("menus/inGame/autosave_icon.png");
-	_frontOrientationLayout.addChild(&_autoSaveIcon1);
+	//_frontOrientationLayout.addChild(&_autoSaveIcon1);
 	
 	_autoSaveIconAnim1._runTimer.pausable(false);
 	_autoSaveIconAnim1.pause();
 	_autoSaveIconAnim1._firstVal = TeColor(255, 255, 255, 0);
 	_autoSaveIconAnim1._secondVal = TeColor(255, 255, 255, 255);
 	Common::Array<float> curve;
-	curve.push_back(0.0);
-	curve.push_back(1.0);
-	curve.push_back(1.0);
-	curve.push_back(0.0);
+	curve.push_back(0.0f);
+	curve.push_back(1.0f);
+	curve.push_back(1.0f);
+	curve.push_back(0.0f);
 	_autoSaveIconAnim1.setCurve(curve);
-	_autoSaveIconAnim1._maxTime = 4000.0;
+	_autoSaveIconAnim1._maxTime = 4000.0f;
 	_autoSaveIconAnim1._callbackObj = &_autoSaveIcon1;
 	_autoSaveIconAnim1._callbackMethod = &Te3DObject2::setColor;
 
 	_autoSaveIcon2.setName("autosaveIcon");
-	_autoSaveIcon2.setAnchor(TeVector3f32(0.5, 0.5, 0.0));
-	_autoSaveIcon2.setPosition(TeVector3f32(0.2, 0.7, 0.0));
-	_autoSaveIcon2.setSize(TeVector3f32(68.0, 86.0, 0.0));
+	_autoSaveIcon2.setAnchor(TeVector3f32(0.5f, 0.5f, 0.0f));
+	_autoSaveIcon2.setPosition(TeVector3f32(0.2f, 0.7f, 0.0f));
+	_autoSaveIcon2.setSize(TeVector3f32(68.0f, 86.0f, 0.0f));
 	_autoSaveIcon2.load("menus/inGame/NoCel.png");
-	_frontOrientationLayout.addChild(&_autoSaveIcon2);
+	//_frontOrientationLayout.addChild(&_autoSaveIcon2);
 
 	_autoSaveIconAnim2._runTimer.pausable(false);
 	_autoSaveIconAnim2.pause();
 	_autoSaveIconAnim2._firstVal = TeColor(255, 255, 255, 0);
 	_autoSaveIconAnim2._secondVal = TeColor(255, 255, 255, 255);
 	_autoSaveIconAnim1.setCurve(curve);
-	_autoSaveIconAnim1._maxTime = 4000.0;
+	_autoSaveIconAnim1._maxTime = 4000.0f;
 	_autoSaveIconAnim1._callbackObj = &_autoSaveIcon2;
 	_autoSaveIconAnim1._callbackMethod = &Te3DObject2::setColor;
 
@@ -273,7 +278,7 @@ bool Application::run() {
 			}
 			game->_returnToMainMenu = false;
 		}
-		if (_gameFinished) {
+		if (_finishedGame) {
 			game->leave(false);
 			_mainMenu.enter();
 			TeLuaGUI finalGui;
@@ -284,7 +289,7 @@ bool Application::run() {
 				// TODO: Not clear how this variant is ever used??
 				finalGui.unload();
 			}
-			_gameFinished = false;
+			_finishedGame = false;
 	  }
 	  InGameScene::updateScroll();
 	  TeObject::deleteNow();

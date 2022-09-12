@@ -40,6 +40,7 @@ void TeCore::addLoc(TeILoc *loc) {
 }
 
 void TeCore::create() {
+	// TODO: Get language from the game definition.  For now just default to en.
 	language("en");
 	_coreNotReady = false;
 	_activityTrackingTimer.alarmSignal().add<TeCore>(this, &TeCore::onActivityTrackingAlarm);

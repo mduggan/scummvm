@@ -54,12 +54,22 @@ void TeResourceManager::removeResource(const TeIntrusivePtr<TeResource> &resourc
 }
 
 void TeResourceManager::removeResource(const TeResource *resource) {
-	for (uint i = 0; i < _resources.size(); i++) {
+	// We want to hold a new reference before removing the old one, as
+	// this could cause the object's destruction - which triggers it
+	// being removed from the list.
+	TeIntrusivePtr<TeResource> ptr;
+	uint i = 0;
+	for (; i < _resources.size(); i++) {
 		if (_resources[i].get() == resource) {
-			_resources.remove_at(i);
+			ptr = _resources[i];
 			break;
 		}
 	}
+	if (i < _resources.size())
+		_resources.remove_at(i);
+		
+	// now we can let the other pointer go.  It could cause another removeResource request
+	// but now it's not in the list any more.
 }
 
 } // end namespace Syberia

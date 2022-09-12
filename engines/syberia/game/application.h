@@ -132,7 +132,6 @@ private:
 	bool _captureFade;
 	bool _created;
 
-	bool _gameFinished;
 	int _difficulty;
 
 	TeXmlGui _helpGui;
