@@ -54,11 +54,9 @@ void TeModel::draw() {
 		renderer->sendModelMatrix(transform);
 		renderer->pushMatrix();
 		renderer->multiplyMatrix(transform);
-		if (!_meshes.empty()) {
-			for (TeMesh &mesh : _meshes) {
-				// TODO: Set some value in the mesh here to this->field_0x158??
-				mesh.draw();
-			}
+		for (TeMesh &mesh : _meshes) {
+			// TODO: Set some value in the mesh here to this->field_0x158??
+			mesh.draw();
 		}
 		renderer->popMatrix();
 		TeLight::disableAll();

@@ -64,6 +64,7 @@ public:
 	TeColor _emissionColor;
 	float _shininess;
 	bool _enableLights;
+	bool _enableSomethingDefault0;
 private:
 };
 

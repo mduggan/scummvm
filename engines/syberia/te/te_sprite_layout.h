@@ -60,7 +60,7 @@ public:
 	void updateMesh() override;
 	void updateSize() override;
 
-	Common::SharedPtr<TeTiledSurface> _tiledSurfacePtr;
+	TeIntrusivePtr<TeTiledSurface> _tiledSurfacePtr;
 
 private:
 	bool _sizeSet;

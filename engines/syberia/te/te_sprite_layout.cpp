@@ -44,7 +44,10 @@ void TeSpriteLayout::draw() {
 	if (!visible() || !worldVisible())
 		return;
 	
-	debug("Drawing TeSpriteLayout %p (%s)", this, name().c_str());
+	debug("Drawing TeSpriteLayout %p (%s, surface %s, size %fx%f, surface %fx%f)", this,
+		  name().empty() ? "no name" : name().c_str(), _tiledSurfacePtr->getAccessName().toString().c_str(),
+		  size().x(), size().y(),
+		  _tiledSurfacePtr->size().x(), _tiledSurfacePtr->size().y());
 	TeMatrix4x4 matrix = worldTransformationMatrix();
 	
 	if (!_noRoundZ) {
@@ -68,7 +71,7 @@ bool TeSpriteLayout::onParentWorldColorChanged() {
 
 bool TeSpriteLayout::load(const Common::Path &path) {
 	if (path.empty()) {
-		_tiledSurfacePtr.reset(new TeTiledSurface());
+		_tiledSurfacePtr = new TeTiledSurface();
 		return true;
 	}
 	
