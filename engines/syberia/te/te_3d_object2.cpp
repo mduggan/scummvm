@@ -163,10 +163,11 @@ void Te3DObject2::setParent(Te3DObject2 *newparent) {
 			_parent->onWorldTransformationMatrixChanged().insert(_onWorldTransformationMatrixChangedParentCallback);
 		if (_onWorldColorChangedParentCallback)
 			_parent->onWorldColorChanged().insert(_onWorldColorChangedParentCallback);
+
+		_onWorldVisibleChangedSlotSignal.call();
+		_onParentWorldTransformationMatrixChangedSignal.call();
+		_onParentWorldColorChangedSignal.call();
 	}
-	_onWorldVisibleChangedSlotSignal.call();
-	_onParentWorldTransformationMatrixChangedSignal.call();
-	_onParentWorldColorChangedSignal.call();
 }
 
 void Te3DObject2::setPosition(const TeVector3f32 &pos) {

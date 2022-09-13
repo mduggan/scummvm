@@ -22,7 +22,7 @@
 #include "common/textconsole.h"
 #include "common/debug.h"
 
-#include "graphics/opengl/glad.h"
+#include "graphics/opengl/system_headers.h"
 
 #include "syberia/te/te_renderer.h"
 #include "syberia/te/te_light.h"
@@ -149,7 +149,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 		destProperties._materialMode = material->_mode;
 		destProperties._matrix = currentMatrix;
 
-		destProperties._glTexEnvMode = mesh.glTexenvMode();
+		destProperties._glTexEnvMode = mesh.gltexenvMode();
 		destProperties._sourceTransparentMesh = _numTransparentMeshes * 3;
 		destProperties._hasColor = mesh.hasColor();
 		destProperties._zLength = length;
@@ -198,7 +198,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 			destProperties._ambientColor = material->_ambientColor;
 			destProperties._materialMode = material->_mode;
 		
-			destProperties._glTexEnvMode = mesh.glTexenvMode();
+			destProperties._glTexEnvMode = mesh.gltexenvMode();
 			destProperties._sourceTransparentMesh = meshPropNo;
 			destProperties._hasColor = mesh.hasColor();
 			destProperties._zLength = length;
@@ -266,26 +266,27 @@ void TeRenderer::init() {
 	glDisable(GL_CULL_FACE);
 	TeLight::disableAll();
 	glDisable(GL_COLOR_MATERIAL);
-	glEnable(GL_DEPTH_TEST);
+	// FIXME: Work out why this results in nothing at all appearing.
+	//glEnable(GL_DEPTH_TEST);
 	glDepthMask(true);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_DONT_CARE);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_DONT_CARE);
 	glClearDepth(1.0);
 	glClearStencil(0);
 	_clearColor = TeColor(0, 0, 0, 255);
 	glClearColor(0, 0, 0, 1.0);
-	debug("[TeRenderer::init] Vendor : %s\n", glGetString(GL_VENDOR));
-	debug("[TeRenderer::init] Renderer : %s\n", glGetString(GL_RENDERER));
-	debug("[TeRenderer::init] Version : %s\n", glGetString(GL_VERSION));
+	debug("[TeRenderer::init] Vendor : %s", glGetString(GL_VENDOR));
+	debug("[TeRenderer::init] Renderer : %s", glGetString(GL_RENDERER));
+	debug("[TeRenderer::init] Version : %s", glGetString(GL_VERSION));
 	int bits;
 	glGetIntegerv(GL_STENCIL_BITS, &bits);
-	debug("[TeRenderer::init] Sentil buffer bits : %d\n", bits);
+	debug("[TeRenderer::init] Sentil buffer bits : %d", bits);
 	glGetIntegerv(GL_DEPTH_BITS, &bits);
-	debug("[TeRenderer::init] Depth buffer bits : %d\n", bits);
-	debug("[TeRenderer::init] Extensions : %s\n", glGetString(GL_EXTENSIONS));
+	debug("[TeRenderer::init] Depth buffer bits : %d", bits);
+	//debug("[TeRenderer::init] Extensions : %s\n", glGetString(GL_EXTENSIONS));
 	//TeOpenGLExtensions::loadExtensions(); // this does nothing in the game?
 	_currentColor = TeColor(255, 255, 255, 255);
 	_scissorEnabled = false;
@@ -302,6 +303,9 @@ void TeRenderer::loadMatrix(const TeMatrix4x4 &matrix) {
 }
 
 void TeRenderer::loadMatrixToGL(const TeMatrix4x4 &matrix) {
+	int mmode;
+	glGetIntegerv(GL_MATRIX_MODE, &mmode);
+	debug("loadMatrixToGL[0x%x]: %s", mmode, matrix.toString().c_str());
 	glLoadMatrixf(matrix.getData());
 }
 
@@ -482,7 +486,7 @@ void TeRenderer::scale(float xs, float ys, float zs) {
 
 void TeRenderer::setClearColor(const TeColor &col) {
 	_clearColor = col;
-	glClearColor(col.r() / 255.0, col.g() / 255.0, col.b() / 255.0, col.a() / 255.0);
+	glClearColor(col.r() / 255.0f, col.g() / 255.0f, col.b() / 255.0f, col.a() / 255.0f);
 }
 
 void TeRenderer::setCurrentColor(const TeColor &col) {

@@ -37,6 +37,7 @@
 #include "syberia/te/te_resource_manager.h"
 //#include "syberia/te/te_sound_manager.h"
 
+#include "graphics/opengl/system_headers.h"
 
 namespace Syberia {
 
@@ -50,7 +51,6 @@ SyberiaEngine::SyberiaEngine(OSystem *syst, const ADGameDescription *gameDesc) :
 }
 
 SyberiaEngine::~SyberiaEngine() {
-	delete _screen;
 	delete _application;
 	delete _renderer;
 	delete _core;
@@ -107,18 +107,16 @@ void SyberiaEngine::configureSearchPaths() {
 }
 
 Common::Error SyberiaEngine::run() {
+	// Initialize 800x600 graphics mode
+	initGraphics3d(800, 600);
+
 	configureSearchPaths();
-	// TODO (from BasicOpenGLView::prepareOpenGL)
+	// from BasicOpenGLView::prepareOpenGL..
 	_application = new Application();
 	_renderer = new TeRenderer();
 	_renderer->init();
 	_renderer->reset();
 	_application->create();
-	
-	
-	// Initialize 800x600 graphics mode
-	initGraphics(800, 600);
-	_screen = new Graphics::Screen();
 
 	// Set the engine's debugger console
 	setDebugger(new Console());
@@ -128,11 +126,6 @@ Common::Error SyberiaEngine::run() {
 	if (saveSlot != -1)
 		(void)loadGameState(saveSlot);
 
-	// Draw a series of boxes on screen as a sample
-	for (int i = 0; i < 100; ++i)
-		_screen->frameRect(Common::Rect(i, i, 800 - i, 200 - i), i);
-	_screen->update();
-
 	// Simple event handling loop
 	Common::Event e;
 
@@ -140,12 +133,23 @@ Common::Error SyberiaEngine::run() {
 		while (g_system->getEventManager()->pollEvent(e)) {
 		}
 
+#if DEBUG_GL
+		glClear(GL_COLOR_BUFFER_BIT);
+		glRotatef(1, 0, 0, 1);
+		glBegin(GL_TRIANGLES);
+		glColor3f(1, 0, 0); glVertex2f( 0,  1); // Bottom
+		glColor3f(0, 1, 0); glVertex2f(-1, 0 ); // Upper Left
+		glColor3f(0, 0, 1); glVertex2f( 1, 0 ); // Upper Right
+		glEnd();
+#else
 		_application->run();
-		_screen->update();
+#endif
+
+		g_system->updateScreen();
 
 		// Delay for a bit. All events loops should have a delay
 		// to prevent the system being unduly loaded
-		g_system->delayMillis(10);
+		g_system->delayMillis(500); // FIXME: Return to a small number (10) once 3d is working better.
 	}
 
 	return Common::kNoError;

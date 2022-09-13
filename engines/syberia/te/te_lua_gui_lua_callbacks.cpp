@@ -200,7 +200,7 @@ int layoutBindings(lua_State *L) {
 			} else if (!strcmp(s, "consoleNoStretch")) {
 				warning("TODO: Handle _g_bWidescreen");
 				if (_g_bWidescreen) {
-					layout->setScale(TeVector3f32(0.7500001,1.0,1.0));
+					layout->setScale(TeVector3f32(0.7500001f, 1.0f ,1.0f));
 				}
 			} else {
 				warning("[TeLuaGUI.layoutBindings] Unreconized attribute : %s\n", s);

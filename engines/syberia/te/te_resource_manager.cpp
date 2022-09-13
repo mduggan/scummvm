@@ -68,8 +68,8 @@ void TeResourceManager::removeResource(const TeResource *resource) {
 	if (i < _resources.size())
 		_resources.remove_at(i);
 		
-	// now we can let the other pointer go.  It could cause another removeResource request
-	// but now it's not in the list any more.
+	// now we can let the other pointer go.  It could cause another
+	// removeResource request but now it's not in the list any more.
 }
 
 } // end namespace Syberia

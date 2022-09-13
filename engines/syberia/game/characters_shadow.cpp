@@ -39,8 +39,8 @@ void CharactersShadow::createTexture(InGameScene *scene) {
 void CharactersShadow::destroy() {
 	TeRenderer *renderer = g_engine->getRenderer();
 	renderer->disableTexture();
-	//__stubs::_glBindTexture(GL_TEXTURE_2D,0);
-	//__stubs::_glDeleteTextures(1,(uint *)this);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	//glDeleteTextures(1, (uint *)this);
 	error("TODO: Finish implementation here");
 }
 
