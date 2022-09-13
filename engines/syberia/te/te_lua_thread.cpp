@@ -48,7 +48,7 @@ void TeLuaThread::_resume(int nargs) {
 	_lastResumeResult = lua_resume(_luaThread, nargs);
 	if (_lastResumeResult > 1) {
 		const char *msg = lua_tolstring(_luaThread, -1, nullptr);
-		warning("TeLuaThread::_resume: %s\n", msg);
+		warning("TeLuaThread::_resume: %s", msg);
 	}
 	// TODO: This seems suspicous... but it's what the original does.
 	if (_lastResumeResult != 1 && _released) {
@@ -134,7 +134,7 @@ void TeLuaThread::executeFile(const Common::Path &path) {
 	_lastResumeResult = luaL_loadbuffer(_luaThread, buf, fileLen, path.toString().c_str());
 	if (_lastResumeResult) {
 		const char *msg = lua_tostring(_luaThread, -1);
-		warning("TeLuaThread::executeFile: %s\n", msg);
+		warning("TeLuaThread::executeFile: %s", msg);
 	}
 	delete [] buf;
 

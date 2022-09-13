@@ -38,6 +38,7 @@ public:
 	TeVector3f32 mult4x3(const TeVector3f32 &vec) const;
 	// TODO add public members
 
+	Common::String toString() const;
 private:
 	// TODO add private members
 

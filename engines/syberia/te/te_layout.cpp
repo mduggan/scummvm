@@ -30,8 +30,8 @@ TeLayout::TeLayout() : Te3DObject2(), _updatingZ(false), _updatingZSize(false),
 	_updatingPosition(false), _updatingWorldMatrix(false), _updatingSize(false),
 	_autoz(true), _childOrParentChanged(true), _childChanged(true),
 	_sizeChanged(true), _positionChanged(true), _worldMatrixChanged(true),
-	_sizeType(CoordinatesType::ABSOLUTE), _userSize(_size), _anchor(0.5, 0.5, 0.5),
-	_ratio(1.0), _drawMode(TeILayout::DrawMode0), _safeAreaRatio(1.3333334),
+	_sizeType(CoordinatesType::ABSOLUTE), _userSize(_size), _anchor(0.5f, 0.5f, 0.5f),
+	_ratio(1.0f), _drawMode(TeILayout::DrawMode0), _safeAreaRatio(1.3333334f),
 	_ratioMode(RATIO_MODE_NONE), _positionType(CoordinatesType::RELATIVE_TO_PARENT)
 {
 	_onChildSizeChangedCallback.reset(
@@ -103,7 +103,7 @@ void TeLayout::draw() {
 	}
 }
 
-static const float EPSILON = 1.192093e-07;
+static const float EPSILON = 1.192093e-07f;
 
 bool TeLayout::isMouseIn(const TeVector2s32 &mouseloc) {
 	TeVector3f32 transformedPos = transformMousePosition(mouseloc);
@@ -311,13 +311,18 @@ void TeLayout::updatePosition() {
 	_updatingPosition = true;
 	TeVector3f32 oldpos = _position;
 	Te3DObject2 *parentObj = parent();
+	static const TeVector3f32 midPoint(0.5f, 0.5f, 0.5f);
 	if (_positionType == RELATIVE_TO_PARENT && parentObj) {
-		static const TeVector3f32 halfPixel(0.5, 0.5, 0.5);
-		const TeVector3f32 offsetUserPos = _userPosition - halfPixel;
+		const TeVector3f32 offsetUserPos = _userPosition - midPoint;
 		const TeVector3f32 parentSize(parentObj->xSize(), parentObj->ySize(), 0.0);
-		const TeVector3f32 offsetAnchor =  halfPixel - _anchor;
+		const TeVector3f32 offsetAnchor =  midPoint - _anchor;
 		const TeVector3f32 thisSize(xSize(), ySize(), 0.0);
 		_position = (offsetUserPos * parentSize) + (offsetAnchor * thisSize);
+	} else if (_positionType == RELATIVE_TO_PARENT && !parentObj) {
+		// Not in original, but no parent -> set midpoint.
+		const TeVector3f32 offsetAnchor =  midPoint - _anchor;
+		const TeVector3f32 thisSize(xSize(), ySize(), 0.0);
+		_position = offsetAnchor * thisSize;
 	} else if (_positionType == ABSOLUTE) {
 		_position = _userPosition;
 	}
@@ -401,7 +406,7 @@ void TeLayout::updateZ() {
 	_childOrParentChanged = false;
 	_updatingZ = true;
 
-	float ztotal = 0.1;
+	float ztotal = 0.1f;
 	for (auto &child : childList()) {
 		ztotal += child->zSize();
 	}

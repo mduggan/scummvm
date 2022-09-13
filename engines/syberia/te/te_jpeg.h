@@ -26,7 +26,7 @@
 #include "syberia/te/te_i_codec.h"
 
 namespace Graphics {
-class Surface;
+struct Surface;
 };
 
 namespace Syberia {

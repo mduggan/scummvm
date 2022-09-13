@@ -19,7 +19,7 @@
  *
  */
 
-#include "graphics/opengl/glad.h"
+#include "graphics/opengl/system_headers.h"
 
 #include "syberia/syberia.h"
 #include "syberia/te/te_renderer.h"
@@ -30,7 +30,7 @@
 namespace Syberia {
 
 TeMesh::TeMesh() : _matrixForced(false), _mode(MeshMode0),
-_hasAlpha(false), _glTexEnvMode(GL_MODULATE), _initialMaterialIndexCount(0),
+_hasAlpha(false), _gltexEnvMode(GL_MODULATE), _initialMaterialIndexCount(0),
 _drawWires(false), _shouldDrawMaybe(true) {
 }
 
@@ -101,23 +101,23 @@ void TeMesh::draw() {
 	renderer->pushMatrix();
 	renderer->loadMatrixToGL(renderer->currentMatrix());
 	glEnableClientState(GL_VERTEX_ARRAY);
-	if (!normals.empty()) {
+	if (!normals.empty())
 		glEnableClientState(GL_NORMAL_ARRAY);
-	}
-	if (!_colors.empty()) {
+
+	if (!_colors.empty())
 		glEnableClientState(GL_COLOR_ARRAY);
-	}
+
 	glVertexPointer(3, GL_FLOAT, 12, verticies.data());
-	if (!normals.empty()) {
+	if (!normals.empty())
 		glNormalPointer(GL_FLOAT, 12, normals.data());
-	}
-	if (!_uvs.empty() && renderer->shadowMode() != TeRenderer::ShadowMode2) {
+
+	if (!_uvs.empty() && renderer->shadowMode() != TeRenderer::ShadowMode2)
 		glTexCoordPointer(2, GL_FLOAT, 8, _uvs.data());
-	}
-	if (!_colors.empty()) {
+
+	if (!_colors.empty())
 		glColorPointer(4, GL_UNSIGNED_BYTE,4, _colors.data());
-	}
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, _glTexEnvMode);
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, _gltexEnvMode);
 	if (renderer->scissorEnabled()) {
 		glEnable(GL_SCISSOR_TEST);
 		uint scissorx = renderer->scissorX();
@@ -128,9 +128,9 @@ void TeMesh::draw() {
 	}
 
 	if (_faceCounts.empty()) {
-		if (!_materials.empty()) {
+		if (!_materials.empty())
 			_materials[0].apply();
-		}
+
 		glDrawElements(_mode, _indexes.size(), GL_UNSIGNED_SHORT, _indexes.data());
 		if (!_materials.empty()) {
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -151,9 +151,9 @@ void TeMesh::draw() {
 		}
 	}
 
-	if (!renderer->scissorEnabled()) {
+	if (!renderer->scissorEnabled())
 		glDisable(GL_SCISSOR_TEST);
-	}
+
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);

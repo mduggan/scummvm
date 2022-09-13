@@ -20,7 +20,7 @@
  */
 
 #include "common/textconsole.h"
-#include "graphics/opengl/glad.h"
+#include "graphics/opengl/system_headers.h"
 
 #include "syberia/syberia.h"
 
@@ -115,7 +115,7 @@ void TeMaterial::apply() {
 	}
 
 	//warning("TODO: Work out what TeMaterial::_enableSomethingDefault0 actually is.");
-	if (_enableSomethingDefault0 == false) {
+	if (!_enableSomethingDefault0) {
 		glDisable(GL_TEXTURE_GEN_S);
 		glDisable(GL_TEXTURE_GEN_T);
 		glDisable(GL_TEXTURE_GEN_R);

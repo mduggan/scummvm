@@ -63,8 +63,6 @@ protected:
 	Common::Error run() override;
 	
 public:
-	Graphics::Screen *_screen = nullptr;
-public:
 	SyberiaEngine(OSystem *syst, const ADGameDescription *gameDesc);
 	~SyberiaEngine() override;
 

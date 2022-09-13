@@ -44,9 +44,9 @@ void TeImage::create() {
 }
 
 void TeImage::create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &pal,
-			Format format, uint bufxsize, uint bufysize) {
-	_format = format;
-	Graphics::PixelFormat pxformat = ((format == TeImage::RGB8) ?
+			Format teformat, uint bufxsize, uint bufysize) {
+	_format = teformat;
+	Graphics::PixelFormat pxformat = ((teformat == TeImage::RGB8) ?
 		Graphics::createPixelFormat<888>() : Graphics::createPixelFormat<8888>());
 	
 	Graphics::Surface::create(xsize, ysize, pxformat);
@@ -72,7 +72,7 @@ void TeImage::fill(byte r, byte g, byte b, byte a)  {
 	error("TODO: TeImage: Implement me.");
 }
 
-void TeImage::getBuff(uint x, uint y, byte *pout, uint w, uint h)  {
+void TeImage::getBuff(uint x, uint y, byte *pout, uint w_, uint h_)  {
 	error("TODO: TeImage: Implement me.");
 }
 

@@ -100,7 +100,7 @@ public:
 	uint numIndexes() const { return _indexes.size(); }
 	uint numVerticies() const { return _verticies.size(); }
 	bool shouldDrawMaybe() const { return _shouldDrawMaybe; }
-	uint glTexenvMode() const { return _glTexEnvMode; }
+	uint gltexenvMode() const { return _gltexEnvMode; }
 	
 	void setShouldDrawMaybe(bool val) { _shouldDrawMaybe = val; }
 
@@ -126,7 +126,7 @@ private:
 	bool _drawWires;
 	bool _shouldDrawMaybe;
 	
-	uint _glTexEnvMode;
+	uint _gltexEnvMode;
 
 	// TODO add private members
 
