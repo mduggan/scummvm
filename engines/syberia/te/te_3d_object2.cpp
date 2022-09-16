@@ -32,9 +32,19 @@ Te3DObject2::Te3DObject2() : _childListChanged(false), _parent(nullptr), _scale(
 			new TeCallback0Param<Te3DObject2>(this, &Te3DObject2::onParentWorldTransformationMatrixChanged));
 }
 
+Te3DObject2::~Te3DObject2() {
+	for (auto *child : _children) {
+		child->setParent(nullptr);
+	}
+	if (parent()) {
+		parent()->removeChild(this);
+	}
+	setParent(nullptr);
+}
+
 void Te3DObject2::addChild(Te3DObject2 *child) {
 	_children.push_back(child);
-	child->setParent(this); // TODO: This seems like the right thing to call here? Confirm it.
+	child->setParent(this);
 	_childListChangedSignal.call();
 }
 
@@ -118,6 +128,8 @@ void Te3DObject2::removeChild(Te3DObject2 *child) {
 		}
 	}
 	if (i < _children.size()) {
+		_children[i]->setParent(nullptr);
+		_children.remove_at(i);
 		_childListChangedSignal.call();
 	}
 }
@@ -128,8 +140,8 @@ bool Te3DObject2::onWorldVisibleChangedSlot() {
 }
 
 void Te3DObject2::removeChildren() {
-	for (uint i = 0; i < _children.size(); i++) {
-		_children[i]->setParent(nullptr);
+	for (auto *child : _children) {
+		child->setParent(nullptr);
 	}
 	_children.clear();
 	_childListChangedSignal.call();
@@ -235,8 +247,8 @@ TeColor Te3DObject2::worldColor() {
 	if (!_parent || !_colorInheritance) {
 		return color();
 	} else {
-		TeColor parentCol = _parent->worldColor();
-		TeColor thisCol = color();
+		const TeColor parentCol = _parent->worldColor();
+		const TeColor thisCol = color();
 		return parentCol * thisCol;
 	}
 }

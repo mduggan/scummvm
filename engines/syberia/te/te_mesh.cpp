@@ -74,7 +74,7 @@ void TeMesh::draw() {
 		renderer->multiplyMatrix(_forceMatrix);
 	else
 		renderer->multiplyMatrix(transformationMatrix());
-	
+
 	Common::Array<TeVector3f32> &normals = (_updatedVerticies.empty() ? _normals : _updatedNormals);
 	Common::Array<TeVector3f32> &verticies = (_updatedVerticies.empty() ? _verticies : _updatedVerticies);
 	if (renderer->shadowMode() != TeRenderer::ShadowMode1) {
@@ -99,7 +99,7 @@ void TeMesh::draw() {
 
 	renderer->setMatrixMode(TeRenderer::MM_GL_MODELVIEW);
 	renderer->pushMatrix();
-	renderer->loadMatrixToGL(renderer->currentMatrix());
+	renderer->loadCurrentMatrixToGL();
 	glEnableClientState(GL_VERTEX_ARRAY);
 	if (!normals.empty())
 		glEnableClientState(GL_NORMAL_ARRAY);
@@ -115,7 +115,7 @@ void TeMesh::draw() {
 		glTexCoordPointer(2, GL_FLOAT, 8, _uvs.data());
 
 	if (!_colors.empty())
-		glColorPointer(4, GL_UNSIGNED_BYTE,4, _colors.data());
+		glColorPointer(4, GL_UNSIGNED_BYTE, 4, _colors.data());
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, _gltexEnvMode);
 	if (renderer->scissorEnabled()) {
@@ -158,7 +158,7 @@ void TeMesh::draw() {
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
-	
+
 	//renderer->setCurrentColor(renderer->currentColor()); // pointless?
 
 	if (_drawWires && !normals.empty()) {
@@ -218,10 +218,12 @@ TeMesh::Mode TeMesh::getMode() const {
 }
 
 bool TeMesh::hasAlpha(uint idx) {
-	// TODO: this logic is a bit sketchy.  Check it again.
+	// FIXME: this logic is a bit sketchy.  Check it again.
 	bool retval = _hasAlpha && !_colors.empty();
+	return retval;
+
 	for (const TeMaterial &material : _materials) {
-		/*if (!material._someFlagDefault0 == 0)*/
+		//if (!material._someFlagDefault0 == 0)
 		retval = true;
 		if (material._mode != TeMaterial::Mode1 && material._ambientColor.a() == 255)
 			retval = (material._diffuseColor.a() != 255);
@@ -243,7 +245,7 @@ void TeMesh::resizeUpdatedTables(unsigned long newSize) {
 
 void TeMesh::setColor(const TeColor &col) {
 	Te3DObject2::setColor(col);
-	
+
 	if (!_verticies.empty()) {
 		TeColor colnow = Te3DObject2::color();
 		_colors.resize(_verticies.size());

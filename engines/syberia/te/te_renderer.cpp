@@ -34,7 +34,7 @@ _numTransparentMeshes(0), _pendingTransparentMeshProperties(0) {
 }
 
 void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsigned long meshno, unsigned long materialno) {
-	const float zSomething = _currentCamera->_zsomething1;
+	const float zSomething = _currentCamera->_orthNearVal;
 	const TeMesh::Mode meshMode = mesh.getMode();
 	if (!meshno) {
 		if (meshMode == TeMesh::MeshMode6) {
@@ -126,7 +126,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 		local_198.z() -= zSomething;
 		float length;
 		if (_currentCamera->_projectionMatrixType < 4) {
-			length = abs(local_198.squaredLength());
+			length = -local_198.squaredLength();
 		} else if (_currentCamera->_projectionMatrixType == 4) {
 			length = local_198.z() * local_198.z();
 		} else {
@@ -177,7 +177,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 
 			float length;
 			if (_currentCamera->_projectionMatrixType < 4) {
-				length = abs(local_208.squaredLength());
+				length = -local_208.squaredLength();
 			} else if (_currentCamera->_projectionMatrixType == 4) {
 				length = local_208.z() * local_208.z();
 			} else {
@@ -241,7 +241,7 @@ void TeRenderer::disableWireFrame() {
 
 void TeRenderer::disableZBuffer() {
 	glDisable(GL_DEPTH_TEST);
-	glDepthMask(false);
+	glDepthMask(GL_FALSE);
 }
 
 void TeRenderer::drawLine(const TeVector3f32 &from, const TeVector3f32 &to) {
@@ -259,7 +259,7 @@ void TeRenderer::enableWireFrame() {
 
 void TeRenderer::enableZBuffer() {
 	glEnable(GL_DEPTH_TEST);
-	glDepthMask(true);
+	glDepthMask(GL_TRUE);
 }
 
 void TeRenderer::init() {
@@ -267,8 +267,8 @@ void TeRenderer::init() {
 	TeLight::disableAll();
 	glDisable(GL_COLOR_MATERIAL);
 	// FIXME: Work out why this results in nothing at all appearing.
-	//glEnable(GL_DEPTH_TEST);
-	glDepthMask(true);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -309,14 +309,19 @@ void TeRenderer::loadMatrixToGL(const TeMatrix4x4 &matrix) {
 	glLoadMatrixf(matrix.getData());
 }
 
+void TeRenderer::loadCurrentMatrixToGL() {
+	const TeMatrix4x4 current = currentMatrix();
+	loadMatrixToGL(current);
+}
+
 void TeRenderer::loadProjectionMatrix(const TeMatrix4x4 &matrix) {
 	glMatrixMode(GL_PROJECTION);
 	_matrixMode = MM_GL_PROJECTION;
-	_matriciesStacks[MM_GL_PROJECTION].loadIdentity();
+	_matriciesStacks[_matrixMode].loadIdentity();
 	_matriciesStacks[_matrixMode].loadMatrix(matrix);
 	glMatrixMode(GL_MODELVIEW);
 	_matrixMode = MM_GL_MODELVIEW;
-	_matriciesStacks[MM_GL_MODELVIEW].loadIdentity();
+	_matriciesStacks[_matrixMode].loadIdentity();
 }
 
 void TeRenderer::multiplyMatrix(const TeMatrix4x4 &matrix) {
@@ -355,7 +360,7 @@ void TeRenderer::renderTransparentMeshes() {
 	if (!_numTransparentMeshes)
 		return;
 
-	glDepthMask(false);
+	glDepthMask(GL_FALSE);
 	Common::sort(_transparentMeshProperties.begin(), _transparentMeshProperties.end(),
 		 compareTransparentMeshProperties);
 	
@@ -408,7 +413,7 @@ void TeRenderer::renderTransparentMeshes() {
 		_matriciesStacks[_matrixMode].pushMatrix();
 		_matriciesStacks[_matrixMode].loadMatrix(_transparentMeshProperties[i]._matrix);
 		glPushMatrix();
-		glLoadMatrixf(_matriciesStacks[_matrixMode].currentMatrix().getData());
+		loadCurrentMatrixToGL();
 		if (texture) {
 			glEnable(GL_TEXTURE_2D);
 			_textureEnabled = true;
@@ -458,7 +463,7 @@ void TeRenderer::renderTransparentMeshes() {
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	_pendingTransparentMeshProperties = 0;
-	glDepthMask(true);
+	glDepthMask(GL_TRUE);
 	_transparentMeshProperties.clear();
 }
 
@@ -505,6 +510,7 @@ void TeRenderer::setMatrixMode(enum MatrixMode mode) {
 		glmode = GL_MODELVIEW;
 	else if (mode == MM_GL_PROJECTION)
 		glmode = GL_PROJECTION;
+
 	if (glmode)
 		glMatrixMode(glmode);
 	_matrixMode = mode;

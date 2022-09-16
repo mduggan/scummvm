@@ -36,6 +36,8 @@ class TeLayout : public TeILayout, public Te3DObject2 {
 public:
 	TeLayout();
 
+	virtual ~TeLayout();
+
 	void addChild(Te3DObject2 *child) override;
 	void addChildBefore(Te3DObject2 *newchild, const Te3DObject2 *ref) override;
 	const TeVector3f32 &anchor();

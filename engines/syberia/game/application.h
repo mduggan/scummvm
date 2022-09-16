@@ -39,6 +39,10 @@
 #include "syberia/te/te_xml_gui.h"
 #include "syberia/te/te_font3.h"
 
+namespace Common {
+class Event;
+}
+
 namespace Syberia {
 
 class Application {
@@ -67,7 +71,7 @@ public:
 	bool isFading();
 	bool onBlackFadeAnimationFinished();
 	bool onMainWindowSizeChanged();
-	bool onMousePositionChanged();
+	bool onMousePositionChanged(const Common::Event &e);
 
 	bool isLockCursor();
 	bool isLockPad();

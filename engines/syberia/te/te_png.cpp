@@ -59,11 +59,11 @@ bool TePng::load(Common::SeekableReadStream &stream) {
 	if (!png.loadStream(stream))
 		return false;
 	
-	if (png.getTransparentColor() == -1) {
-		_loadedSurface = png.getSurface()->convertTo(Graphics::createPixelFormat<888>());
-	} else {
-		_loadedSurface = png.getSurface()->convertTo(Graphics::createPixelFormat<8888>());
-	}
+	//if (png.getTransparentColor() == -1) {
+	//	_loadedSurface = png.getSurface()->convertTo(Graphics::createPixelFormat<888>());
+	//} else {
+		_loadedSurface = png.getSurface()->convertTo(Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
+	//}
 	return true;
 }
 
@@ -81,9 +81,9 @@ uint TePng::height() {
 
 TeImage::Format TePng::imageFormat() {
 	if (_loadedSurface) {
-		if (_loadedSurface->format == Graphics::createPixelFormat<8888>())
+		if (_loadedSurface->format == Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24))
 			return TeImage::RGBA8;
-		else if (_loadedSurface->format == Graphics::createPixelFormat<888>())
+		else if (_loadedSurface->format == Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0))
 			return TeImage::RGB8;
 	}
 	return TeImage::INVALID;

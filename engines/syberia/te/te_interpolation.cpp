@@ -69,7 +69,7 @@ double TeInterpolation::interpole(double where, double max) const {
 
 	if (leftElemNum >= (int)arrayLen - 1)
 		return _array[arrayLen - 1];
-	else if (leftElemNum <= 0)
+	else if (leftElemNum < 0)
 		return _array[0];
 
 	double left = _array[leftElemNum];

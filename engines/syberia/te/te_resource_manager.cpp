@@ -27,6 +27,14 @@ namespace Syberia {
 TeResourceManager::TeResourceManager() {
 }
 
+TeResourceManager::~TeResourceManager() {
+	// Remove resources one at a time as they may be inter-dependant,
+	// causing removals during iteration.
+	while (_resources.size()) {
+		_resources.erase(_resources.end() - 1);
+	}
+}
+
 void TeResourceManager::addResource(const TeIntrusivePtr<TeResource> &resource) {
 	_resources.insert_at(0, resource);
 }

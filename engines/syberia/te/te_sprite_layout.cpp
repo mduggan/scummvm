@@ -26,7 +26,7 @@
 
 namespace Syberia {
 
-TeSpriteLayout::TeSpriteLayout() : _tiledSurfacePtr(new TeTiledSurface()), _sizeSet(false), _noRoundZ(false) {
+TeSpriteLayout::TeSpriteLayout() : _tiledSurfacePtr(new TeTiledSurface()), _sizeSet(false), _allowFloatTranslate(false) {
 	_tiledSurfacePtr->setColor(TeColor(255, 255, 255, 255));
 	updateMesh();
 }
@@ -50,9 +50,9 @@ void TeSpriteLayout::draw() {
 		  _tiledSurfacePtr->size().x(), _tiledSurfacePtr->size().y());
 	TeMatrix4x4 matrix = worldTransformationMatrix();
 	
-	if (!_noRoundZ) {
-		matrix(3, 0) = (int)matrix(3, 0);
-		matrix(3, 1) = (int)matrix(3, 1);
+	if (!_allowFloatTranslate) {
+		matrix(0, 3) = (int)matrix(0, 3);
+		matrix(1, 3) = (int)matrix(1, 3);
 	}
 	
 	TeRenderer *renderer = g_engine->getRenderer();
@@ -183,7 +183,9 @@ void TeSpriteLayout::stop() {
 
 void TeSpriteLayout::updateMesh() {
 	TeLayout::updateMesh();
-	_tiledSurfacePtr->setSize(TeVector3f32(xSize(), abs(ySize()), 1.0));
+	// Surface always renders to a 1x1 mesh.
+	const TeVector3f32 surfaceScale(xSize(), -ySize(), 1.0);
+	_tiledSurfacePtr->setScale(surfaceScale);
 }
 
 void TeSpriteLayout::updateSize() {

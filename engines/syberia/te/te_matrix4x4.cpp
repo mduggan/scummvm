@@ -24,9 +24,58 @@
 namespace Syberia {
 
 TeMatrix4x4::TeMatrix4x4() {
+	setToIdentity();
 }
 
-TeMatrix4x4::TeMatrix4x4(const Math::Matrix<4, 4> &matrix) : Math::Matrix<4, 4>(matrix) {
+void TeMatrix4x4::setToIdentity() {
+	_data[0] = _data[5] = _data[10] = _data[15] = 1.0f;
+	_data[1] = _data[2] = _data[3] = _data[4] = 0.0f;
+	_data[6] = _data[7] = _data[8] = _data[9] = 0.0f;
+	_data[11] = _data[12] = _data[13] = _data[14] = 0.0f;
+}
+
+TeMatrix4x4::TeMatrix4x4(const Math::Matrix<4, 4> &matrix) {
+	// Transpose  - row-major to column-major.
+	float *d = getData();
+	const float *s = matrix.getData();
+	for (int c = 0; c < 4; c++) {
+		for (int r = 0; r < 4; r++) {
+			d[c * 4 + r] = s[r * 4 + c];
+		}
+	}
+}
+
+TeMatrix4x4 operator*(const TeMatrix4x4 &left, const TeMatrix4x4 &right) {
+	TeMatrix4x4 retval;
+	const float *d1 = left.getData();
+	const float *d2 = right.getData();
+	float *res = retval.getData();
+
+	res[0] = res[5] = res[10] = res[15] = 0.0f;
+
+	for (int r = 0; r < 4; r++) {
+		for (int c = 0; c < 16; c += 4) {
+			res[c + r] = (d1[r + 0] * d2[c + 0]) +
+						 (d1[r + 4] * d2[c + 1]) +
+						 (d1[r + 8] * d2[c + 2]) +
+						 (d1[r + 12] * d2[c + 3]);
+		}
+	}
+
+	return retval;
+}
+
+TeMatrix4x4 &TeMatrix4x4::operator*=(const TeMatrix4x4 &mul) {
+	error("TODO: Opeartor *=");
+	return *this;
+}
+
+bool TeMatrix4x4::operator==(const TeMatrix4x4 &other) const {
+	for (int i = 0; i < 16; i++) {
+		if (_data[i] != other._data[i])
+			return false;
+	}
+	return true;
 }
 
 void TeMatrix4x4::scale(const TeVector3f32 &vec) {
@@ -34,8 +83,15 @@ void TeMatrix4x4::scale(const TeVector3f32 &vec) {
 	scaleMatrix(0, 0) = vec.x();
 	scaleMatrix(1, 1) = vec.y();
 	scaleMatrix(2, 2) = vec.z();
-	Math::Matrix<4,4> result = (*this * scaleMatrix);
-	*this = result;
+	*this = (*this * scaleMatrix);
+}
+
+void TeMatrix4x4::translate(const TeVector3f32 &vec) {
+	TeMatrix4x4 translMatrix;
+	translMatrix(0, 3) = vec.x();
+	translMatrix(1, 3) = vec.y();
+	translMatrix(2, 3) = vec.z();
+	*this = (*this * translMatrix);
 }
 
 TeVector3f32 TeMatrix4x4::mult4x3(const TeVector3f32 &vec) const {
@@ -65,10 +121,159 @@ TeVector3f32 TeMatrix4x4::mult3x3(const TeVector3f32 &vec) const {
 Common::String TeMatrix4x4::toString() const {
 	const float *data = getData();
 	return Common::String::format("[[%.03f %.03f %.03f %.03f]  [%.03f %.03f %.03f %.03f]  [%.03f %.03f %.03f %.03f]  [%.03f %.03f %.03f %.03f]]",
-								  data[0], data[1], data[2], data[3],
-								  data[4], data[5], data[6], data[7],
-								  data[8], data[9], data[10], data[11],
-								  data[12], data[13], data[14], data[15]);
+								  data[0], data[4], data[8], data[12],
+								  data[1], data[5], data[9], data[13],
+								  data[2], data[6], data[10], data[14],
+								  data[3], data[7], data[11], data[15]);
 }
+
+
+TeMatrix4x4 TeMatrix4x4::transpose() const {
+	TeMatrix4x4 ret;
+	const float *s = getData();
+	float *d = ret.getData();
+	for (int c = 0; c < 4; c++) {
+		for (int r = 0; r < 4; r++) {
+			d[c * 4 + r] = s[r * 4 + c];
+		}
+	}
+	return ret;
+}
+
+
+bool TeMatrix4x4::inverse() {
+	TeMatrix4x4 invMatrix;
+	float *inv = invMatrix.getData();
+	TeMatrix4x4 temp = transpose();
+	float *m = temp.getData();
+
+	inv[0] = m[5]  * m[10] * m[15] -
+			 m[5]  * m[11] * m[14] -
+			 m[9]  * m[6]  * m[15] +
+			 m[9]  * m[7]  * m[14] +
+			 m[13] * m[6]  * m[11] -
+			 m[13] * m[7]  * m[10];
+
+	inv[4] = -m[4]  * m[10] * m[15] +
+			  m[4]  * m[11] * m[14] +
+			  m[8]  * m[6]  * m[15] -
+			  m[8]  * m[7]  * m[14] -
+			  m[12] * m[6]  * m[11] +
+			  m[12] * m[7]  * m[10];
+
+	inv[8] = m[4]  * m[9]  * m[15] -
+			 m[4]  * m[11] * m[13] -
+			 m[8]  * m[5]  * m[15] +
+			 m[8]  * m[7]  * m[13] +
+			 m[12] * m[5]  * m[11] -
+			 m[12] * m[7]  * m[9];
+
+	inv[12] = -m[4]  * m[9]  * m[14] +
+			   m[4]  * m[10] * m[13] +
+			   m[8]  * m[5]  * m[14] -
+			   m[8]  * m[6]  * m[13] -
+			   m[12] * m[5]  * m[10] +
+			   m[12] * m[6]  * m[9];
+
+	inv[1] = -m[1]  * m[10] * m[15] +
+			  m[1]  * m[11] * m[14] +
+			  m[9]  * m[2]  * m[15] -
+			  m[9]  * m[3]  * m[14] -
+			  m[13] * m[2]  * m[11] +
+			  m[13] * m[3]  * m[10];
+
+	inv[5] = m[0]  * m[10] * m[15] -
+			 m[0]  * m[11] * m[14] -
+			 m[8]  * m[2]  * m[15] +
+			 m[8]  * m[3]  * m[14] +
+			 m[12] * m[2]  * m[11] -
+			 m[12] * m[3]  * m[10];
+
+	inv[9] = -m[0]  * m[9]  * m[15] +
+			  m[0]  * m[11] * m[13] +
+			  m[8]  * m[1]  * m[15] -
+			  m[8]  * m[3]  * m[13] -
+			  m[12] * m[1]  * m[11] +
+			  m[12] * m[3]  * m[9];
+
+	inv[13] = m[0]  * m[9]  * m[14] -
+			  m[0]  * m[10] * m[13] -
+			  m[8]  * m[1]  * m[14] +
+			  m[8]  * m[2]  * m[13] +
+			  m[12] * m[1]  * m[10] -
+			  m[12] * m[2]  * m[9];
+
+	inv[2] = m[1]  * m[6] * m[15] -
+			 m[1]  * m[7] * m[14] -
+			 m[5]  * m[2] * m[15] +
+			 m[5]  * m[3] * m[14] +
+			 m[13] * m[2] * m[7] -
+			 m[13] * m[3] * m[6];
+
+	inv[6] = -m[0]  * m[6] * m[15] +
+			  m[0]  * m[7] * m[14] +
+			  m[4]  * m[2] * m[15] -
+			  m[4]  * m[3] * m[14] -
+			  m[12] * m[2] * m[7] +
+			  m[12] * m[3] * m[6];
+
+	inv[10] = m[0]  * m[5] * m[15] -
+			  m[0]  * m[7] * m[13] -
+			  m[4]  * m[1] * m[15] +
+			  m[4]  * m[3] * m[13] +
+			  m[12] * m[1] * m[7] -
+			  m[12] * m[3] * m[5];
+
+	inv[14] = -m[0]  * m[5] * m[14] +
+			   m[0]  * m[6] * m[13] +
+			   m[4]  * m[1] * m[14] -
+			   m[4]  * m[2] * m[13] -
+			   m[12] * m[1] * m[6] +
+			   m[12] * m[2] * m[5];
+
+	inv[3] = -m[1] * m[6] * m[11] +
+			  m[1] * m[7] * m[10] +
+			  m[5] * m[2] * m[11] -
+			  m[5] * m[3] * m[10] -
+			  m[9] * m[2] * m[7] +
+			  m[9] * m[3] * m[6];
+
+	inv[7] = m[0] * m[6] * m[11] -
+			 m[0] * m[7] * m[10] -
+			 m[4] * m[2] * m[11] +
+			 m[4] * m[3] * m[10] +
+			 m[8] * m[2] * m[7] -
+			 m[8] * m[3] * m[6];
+
+	inv[11] = -m[0] * m[5] * m[11] +
+			   m[0] * m[7] * m[9] +
+			   m[4] * m[1] * m[11] -
+			   m[4] * m[3] * m[9] -
+			   m[8] * m[1] * m[7] +
+			   m[8] * m[3] * m[5];
+
+	inv[15] = m[0] * m[5] * m[10] -
+			  m[0] * m[6] * m[9] -
+			  m[4] * m[1] * m[10] +
+			  m[4] * m[2] * m[9] +
+			  m[8] * m[1] * m[6] -
+			  m[8] * m[2] * m[5];
+
+	float det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+
+	if (det == 0)
+		return false;
+
+	det = 1.0 / det;
+
+	for (int i = 0; i < 16; i++) {
+		m[i] = inv[i] * det;
+	}
+
+	*this = temp.transpose();
+
+	return true;
+}
+
 
 } // end namespace Syberia

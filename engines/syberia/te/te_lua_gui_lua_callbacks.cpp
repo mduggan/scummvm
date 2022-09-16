@@ -256,7 +256,7 @@ int spriteLayoutBindings(lua_State *L) {
 		if (type == LUA_TSTRING) {
 			const char *s = lua_tolstring(L, -2, 0);
 			if (!strcmp(s, "name")) {
-				layout->setName(s);
+				layout->setName(TeLuaToTeString(L, -1));
 			} else if (!strcmp(s, "sizeType")) {
 				layout->setSizeType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
 			} else if (!strcmp(s, "size")) {
@@ -444,7 +444,7 @@ int buttonLayoutBindings(lua_State *L) {
 					layout->setScale(TeVector3f32(0.7500001,1.0,1.0));
 				}
 			} else {
-				warning("[TeLuaGUI.layoutBindings] Unreconized attribute : %s\n", s);
+				warning("[TeLuaGUI.buttonLayoutBindings] Unreconized attribute : %s\n", s);
 			}
 		} else if (type == LUA_TNUMBER) {
 			Te3DObject2 *obj = TeLuaTo<Te3DObject2*>(L, -1);

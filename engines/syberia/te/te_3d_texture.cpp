@@ -40,8 +40,7 @@ void Te3DTexture::bind() {
 	glBindTexture(GL_TEXTURE_2D, _glTexture);
 	renderer->setMatrixMode(TeRenderer::MM_GL_TEXTURE);
 	renderer->loadMatrix(_matrix);
-	const TeMatrix4x4 matrix = renderer->currentMatrix();
-	renderer->loadMatrixToGL(matrix);
+	renderer->loadCurrentMatrixToGL();
 	renderer->setMatrixMode(TeRenderer::MM_GL_MODELVIEW);
 }
 
@@ -50,12 +49,12 @@ void Te3DTexture::copyCurrentRender(uint xoffset, uint yoffset, uint x, uint y) 
 	_matrix.setToIdentity();
 	const TeVector3f32 local_40((float)_width / _texWidth, (float)_height / _texHeight, 1.0);
 	_matrix.scale(local_40);
-	const TeVector3f32 local_50((float)_translateX / _width, (float)_translateY / _height, 0.0);
+	const TeVector3f32 local_50((float)_leftBorder / _width, (float)_btmBorder / _height, 0.0);
 	_matrix.translate(local_50);
 	const TeVector3f32 local_60(
-			   1.0 - (float)(_somethingOffsetX + _translateX) /
+			   1.0 - (float)(_rightBorder + _leftBorder) /
 					 (float)_width,
-			   1.0 - (float)(_somethingOffsetY + _translateY) /
+			   1.0 - (float)(_topBorder + _btmBorder) /
 					 (float)_height, 1.0);
 	_matrix.scale(local_60);
 	bind();
@@ -63,9 +62,9 @@ void Te3DTexture::copyCurrentRender(uint xoffset, uint yoffset, uint x, uint y) 
 }
 
 void Te3DTexture::create() {
-	_flipY = false;
-	_translateX = _translateY = _texWidth = _texHeight = 0;
-	_somethingOffsetX = _somethingOffsetY = _width = _height = 0;
+	_flipY = true;
+	_leftBorder = _btmBorder = _texWidth = _texHeight = 0;
+	_rightBorder = _topBorder = _width = _height = 0;
 	_format = TeImage::INVALID;
 	_loaded = 0;
 	if (!_createdTexture)
@@ -135,20 +134,19 @@ bool Te3DTexture::load(const TeImage &img) {
 
 	warning("TODO: set some other fields from the image here.");
 	// for now just set some good defaults.
-	_flipY = false;
-	_translateX = 0;
-	_translateY = 0;
+	_flipY = true;    //img._flipY;
+	_leftBorder = 0;  //img._leftBorder;
+	_btmBorder = 0;   //img._btmBorder;
+	_rightBorder = 0; //img._rightBorder;
+	_topBorder = 0;   //img._topBorder;
 
-
-	_somethingOffsetX = _translateX + 4;
-	_somethingOffsetY = _translateY + 4;
 	const TeVector2s32 optimizedSz = optimisedSize(img.bufSize());
 	_texWidth = optimizedSz._x;
 	_texHeight = optimizedSz._y;
 
 	glBindTexture(GL_TEXTURE_2D, _glTexture);
-	glPixelStorei(GL_UNPACK_SWAP_BYTES, 0);
-	glPixelStorei(GL_UNPACK_LSB_FIRST, 0);
+	glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_FALSE);
+	glPixelStorei(GL_UNPACK_LSB_FIRST, GL_FALSE);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
@@ -160,14 +158,14 @@ bool Te3DTexture::load(const TeImage &img) {
 		if (_glPixelFormat != GL_INVALID_ENUM) {
 			glpxformat = _glPixelFormat;
 		}
-		glTexImage2D(GL_TEXTURE_2D, 0, glpxformat, _texWidth, _texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, imgdata);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _texWidth, _texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.pitch / 3, img.h, GL_RGB, GL_UNSIGNED_BYTE, imgdata);
 	} else if (_format == TeImage::RGBA8) {
-		GLenum glpxformat = GL_RGBA;
+		GLenum glpxformat = GL_RGBA8;
 		if (_glPixelFormat != GL_INVALID_ENUM) {
 			glpxformat = _glPixelFormat;
 		}
-	  	glTexImage2D(GL_TEXTURE_2D, 0, glpxformat, _texWidth, _texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _texWidth, _texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img.w, img.h, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 	} else {
 		warning("Te3DTexture::load can't send image format %d to GL.", _format);
@@ -176,12 +174,12 @@ bool Te3DTexture::load(const TeImage &img) {
 	_matrix.setToIdentity();
 
 	_matrix.scale(TeVector3f32((float)_width / _texWidth, (float)_height / _texHeight, 1.0f));
-	_matrix.translate(TeVector3f32((float)_translateX / _width, (float)_translateY / _height, 0.0f));
-	_matrix.scale(TeVector3f32(1.0 - (float)(_somethingOffsetX + _translateX) / _width,
-			   1.0 - (float)(_somethingOffsetY + _translateY) / _height, 1.0));
+	_matrix.translate(TeVector3f32((float)_leftBorder / _width, (float)_btmBorder / _height, 0.0f));
+	_matrix.scale(TeVector3f32(1.0 - (float)(_rightBorder + _leftBorder) / _width,
+			   1.0 - (float)(_topBorder + _btmBorder) / _height, 1.0f));
 	if (_flipY) {
 		_matrix.translate(TeVector3f32(0.0f, 1.0f, 0.0f));
-		_matrix.translate(TeVector3f32(1.0f, -1.0f, 1.0f));
+		_matrix.scale(TeVector3f32(1.0f, -1.0f, 1.0f));
 	}
 	_loaded = true;
 	return true;
@@ -214,12 +212,10 @@ TeVector2s32 Te3DTexture::optimisedSize(const TeVector2s32 &size) {
 }
 
 void Te3DTexture::unbind() {
-	TeMatrix4x4 matrix;
 	TeRenderer *renderer = g_engine->getRenderer();
 	renderer->setMatrixMode(TeRenderer::MM_GL_TEXTURE);
-	renderer->loadMatrix(matrix);
-	matrix = renderer->currentMatrix();
-	renderer->loadMatrixToGL(matrix);
+	renderer->loadIdentityMatrix();
+	renderer->loadCurrentMatrixToGL();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	renderer->setMatrixMode(TeRenderer::MM_GL_MODELVIEW);
 }

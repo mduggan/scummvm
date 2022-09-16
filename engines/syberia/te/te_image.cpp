@@ -47,7 +47,7 @@ void TeImage::create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &pal,
 			Format teformat, uint bufxsize, uint bufysize) {
 	_format = teformat;
 	Graphics::PixelFormat pxformat = ((teformat == TeImage::RGB8) ?
-		Graphics::createPixelFormat<888>() : Graphics::createPixelFormat<8888>());
+									  Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0) : Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
 	
 	Graphics::Surface::create(xsize, ysize, pxformat);
 }

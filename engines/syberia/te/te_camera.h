@@ -70,8 +70,8 @@ public:
 	void viewport(int x, int y, uint width, uint height);
 
 	int _projectionMatrixType;
-	float _zsomething1;
-	float _zsomething2;
+	float _orthNearVal;
+	float _orthFarVal;
 
 private:
 	int _viewportX;
@@ -82,10 +82,10 @@ private:
 	int _transformA;
 	int _transformB;
 
-	float _orthogonalParam1;
-	float _orthogonalParam2;
-	float _orthogonalParam3;
-	float _orthogonalParam4;
+	float _orthogonalParamL;
+	float _orthogonalParamR;
+	float _orthogonalParamT;
+	float _orthogonalParamB;
 	
 	TeMatrix4x4 _projectionMatrix;
 	

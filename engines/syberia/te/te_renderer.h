@@ -92,7 +92,7 @@ public:
 	void init();
 	void loadIdentityMatrix();
 	void loadMatrix(const TeMatrix4x4 &matrix);
-	void loadMatrixToGL(const TeMatrix4x4 &matrix);
+	void loadCurrentMatrixToGL();
 	void loadProjectionMatrix(const TeMatrix4x4 &matrix);
 	void multiplyMatrix(const TeMatrix4x4 &matrix);
 	void optimiseTransparentMeshProperties();
@@ -151,6 +151,7 @@ private:
 
 	TeMatriciesStack _matriciesStacks[3];  // one per matrix mode.
 
+	void loadMatrixToGL(const TeMatrix4x4 &matrix);
 };
 
 } // end namespace Syberia
