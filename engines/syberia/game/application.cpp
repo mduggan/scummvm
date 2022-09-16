@@ -22,8 +22,9 @@
 #include "common/textconsole.h"
 #include "common/file.h"
 #include "common/util.h"
+#include "common/events.h"
 
-#include "graphics/opengl/glad.h"
+#include "graphics/opengl/system_headers.h"
 
 #include "syberia/syberia.h"
 #include "syberia/game/game.h"
@@ -48,19 +49,20 @@ Application::Application() : _finishedGame(false), _finishedFremium(false), _cap
 
 void Application::create() {
 	warning("TODO: Move mainWindowCamera to mainWindow");
-	
+
+	const int winWidth = g_engine->getDefaultScreenWidth();
+	const int winHeight = g_engine->getDefaultScreenHeight();
 	// See TeMainWindowBase::initCamera
 	_mainWindowCamera.reset(new TeCamera());
 	_mainWindowCamera->_projectionMatrixType = 4;
-	int winWidth = 800;
-	int winHeight = 600;
 	_mainWindowCamera->viewport(0, 0, winWidth, winHeight);
-	_mainWindowCamera->orthogonalParams(winWidth * -0.5, winWidth * 0.5, winHeight * 0.5, winHeight * -0.5);
-	_mainWindowCamera->_zsomething1 = -2048.0f;
-	_mainWindowCamera->_zsomething2 = 2048.0f;
+	_mainWindowCamera->orthogonalParams(winWidth * -0.5f, winWidth * 0.5f, winHeight * 0.5f, winHeight * -0.5f);
+	_mainWindowCamera->_orthNearVal = -2048.0f;
+	_mainWindowCamera->_orthFarVal = 2048.0f;
 
-	_mainWindow.setSize(TeVector3f32(winWidth, winHeight, 0.0));
+	_mainWindow.setSize(TeVector3f32(winWidth, winHeight, 100.0));
 	_mainWindow.setSizeType(TeILayout::ABSOLUTE);
+	_mainWindow.setPositionType(TeILayout::ABSOLUTE);
 
 	TeResourceManager *resmgr = g_engine->getResourceManager();
 	_fontComic = resmgr->getResource<TeFont3>("Common/Fonts/ComicRelief.ttf");
@@ -69,7 +71,7 @@ void Application::create() {
 	_fontChaucer = resmgr->getResource<TeFont3>("Common/Fonts/CHAUCER.TTF");
 	_fontColaborate = resmgr->getResource<TeFont3>("Common/Fonts/Colaborate-Regular.otf");
 	_fontProDisplay = resmgr->getResource<TeFont3>("Common/Fonts/ProDisplay.ttf");
-	
+
 	// Prebuild some fonts.. cover letters, numbers, a few accented chars, and punctuation.
 	warning("TODO: Build some text with TeTextBase2 here.");
 	/*
@@ -98,7 +100,7 @@ void Application::create() {
 	TeCore *core = g_engine->getCore();
 	static const char allLangs[][3] = {"en", "fr", "de", "es", "it", "ru"};
 	const Common::Path textsPath("texts");
-	
+
 	// Try alternate langs..
 	int i = 0;
 	Common::Path textFilePath;
@@ -131,7 +133,7 @@ void Application::create() {
 	}
 
 	_helpGui.load(helpMenuFilePath);
-	
+
 	debug("TODO: set TeCore flags here? Do they do anything?");
 
 	// Game calls these here but does nothing with result?
@@ -142,28 +144,27 @@ void Application::create() {
 	_backLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_backLayout.setSize(TeVector3f32(1.0f, 1.0f, 0.0f));
 	_mainWindow.addChild(&_backLayout);
-	
+
 	_frontOrientationLayout.setName("orientationLayoutFront");
 	_frontOrientationLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_frontOrientationLayout.setSize(TeVector3f32(1.0f, 1.0f, 0.0f));
 	_mainWindow.addChild(&_frontOrientationLayout);
-	
+
 	_frontLayout.setName("layoutFront");
 	_frontLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_frontLayout.setSize(TeVector3f32(1.0f, 1.0f, 0.0f));
 	_frontOrientationLayout.addChild(&_frontLayout);
-	
-	_visFade.init();
-	
-	warning("TODO: *** Re-enable adding the fade sprites once we can see something.");
-	//_frontOrientationLayout.addChild(&_visFade._fadeCaptureSprite);
-	//_frontOrientationLayout.addChild(&_visFade._blackFadeSprite);
-	//_frontOrientationLayout.addChild(&_visFade._buttonLayout);
 
-	//_frontLayout.addChild(&_appSpriteLayout);
+	_visFade.init();
+
+	_frontOrientationLayout.addChild(&_visFade._fadeCaptureSprite);
+	_frontOrientationLayout.addChild(&_visFade._blackFadeSprite);
+	_frontOrientationLayout.addChild(&_visFade._buttonLayout);
+
+	_frontLayout.addChild(&_appSpriteLayout);
 	_appSpriteLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_appSpriteLayout.setSize(TeVector3f32(1.0f, 1.0f, 1.0f));
-	
+
 	// Note: The games do some loading of a "version.ver" file here to add a
 	// watermark to the backLayout, but that file doesn't exist in any of the
 	// GOG games so it was probably only used during development.
@@ -171,35 +172,36 @@ void Application::create() {
 	if (Common::File::exists(verFilePath)) {
 		warning("Skipping doing anything with version.ver file");
 	}
-	
+
 	_mouseCursorLayout.setName("mouseCursor");
-	
+
 	// Not needed in scummvm:
+	g_system->showMouse(false);
 	//mainWindow->setNativeCursorVisible(false);
-	
+
 	_mouseCursorLayout.load("pictures/cursor.png");
 	_mouseCursorLayout.setAnchor(TeVector3f32(0.3f, 0.1f, 0.0f));
-	//_frontOrientationLayout.addChild(&_mouseCursorLayout);
-	
+	_frontOrientationLayout.addChild(&_mouseCursorLayout);
+
 	_lockCursorButton.setName("lockCursorButton");
 	_lockCursorButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorButton.setSize(TeVector3f32(2.0f, 0.095f, 0.0f));
 	_lockCursorButton.setPositionType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorButton.setPosition(TeVector3f32(0.95f, 0.95f, 0.0f));
-	//_frontOrientationLayout.addChild(&_lockCursorButton);
-	
+	_frontOrientationLayout.addChild(&_lockCursorButton);
+
 	_lockCursorFromActionButton.setName("lockCursorFromActionButton");
 	_lockCursorFromActionButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorFromActionButton.setSize(TeVector3f32(2.0f, 2.0f, 0.0f));
-	//_frontOrientationLayout.addChild(&_lockCursorFromActionButton);
+	_frontOrientationLayout.addChild(&_lockCursorFromActionButton);
 
 	_autoSaveIcon1.setName("autosaveIcon");
 	_autoSaveIcon1.setAnchor(TeVector3f32(0.5f, 0.5f, 0.0f));
 	_autoSaveIcon1.setPosition(TeVector3f32(0.2f, 0.9f, 0.0f));
 	_autoSaveIcon1.setSize(TeVector3f32(128.0f, 64.0f, 0.0f));
 	_autoSaveIcon1.load("menus/inGame/autosave_icon.png");
-	//_frontOrientationLayout.addChild(&_autoSaveIcon1);
-	
+	_frontOrientationLayout.addChild(&_autoSaveIcon1);
+
 	_autoSaveIconAnim1._runTimer.pausable(false);
 	_autoSaveIconAnim1.pause();
 	_autoSaveIconAnim1._firstVal = TeColor(255, 255, 255, 0);
@@ -219,16 +221,16 @@ void Application::create() {
 	_autoSaveIcon2.setPosition(TeVector3f32(0.2f, 0.7f, 0.0f));
 	_autoSaveIcon2.setSize(TeVector3f32(68.0f, 86.0f, 0.0f));
 	_autoSaveIcon2.load("menus/inGame/NoCel.png");
-	//_frontOrientationLayout.addChild(&_autoSaveIcon2);
+	_frontOrientationLayout.addChild(&_autoSaveIcon2);
 
 	_autoSaveIconAnim2._runTimer.pausable(false);
 	_autoSaveIconAnim2.pause();
 	_autoSaveIconAnim2._firstVal = TeColor(255, 255, 255, 0);
 	_autoSaveIconAnim2._secondVal = TeColor(255, 255, 255, 255);
-	_autoSaveIconAnim1.setCurve(curve);
-	_autoSaveIconAnim1._maxTime = 4000.0f;
-	_autoSaveIconAnim1._callbackObj = &_autoSaveIcon2;
-	_autoSaveIconAnim1._callbackMethod = &Te3DObject2::setColor;
+	_autoSaveIconAnim2.setCurve(curve);
+	_autoSaveIconAnim2._maxTime = 4000.0f;
+	_autoSaveIconAnim2._callbackObj = &_autoSaveIcon2;
+	_autoSaveIconAnim2._callbackMethod = &Te3DObject2::setColor;
 
 	_blackFadeAnimationFinishedSignal.add<Application>(this, &Application::onBlackFadeAnimationFinished);
 
@@ -399,8 +401,10 @@ bool Application::onMainWindowSizeChanged() {
 	return false;
 }
 
-bool Application::onMousePositionChanged() {
-	error("TODO: Implement me.");
+bool Application::onMousePositionChanged(const Common::Event &e) {
+	const TeVector3f32 mainWinSize = _mainWindow.size();
+	const TeVector3f32 newCursorPos(e.mouse.x / mainWinSize.x(), e.mouse.y / mainWinSize.y(), 0.0);
+	_mouseCursorLayout.setPosition(newCursorPos);
 	return false;
 }
 

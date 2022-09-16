@@ -28,21 +28,56 @@
 
 namespace Syberia {
 
-class TeMatrix4x4 : public Math::Matrix<4, 4> {
+/* A 4x4 matrix, but stored in *column-major* order to match
+ * OpenGL (and the original engine)
+ */
+class TeMatrix4x4 {
 public:
 	TeMatrix4x4();
 	TeMatrix4x4(const Math::Matrix<4, 4> &matrix);
 
+	void setToIdentity();
+
+	float &operator()(int row, int col) {
+		return *(_data + col * 4 + row);
+	}
+
+	const float &operator()(int row, int col) const {
+		return *(_data + col * 4 + row);
+	}
+
+	bool operator==(const TeMatrix4x4 &other) const;
+	bool operator!=(const TeMatrix4x4 &other) const {
+		return !operator==(other);
+	}
+
+	TeMatrix4x4 &operator*=(const TeMatrix4x4 &mul);
+
 	void scale(const TeVector3f32 &vec);
+	void translate(const TeVector3f32 &vec);
 	TeVector3f32 mult3x3(const TeVector3f32 &vec) const;
 	TeVector3f32 mult4x3(const TeVector3f32 &vec) const;
 	// TODO add public members
 
 	Common::String toString() const;
+
+	void setValue(int row, int col, float val) {
+		operator()(row, col) = val;
+	}
+
+	TeMatrix4x4 transpose() const;
+
+	bool inverse();
+
+	const float *getData() const { return _data; }
+	float *getData() { return _data; }
+
 private:
-	// TODO add private members
+	float _data[16];
 
 };
+
+TeMatrix4x4 operator*(const TeMatrix4x4 &left, const TeMatrix4x4 &right);
 
 } // end namespace Syberia
 

@@ -74,10 +74,10 @@ private:
 	
 	uint _texWidth;
 	uint _texHeight;
-	uint _translateX;
-	uint _translateY;
-	uint _somethingOffsetX;
-	uint _somethingOffsetY;
+	uint _leftBorder;
+	uint _btmBorder;
+	uint _rightBorder;
+	uint _topBorder;
 	bool _flipY;
 
 };

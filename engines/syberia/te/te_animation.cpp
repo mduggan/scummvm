@@ -25,7 +25,7 @@ namespace Syberia {
 
 Common::Array<TeAnimation *> TeAnimation::_animations;
 
-TeAnimation::TeAnimation() {
+TeAnimation::TeAnimation() : _repeatCount(1) {
 }
 
 
@@ -91,8 +91,10 @@ void TeAnimation::seekToStart() {
 
 /*static*/ void TeAnimation::updateAll() {
 	for (auto &anim : _animations) {
-		if (!anim->_runTimer._stopped)
-			anim->update(anim->_runTimer.getTimeFromStart() / 1000.0);
+		if (!anim->_runTimer._stopped) {
+			float msFromStart = anim->_runTimer.getTimeFromStart() / 1000.0;
+			anim->update(msFromStart);
+		}
 	}
 
 }

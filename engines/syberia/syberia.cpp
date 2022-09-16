@@ -106,9 +106,16 @@ void SyberiaEngine::configureSearchPaths() {
 	SearchMan.addSubDirectoryMatching(gameDataDir, "Resources", 0, 3);
 }
 
+int SyberiaEngine::getDefaultScreenWidth() const {
+	return 800;
+}
+
+int SyberiaEngine::getDefaultScreenHeight() const {
+	return 600;
+}
+
 Common::Error SyberiaEngine::run() {
-	// Initialize 800x600 graphics mode
-	initGraphics3d(800, 600);
+	initGraphics3d(getDefaultScreenWidth(), getDefaultScreenHeight());
 
 	configureSearchPaths();
 	// from BasicOpenGLView::prepareOpenGL..
@@ -131,25 +138,16 @@ Common::Error SyberiaEngine::run() {
 
 	while (!shouldQuit()) {
 		while (g_system->getEventManager()->pollEvent(e)) {
+			if (e.type == Common::EVENT_MOUSEMOVE)
+				_application->onMousePositionChanged(e);
 		}
 
-#if DEBUG_GL
-		glClear(GL_COLOR_BUFFER_BIT);
-		glRotatef(1, 0, 0, 1);
-		glBegin(GL_TRIANGLES);
-		glColor3f(1, 0, 0); glVertex2f( 0,  1); // Bottom
-		glColor3f(0, 1, 0); glVertex2f(-1, 0 ); // Upper Left
-		glColor3f(0, 0, 1); glVertex2f( 1, 0 ); // Upper Right
-		glEnd();
-#else
 		_application->run();
-#endif
-
 		g_system->updateScreen();
 
 		// Delay for a bit. All events loops should have a delay
 		// to prevent the system being unduly loaded
-		g_system->delayMillis(500); // FIXME: Return to a small number (10) once 3d is working better.
+		g_system->delayMillis(10);
 	}
 
 	return Common::kNoError;

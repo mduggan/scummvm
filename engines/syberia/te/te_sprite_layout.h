@@ -64,7 +64,7 @@ public:
 
 private:
 	bool _sizeSet;
-	bool _noRoundZ;
+	bool _allowFloatTranslate;
 	
 	// TODO add private members
 

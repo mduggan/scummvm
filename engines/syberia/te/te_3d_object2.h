@@ -35,7 +35,7 @@ namespace Syberia {
 class Te3DObject2 : public TeI3DObject2 {
 public:
 	Te3DObject2();
-	virtual ~Te3DObject2() {};
+	virtual ~Te3DObject2();
 
 	// note, probably should be Te*I*3DObject2 args here
 	virtual void addChild(Te3DObject2 *newChild);

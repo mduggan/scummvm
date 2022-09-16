@@ -50,7 +50,7 @@ void TeModel::draw() {
 	TeRenderer *renderer = g_engine->getRenderer();
 	
 	if (worldVisible()) {
-		const TeMatrix4x4 transform = worldTransformationMatrix();
+		const TeMatrix4x4 transform = transformationMatrix();
 		renderer->sendModelMatrix(transform);
 		renderer->pushMatrix();
 		renderer->multiplyMatrix(transform);

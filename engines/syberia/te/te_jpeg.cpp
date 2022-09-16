@@ -57,11 +57,11 @@ bool TeJpeg::load(Common::SeekableReadStream &stream) {
 		delete _loadedSurface;
 	_loadedSurface = nullptr;
 
-	jpg.setOutputPixelFormat(Graphics::createPixelFormat<888>());
+	jpg.setOutputPixelFormat(Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
 	if (!jpg.loadStream(stream))
 		return false;
 	
-	_loadedSurface = jpg.getSurface()->convertTo(Graphics::createPixelFormat<888>());
+	_loadedSurface = jpg.getSurface()->convertTo(Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
 	return true;
 }
 
@@ -78,7 +78,7 @@ uint TeJpeg::height() {
 }
 
 TeImage::Format TeJpeg::imageFormat() {
-	return TeImage::RGB8;
+	return TeImage::RGBA8;
 }
 
 void TeJpeg::setLeftBorderSize(uint val) {

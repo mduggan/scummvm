@@ -108,7 +108,10 @@ public:
 		Common::Serializer s(stream, nullptr);
 		return syncGame(s);
 	}
-	
+
+	int getDefaultScreenWidth() const;
+	int getDefaultScreenHeight() const;
+
 	Application *getApplication();
 	Game *getGame();
 	TeCore *getCore();

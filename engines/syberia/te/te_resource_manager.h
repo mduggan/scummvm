@@ -41,6 +41,8 @@ class TeResourceManager {
 public:
 	TeResourceManager();
 
+	~TeResourceManager();
+
 	void addResource(const TeIntrusivePtr<TeResource> &resource);
 	void addResource(TeResource *resource);
 	bool exists(const Common::Path &path);

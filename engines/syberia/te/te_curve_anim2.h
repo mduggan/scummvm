@@ -51,12 +51,15 @@ public:
 		double amount = _interp.interpole(time, _maxTime);
 		
 		const S interpVal = linearInterpolation<S>(_firstVal, _secondVal, amount);
+		//debug("CurveAnim %.02f/%.02f (%.02f) -> %s", time, _maxTime, amount, interpVal.toString().c_str());
 		(_callbackObj->*_callbackMethod)(interpVal);
 		if (_lastUpdateTime >= _maxTime) {
-			if (_repeatCount == -1)
+			if (_repeatCount == -1) {
 				seekToStart();
-			else
+			} else {
+				stop();
 				onFinished().call();
+			}
 		}
 	}
 

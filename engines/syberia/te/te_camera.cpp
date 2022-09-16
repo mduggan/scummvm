@@ -28,9 +28,9 @@
 
 namespace Syberia {
 
-TeCamera::TeCamera() : _projectionMatrixType(0), _orthogonalParam1(1.0f),
-	_orthogonalParam2(0.0f), _orthogonalParam3(1.0f), _orthogonalParam4(0.0f),
-	_zsomething1(10.0), _zsomething2(4000.0), _transformA(0), _transformB(0)
+TeCamera::TeCamera() : _projectionMatrixType(0), _orthogonalParamL(1.0f),
+	_orthogonalParamR(0.0f), _orthogonalParamT(1.0f), _orthogonalParamB(0.0f),
+	_orthNearVal(10.0), _orthFarVal(4000.0), _transformA(0), _transformB(0)
 {
 }
 
@@ -42,7 +42,7 @@ void TeCamera::applyProjection() {
 	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
 	updateProjectionMatrix();
 	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_PROJECTION);
-	renderer->loadMatrixToGL(renderer->currentMatrix());
+	renderer->loadCurrentMatrixToGL();
 	renderer->setMatrixMode(TeRenderer::MatrixMode::MM_GL_MODELVIEW);
 }
 
@@ -52,43 +52,42 @@ void TeCamera::applyTransformations() {
 	TeMatrix4x4 matrix = transformationMatrix();
 	matrix.inverse();
 	renderer->loadMatrix(matrix);
-	renderer->loadMatrixToGL(renderer->currentMatrix());
+	renderer->loadCurrentMatrixToGL();
 }
 
 void TeCamera::buildOrthoMatrix() {
-	// TODO: Fix these variable names.
-	float fVar5 = FLT_MAX;
-	if ((_orthogonalParam2 - _orthogonalParam1) != 0.0) {
-	  fVar5 = 1.0 / (_orthogonalParam2 - _orthogonalParam1);
+	float widthNorm = FLT_MAX;
+	if ((_orthogonalParamR - _orthogonalParamL) != 0.0) {
+	  widthNorm = 1.0 / (_orthogonalParamR - _orthogonalParamL);
 	}
-	float fVar4 = FLT_MAX;
-	if ((_zsomething2 - _zsomething1) != 0.0) {
-	  fVar4 = 1.0 / (_zsomething2 - _zsomething1);
+	float heightNorm = FLT_MAX;
+	if (_orthogonalParamB - _orthogonalParamT != 0.0) {
+	  heightNorm = 1.0 / (_orthogonalParamB - _orthogonalParamT);
 	}
-	float fVar6 = FLT_MAX;
-	if (_orthogonalParam4 - _orthogonalParam3 != 0.0) {
-	  fVar6 = 1.0 / (_orthogonalParam4 - _orthogonalParam3);
+	float depthNorm = FLT_MAX;
+	if ((_orthFarVal - _orthNearVal) != 0.0) {
+	  depthNorm = 1.0 / (_orthFarVal - _orthNearVal);
 	}
-	_projectionMatrix.setValue(0, 0, fVar5 + fVar5);
+
+	_projectionMatrix.setValue(0, 0, widthNorm * 2.0f);
 	_projectionMatrix.setValue(0, 1, 0.0);
 	_projectionMatrix.setValue(0, 2, 0.0);
-	_projectionMatrix.setValue(0, 3, 0.0);
+	_projectionMatrix.setValue(0, 3, -((_orthogonalParamR + _orthogonalParamL) * widthNorm));
 
 	_projectionMatrix.setValue(1, 0, 0.0);
-	_projectionMatrix.setValue(1, 1, fVar6 + fVar6);
+	_projectionMatrix.setValue(1, 1, heightNorm * 2.0f);
 	_projectionMatrix.setValue(1, 2, 0.0);
-	_projectionMatrix.setValue(1, 3, 0.0);
+	_projectionMatrix.setValue(1, 3, -((_orthogonalParamB + _orthogonalParamT) * heightNorm));
 
 	_projectionMatrix.setValue(2, 0, 0.0);
 	_projectionMatrix.setValue(2, 1, 0.0);
-	_projectionMatrix.setValue(2, 2, fVar4 * -2.0);
-	_projectionMatrix.setValue(2, 3, 0.0);
+	_projectionMatrix.setValue(2, 2, depthNorm * -2.0f);
+	_projectionMatrix.setValue(2, 3, -((_orthFarVal + _orthNearVal) * depthNorm));
 
-	_projectionMatrix.setValue(3, 0, abs((_orthogonalParam2 + _orthogonalParam1) * fVar5));
-	_projectionMatrix.setValue(3, 1, abs((_orthogonalParam4 + _orthogonalParam3) * fVar6));
-	_projectionMatrix.setValue(3, 2, abs((_zsomething2 + _zsomething1) * fVar4));
+	_projectionMatrix.setValue(3, 0, 0.0);
+	_projectionMatrix.setValue(3, 1, 0.0);
+	_projectionMatrix.setValue(3, 2, 0.0);
 	_projectionMatrix.setValue(3, 3, 1.0);
-
 }
 
 void TeCamera::buildPerspectiveMatrix() {
@@ -119,26 +118,27 @@ void TeCamera::loadBin(const Common::ReadStream &stream) {
 	error("TODO: Implement me.");
 }
 
-void TeCamera::orthogonalParams(float f1, float f2, float f3, float f4) {
-	_orthogonalParam1 = f1;
-	_orthogonalParam2 = f2;
-	_orthogonalParam3 = f3;
-	_orthogonalParam4 = f4;
+void TeCamera::orthogonalParams(float left, float right, float top, float bottom) {
+	_orthogonalParamL = left;
+	_orthogonalParamR = right;
+	_orthogonalParamT = top;
+	_orthogonalParamB = bottom;
 }
 
 TeMatrix4x4 TeCamera::projectionMatrix() {
 	switch(_projectionMatrixType) {
 	case 1:
-	  buildPerspectiveMatrix();
-	  break;
+		buildPerspectiveMatrix();
+		break;
 	case 2:
-	  buildPerspectiveMatrix2();
-	  break;
+		buildPerspectiveMatrix2();
+		break;
 	case 3:
-	  buildPerspectiveMatrix3();
-	  break;
+		buildPerspectiveMatrix3();
+		break;
 	case 4:
-	  buildOrthoMatrix();
+		buildOrthoMatrix();
+		break;
 	}
 	return _projectionMatrix;
 }

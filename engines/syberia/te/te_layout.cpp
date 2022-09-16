@@ -30,10 +30,13 @@ TeLayout::TeLayout() : Te3DObject2(), _updatingZ(false), _updatingZSize(false),
 	_updatingPosition(false), _updatingWorldMatrix(false), _updatingSize(false),
 	_autoz(true), _childOrParentChanged(true), _childChanged(true),
 	_sizeChanged(true), _positionChanged(true), _worldMatrixChanged(true),
-	_sizeType(CoordinatesType::ABSOLUTE), _userSize(_size), _anchor(0.5f, 0.5f, 0.5f),
-	_ratio(1.0f), _drawMode(TeILayout::DrawMode0), _safeAreaRatio(1.3333334f),
-	_ratioMode(RATIO_MODE_NONE), _positionType(CoordinatesType::RELATIVE_TO_PARENT)
+	_sizeType(CoordinatesType::ABSOLUTE), _userSize(1.0f, 1.0f, 1.0f),
+	_anchor(0.5f, 0.5f, 0.5f), _ratio(1.0f), _drawMode(TeILayout::DrawMode0),
+	_safeAreaRatio(1.3333334f), _ratioMode(RATIO_MODE_NONE),
+	_positionType(CoordinatesType::RELATIVE_TO_PARENT)
 {
+	_userPosition = _position = TeVector3f32(0.5f, 0.5f, 0.5f);
+	_size = TeVector3f32(1.0f, 1.0f, 1.0f);
 	_onChildSizeChangedCallback.reset(
 		new TeCallback0Param<TeLayout>(this, &TeLayout::onChildSizeChanged));
 	_onParentSizeChangedCallback.reset(
@@ -43,6 +46,17 @@ TeLayout::TeLayout() : Te3DObject2(), _updatingZ(false), _updatingZSize(false),
 
 	updateSize();
 	updateMesh();
+}
+
+TeLayout::~TeLayout() {
+	if (parent() && _onParentSizeChangedCallback)
+		parent()->onSizeChanged().remove(_onParentSizeChangedCallback);
+
+	if (_onChildSizeChangedCallback) {
+		for (auto &child : childList()) {
+			child->onSizeChanged().remove(_onChildSizeChangedCallback);
+		}
+	}
 }
 
 void TeLayout::addChild(Te3DObject2 *child) {
@@ -181,9 +195,9 @@ void TeLayout::setParent(Te3DObject2 *parent) {
 	Te3DObject2 *oldParent = Te3DObject2::parent();
 	if (oldParent) {
 		if (_onParentSizeChangedCallback)
-			parent->onSizeChanged().remove(_onParentSizeChangedCallback);
+			oldParent->onSizeChanged().remove(_onParentSizeChangedCallback);
 		if (_onParentWorldTransformationMatrixChangedCallback)
-			parent->onWorldTransformationMatrixChanged().remove(_onParentWorldTransformationMatrixChangedCallback);
+			oldParent->onWorldTransformationMatrixChanged().remove(_onParentWorldTransformationMatrixChangedCallback);
 	}
 
 	warning("TODO: remove callback from main window");
@@ -260,7 +274,7 @@ void TeLayout::setScale(const TeVector3f32 &scale) {
 }
 
 void TeLayout::setSize(const TeVector3f32 &size) {
-	TeVector3f32 size3d(size.x(), size.y(), _userSize.z());
+	const TeVector3f32 size3d(size.x(), size.y(), _userSize.z());
 	if (_userSize != size3d) {
 		_userSize.x() = size.x();
 		_userSize.y() = size.y();
@@ -376,6 +390,10 @@ void TeLayout::updateSize() {
 			_size = TeVector3f32(0.0f, 0.0f, 0.0f);
 		}
 	}
+
+	// FIXME: Original doesn't call this here, but I seem to need it.
+	updateMesh();
+
 	_updatingSize = false;
 	// TODO: check this, is it the right flag to set?
 	_positionChanged = true;
