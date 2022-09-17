@@ -84,6 +84,7 @@ MODULE_OBJS := \
 	te/te_scrolling_layout.o \
 	te/te_sfx.o \
 	te/te_sprite_layout.o \
+	te/te_text_base2.o \
 	te/te_text_layout.o \
 	te/te_tga.o \
 	te/te_theora.o \

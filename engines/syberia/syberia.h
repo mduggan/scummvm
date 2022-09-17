@@ -118,9 +118,11 @@ public:
 	TeSoundManager *getSoundManager();
 	TeRenderer *getRenderer();
 	TeResourceManager *getResourceManager();
+	void setWantToQuit() { _wantToQuit = true; }
 
 private:
 	void configureSearchPaths();
+	bool _wantToQuit;
 
 };
 

@@ -19,11 +19,18 @@
  *
  */
 
+#include "video/theora_decoder.h"
+
 #include "syberia/te/te_theora.h"
 
 namespace Syberia {
 
 TeTheora::TeTheora() {
+	_decoder = new Video::TheoraDecoder();
+}
+
+TeTheora::~TeTheora() {
+	delete _decoder;
 }
 
 /*static*/
@@ -32,86 +39,88 @@ bool TeTheora::matchExtension(const Common::String &extn) {
 }
 
 bool TeTheora::load(const Common::Path &path) {
-	error("TODO: Implement load");
+	return _decoder->loadFile(path);
 }
 
 bool TeTheora::load(Common::SeekableReadStream &stream) {
-	error("TODO: Implement load");
+	return _decoder->loadStream(&stream);
 }
 
 uint TeTheora::width() {
-	error("TODO: Implement width");
+	return _decoder->getWidth();
 }
 
 uint TeTheora::height() {
-	error("TODO: Implement height");
+	return _decoder->getHeight();
 }
 
 int TeTheora::nbFrames() {
-	error("TODO: Implement nbFrames");
+	return _decoder->getFrameCount();
 }
 
 TeImage::Format TeTheora::imageFormat() {
-	error("TODO: Implement setLeftBorderSize");
+	//const Graphics::PixelFormat format = _decoder->getPixelFormat();
+	// TODO: use format?
+	return TeImage::RGBA8;
 }
 
 void TeTheora::setLeftBorderSize(uint val) {
-	error("TODO: Implement setLeftBorderSize");
+	error("TODO: Implement TeTheora::setLeftBorderSize");
 }
 
 uint TeTheora::leftBorderSize() {
-	error("TODO: Implement leftBorderSize");
+	error("TODO: Implement TeTheora::leftBorderSize");
 }
 
 void TeTheora::setRightBorderSize(uint val) {
-	error("TODO: Implement setRightBorderSize");
+	error("TODO: Implement TeTheora::setRightBorderSize");
 }
 
 uint TeTheora::rightBorderSize() {
-	error("TODO: Implement rightBorderSize");
+	error("TODO: Implement TeTheora::rightBorderSize");
 }
 
 void TeTheora::setBottomBorderSize(uint val) {
-	error("TODO: Implement setBottomBorderSize");
+	error("TODO: Implement TeTheora::setBottomBorderSize");
 }
 
 uint TeTheora::bottomBorderSize() {
-	error("TODO: Implement bottomBorderSize");
+	error("TODO: Implement TeTheora::bottomBorderSize");
 }
 
 void TeTheora::setTopBorderSize(uint val) {
-	error("TODO: Implement setTopBorderSize");
+	error("TODO: Implement TeTheora::setTopBorderSize");
 }
 
 uint TeTheora::topBorderSize() {
-	error("TODO: Implement topBorderSize");
+	error("TODO: Implement TeTheora::topBorderSize");
 }
 
 float TeTheora::frameRate() {
-	error("TODO: Implement frameRate");
+	return _decoder->getRate().toDouble();
 }
 
 bool TeTheora::update(unsigned long i, TeImage &imgout) {
-	error("TODO: Implement update");
+	const Graphics::Surface *frame = _decoder->decodeNextFrame();
+	// TODO: Maybe need to use i here.
+	imgout.copyFrom(*frame);
+	return true;
 }
 
 bool TeTheora::isAtEnd() {
-	error("TODO: Implement isAtEnd");
+	return _decoder->endOfVideo();
 }
 
 void TeTheora::setColorKeyActivated(bool val) {
-	error("TODO: Implement setColorKeyActivated");
+	error("TODO: Implement TeTheora::setColorKeyActivated");
 }
 
 void TeTheora::setColorKey(const TeColor &col) {
-	error("TODO: Implement setColorKey");
+	error("TODO: Implement TeTheora::setColorKey");
 }
 
 void TeTheora::setColorKeyTolerence(float val) {
-	error("TODO: Implement setColorKeyTolerence");
+	error("TODO: Implement TeTheora::setColorKeyTolerence");
 }
-
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

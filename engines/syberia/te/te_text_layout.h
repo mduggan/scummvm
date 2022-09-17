@@ -23,6 +23,7 @@
 #define SYBERIA_TE_TE_TEXT_LAYOUT_H
 
 #include "syberia/te/te_layout.h"
+#include "syberia/te/te_text_base2.h"
 
 namespace Syberia {
 
@@ -31,9 +32,16 @@ public:
 	TeTextLayout();
 
 	void setText(const Common::String &val);
-	// TODO add public members
+	void setInterLine(float val);
+	void setWrapMode(int mode);
+	void setTextSizeType(int type);
+	void setTextSizeProportionalToWidth(int val);
 
 private:
+	int _textSizeType;
+	int _textSizeProportionalToWidth;
+	
+	TeTextBase2 _base;
 	// TODO add private members
 
 };

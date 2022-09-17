@@ -91,6 +91,9 @@ public:
 	TeMusic &music() { return _music; }
 	Credits &credits() { return _credits; }
 	TeVisualFade &visualFade() { return _visFade; }
+	TeSpriteLayout &appSpriteLayout() { return _appSpriteLayout; }
+	TeSpriteLayout &mouseCursorLayout() { return _mouseCursorLayout; }
+	const Common::String getVersionString() const { return _versionString; }
 
 	bool _finishedGame;
 	bool _finishedFremium;
@@ -109,7 +112,12 @@ private:
 	TeSpriteLayout _autoSaveIcon1;
 	TeSpriteLayout _autoSaveIcon2;
 
-
+	Common::String _applicationTitle;
+	Common::String _versionString;
+	Common::String _firstWarpPath;
+	Common::String _firstZone;
+	Common::String _firstScene;
+	
 	TeCurveAnim2<Te3DObject2, TeColor> _autoSaveIconAnim1;
 	TeCurveAnim2<Te3DObject2, TeColor> _autoSaveIconAnim2;
 

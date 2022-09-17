@@ -25,12 +25,16 @@
 #include "common/str.h"
 #include "syberia/te/te_i_codec.h"
 
+namespace Video {
+class TheoraDecoder;
+}
+
 namespace Syberia {
 
 class TeTheora : public TeICodec {
 public:
 	TeTheora();
-	virtual ~TeTheora() {}
+	virtual ~TeTheora();
 
 	virtual bool load(const Common::Path &path) override;
 	virtual bool load(Common::SeekableReadStream &stream) override;
@@ -56,6 +60,8 @@ public:
 	static bool matchExtension(const Common::String &extn);
 	// TODO add public members
 
+private:
+	Video::TheoraDecoder *_decoder;
 
 };
 

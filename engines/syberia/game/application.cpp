@@ -45,6 +45,20 @@ Application::Application() : _finishedGame(false), _finishedFremium(false), _cap
 	core->fileFlagSystemSetFlag("platform", "MacOSX");
 	core->fileFlagSystemSetFlag("part", "Full");
 	core->fileFlagSystemSetFlag("distributor", "DefaultDistributor");
+	
+	TeLuaGUI tempGui;
+	tempGui.load("texts/Part.lua");
+	_applicationTitle = tempGui.value("applicationTitle").toString();
+	_versionString = tempGui.value("versionString").toString();
+	_firstWarpPath = tempGui.value("firstWarpPath").toString();
+	_firstZone = tempGui.value("firstZone").toString();
+	_firstScene = tempGui.value("firstScene").toString();
+	
+	// TODO: Configure sound manager here?
+	// TODO: Configure freemium things here?
+	// TODO: Start some timer here?
+	
+	loadOptions("options.xml");
 }
 
 void Application::create() {
@@ -427,7 +441,9 @@ void Application::lockCursorFromAction(bool lock) {
 }
 
 void Application::loadOptions(const Common::String &fname) {
-	error("TODO: Implement me.");
+	// TODO: Maybe load options here - original uses an
+	// xml file but we would want confman.
+	warning("TODO: Implement Application::loadOptions");
 }
 
 void Application::saveOptions(const Common::String &fname) {

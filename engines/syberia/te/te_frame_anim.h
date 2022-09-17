@@ -39,6 +39,9 @@ public:
 	float _frameRate;
 	int _loopCount;
 	bool _reversed;
+	int _lastFrameShown;
+	int _minFrame;
+	int _numFramesToShow;
 
 private:
 	TeSignal0Param _frameChangedSignal;

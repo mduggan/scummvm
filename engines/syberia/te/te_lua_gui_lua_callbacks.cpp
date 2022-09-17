@@ -154,6 +154,39 @@ static TeVector3f32 TeLuaToTeVector3f32(lua_State *L, int index,TeVector3f32 def
 	return retval;
 }
 
+
+static bool loadCommonLayoutItems(lua_State *L, const char *s, TeLayout *layout) {
+	if (!strcmp(s, "name")) {
+		layout->setName(TeLuaToTeString(L, -1));
+	} else if (!strcmp(s, "sizeType")) {
+		layout->setSizeType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
+	} else if (!strcmp(s, "size")) {
+		TeVector3f32 lastSize = layout->userSize();
+		TeVector3f32 size = TeLuaToTeVector3f32(L, -1, lastSize);
+		layout->setSize(size);
+	} else if (!strcmp(s, "ratio")) {
+		layout->setRatio(TeLuaToF32(L, -1));
+	} else if (!strcmp(s, "ratioMode")) {
+		layout->setRatioMode(static_cast<TeILayout::RatioMode>(TeLuaToS32(L, -1)));
+	} else if (!strcmp(s, "safeAreaRatio")) {
+		layout->setSafeAreaRatio(TeLuaToF32(L, -1));
+	} else if (!strcmp(s, "anchor")) {
+		TeVector3f32 lastAnchor = layout->anchor();
+		TeVector3f32 anchor = TeLuaToTeVector3f32(L, -1, lastAnchor);
+		layout->setAnchor(anchor);
+	} else if (!strcmp(s, "positionType")) {
+		layout->setPositionType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
+	} else if (!strcmp(s, "position")) {
+		TeVector3f32 lastPos = layout->userPosition();
+		TeVector3f32 pos = TeLuaToTeVector3f32(L, -1, lastPos);
+		layout->setPosition(pos);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+
 // TODO: Fix this.
 static bool _g_bWidescreen = false;
 
@@ -169,30 +202,8 @@ int layoutBindings(lua_State *L) {
 		int type = lua_type(L, -2);
 		if (type == LUA_TSTRING) {
 			const char *s = lua_tolstring(L, -2, nullptr);
-			if (!strcmp(s, "name")) {
-				layout->setName(TeLuaToTeString(L, -1));
-			} else if (!strcmp(s, "sizeType")) {
-				layout->setSizeType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "size")) {
-				TeVector3f32 lastSize = layout->userSize();
-				TeVector3f32 size = TeLuaToTeVector3f32(L, -1, lastSize);
-				layout->setSize(size);
-			} else if (!strcmp(s, "ratio")) {
-				layout->setRatio(TeLuaToF32(L, -1));
-			} else if (!strcmp(s, "ratioMode")) {
-				layout->setRatioMode(static_cast<TeILayout::RatioMode>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "safeAreaRatio")) {
-				layout->setSafeAreaRatio(TeLuaToF32(L, -1));
-			} else if (!strcmp(s, "anchor")) {
-				TeVector3f32 lastAnchor = layout->anchor();
-				TeVector3f32 anchor = TeLuaToTeVector3f32(L, -1, lastAnchor);
-				layout->setAnchor(anchor);
-			} else if (!strcmp(s, "positionType")) {
-				layout->setPositionType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "position")) {
-				TeVector3f32 lastPos = layout->userPosition();
-				TeVector3f32 pos = TeLuaToTeVector3f32(L, -1, lastPos);
-				layout->setPosition(pos);
+			if (loadCommonLayoutItems(L, s, layout)) {
+				// do nothing.
 			} else if (!strcmp(s, "visible")) {
 				layout->setVisible(TeLuaToBool(L, -1));
 			} else if (!strcmp(s, "color")) {
@@ -231,7 +242,12 @@ int layoutBindings(lua_State *L) {
 }
 
 int listLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("listLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement listLayoutBindings.");
 }
 
 int spriteLayoutBindings(lua_State *L) {
@@ -255,30 +271,8 @@ int spriteLayoutBindings(lua_State *L) {
 		int type = lua_type(L, -2);
 		if (type == LUA_TSTRING) {
 			const char *s = lua_tolstring(L, -2, 0);
-			if (!strcmp(s, "name")) {
-				layout->setName(TeLuaToTeString(L, -1));
-			} else if (!strcmp(s, "sizeType")) {
-				layout->setSizeType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "size")) {
-				TeVector3f32 lastSize = layout->userSize();
-				TeVector3f32 size = TeLuaToTeVector3f32(L, -1, lastSize);
-				layout->setSize(size);
-			} else if (!strcmp(s, "ratio")) {
-				layout->setRatio(TeLuaToF32(L, -1));
-			} else if (!strcmp(s, "ratioMode")) {
-				layout->setRatioMode(static_cast<TeILayout::RatioMode>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "safeAreaRatio")) {
-				layout->setSafeAreaRatio(TeLuaToF32(L, -1));
-			} else if (!strcmp(s, "anchor")) {
-				TeVector3f32 lastAnchor = layout->anchor();
-				TeVector3f32 anchor = TeLuaToTeVector3f32(L, -1, lastAnchor);
-				layout->setAnchor(anchor);
-			} else if (!strcmp(s, "positionType")) {
-				layout->setPositionType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "position")) {
-				TeVector3f32 lastPos = layout->userPosition();
-				TeVector3f32 pos = TeLuaToTeVector3f32(L, -1, lastPos);
-				layout->setPosition(pos);
+			if (loadCommonLayoutItems(L, s, layout)) {
+				// do nothing.
 			} else if (!strcmp(s, "image")) {
 				Common::String imgPath = TeLuaToTeString(L, -1);
 				if (imgPath.substr(0, 2) == "./") {
@@ -392,30 +386,8 @@ int buttonLayoutBindings(lua_State *L) {
 		int type = lua_type(L, -2);
 		if (type == LUA_TSTRING) {
 			const char *s = lua_tolstring(L, -2, nullptr);
-			if (!strcmp(s, "name")) {
-				layout->setName(TeLuaToTeString(L, -1));
-			} else if (!strcmp(s, "sizeType")) {
-				layout->setSizeType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "size")) {
-				TeVector3f32 lastSize = layout->userSize();
-				TeVector3f32 size = TeLuaToTeVector3f32(L, -1, lastSize);
-				layout->setSize(size);
-			} else if (!strcmp(s, "ratio")) {
-				layout->setRatio(TeLuaToF32(L, -1));
-			} else if (!strcmp(s, "ratioMode")) {
-				layout->setRatioMode(static_cast<TeILayout::RatioMode>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "safeAreaRatio")) {
-				layout->setSafeAreaRatio(TeLuaToF32(L, -1));
-			} else if (!strcmp(s, "anchor")) {
-				TeVector3f32 lastAnchor = layout->anchor();
-				TeVector3f32 anchor = TeLuaToTeVector3f32(L, -1, lastAnchor);
-				layout->setAnchor(anchor);
-			} else if (!strcmp(s, "positionType")) {
-				layout->setPositionType(static_cast<TeILayout::CoordinatesType>(TeLuaToS32(L, -1)));
-			} else if (!strcmp(s, "position")) {
-				TeVector3f32 lastPos = layout->userPosition();
-				TeVector3f32 pos = TeLuaToTeVector3f32(L, -1, lastPos);
-				layout->setPosition(pos);
+			if (loadCommonLayoutItems(L, s, layout)) {
+				// do nothing.
 			} else if (!strcmp(s, "upLayout")) {
 				layout->setUpLayout(TeLuaTo<TeLayout*>(L, -1));
 			} else if (!strcmp(s, "downLayout")) {
@@ -478,39 +450,117 @@ int buttonLayoutBindings(lua_State *L) {
 }
 
 int checkboxLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("checkboxLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement checkboxLayoutBindings.");
 }
 
 int layoutPositionLinearAnimationBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("layoutPositionLinearAnimationBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement layoutPositionLinearAnimationBindings.");
 }
 
 int layoutAnchorLinearAnimationBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("layoutAnchorLinearAnimationBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement layoutAnchorLinearAnimationBindings.");
 }
 
 int textLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("textLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	TeTextLayout *layout = new TeTextLayout();
+	lua_pushnil(L);
+	while (lua_next(L, -2) != 0) {
+		int type = lua_type(L, -2);
+		if (type == LUA_TSTRING) {
+			const char *s = lua_tolstring(L, -2, nullptr);
+			if (loadCommonLayoutItems(L, s, layout)) {
+				// do nothing.
+			} else if (!strcmp(s, "text")) {
+				layout->setText(TeLuaToTeString(L, -1));
+			} else if (!strcmp(s, "interLine") || !strcmp(s, "interline")) {
+				layout->setInterLine(TeLuaToF32(L, -1));
+			} else if (!strcmp(s, "visible")) {
+				layout->setVisible(TeLuaToBool(L, -1));
+			} else if (!strcmp(s, "color")) {
+				layout->setColor(TeLuaToTeColor(L, -1));
+			} else if (!strcmp(s, "wrapMode")) {
+				layout->setWrapMode(TeLuaToS32(L, -1));
+			} else if (!strcmp(s, "textSizeType")) {
+				layout->setTextSizeType(TeLuaToS32(L, -1));
+			} else if (!strcmp(s, "textSizeProportionalToWidth")) {
+				layout->setTextSizeProportionalToWidth(TeLuaToS32(L, -1));
+			} else if (!strcmp(s, "consoleNoStretch")) {
+				warning("TODO: Handle _g_bWidescreen");
+				if (_g_bWidescreen) {
+					layout->setScale(TeVector3f32(0.7500001,1.0,1.0));
+				}
+			} else {
+				warning("[TeLuaGUI.textLayoutBindings] Unreconized attribute : %s", s);
+			}
+		}
+	}
+
+	error("TODO: Implement textLayoutBindings.");
 }
 
 int clipLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("clipLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement clipLayoutBindings.");
 }
 
 int colorLinearAnimationBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("colorLinearAnimationBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement colorLinearAnimationBindings.");
 }
 
 int rotationLinearAnimationBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("rotationLinearAnimationBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement rotationLinearAnimationBindings.");
 }
 
 int scrollingLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("scrollingLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement scrollingLayoutBindings.");
 }
 
 int extendedTextLayoutBindings(lua_State *L) {
-	error("TODO: Implement me.");
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		warning("extendedTextLayoutBindings:: the lua value is not a table\n");
+		return 0;
+	}
+
+	error("TODO: Implement extendedTextLayoutBindings.");
 }
 
 

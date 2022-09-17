@@ -132,7 +132,26 @@ bool TeTiledSurface::load(const TeIntrusivePtr<Te3DTexture> &texture) {
 }
 
 bool TeTiledSurface::onFrameAnimCurrentFrameChanged() {
-   error("TODO: Implement me TeTiledSurface::onFrameAnimCurrentFrameChanged");
+	if (!_codec)
+		return false;
+	
+	if (_imgFormat == TeImage::INVALID) {
+		warning("TeTiledSurface::load: Wrong image format on file %s", _path.toString().c_str());
+		return false;
+	}
+	
+	TeImage img;
+	TeVector2s32 vidSize(_codec->width(), _codec->height());
+	TeVector2s32 optimisedSize = Te3DTexture::optimisedSize(vidSize);
+	
+	int bufysize = MIN(vidSize._y + 4, optimisedSize._y);
+	int bufxsize = MIN(vidSize._x + 4, optimisedSize._x);
+	
+	Common::SharedPtr<TePalette> nullPal;
+	img.create(vidSize._x, vidSize._y, nullPal, _imgFormat, bufxsize, bufysize);
+	if (!_codec->update(_frameAnim._lastFrameShown, img))
+		update(img);
+	return false;
 }
 
 void TeTiledSurface::pause() {
