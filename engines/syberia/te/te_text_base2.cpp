@@ -19,54 +19,13 @@
  *
  */
 
-#ifndef SYBERIA_TE_TE_ANIMATION_H
-#define SYBERIA_TE_TE_ANIMATION_H
-
-#include "common/array.h"
-#include "engines/syberia/te/te_timer.h"
-#include "engines/syberia/te/te_signal.h"
+#include "syberia/te/te_text_base2.h"
 
 namespace Syberia {
 
-class TeAnimation {
-public:
-	TeAnimation();
-	virtual ~TeAnimation() {};
+TeTextBase2::TeTextBase2() {
+}
 
-	void cont();
-	void pause();
-	void stop();
-	void reset();
-	void play() {
-		cont();
-	}
-	virtual void update(double time) = 0;
-	
-	void seekToStart();
-	//void staticDestroy();
-
-	static void pauseAll();
-	static void resumeAll();
-	static void updateAll();
-
-	
-	TeSignal0Param &onStop() { return _onStopSignal; }
-	TeSignal0Param &onFinished() { return _onFinishedSignal; }
-
-	TeTimer _runTimer;
-	int _repeatCount;
-
-protected:
-	TeSignal0Param _onStopSignal;
-	TeSignal0Param _onFinishedSignal;
-
-private:
-	void removeThisFromAnimations();
-
-	static Common::Array<TeAnimation *> _animations;
-
-};
+// TODO: Add more functions here.
 
 } // end namespace Syberia
-
-#endif // SYBERIA_TE_TE_ANIMATION_H

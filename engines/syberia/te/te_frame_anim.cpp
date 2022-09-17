@@ -19,15 +19,44 @@
  *
  */
 
+#include "common/util.h"
 #include "syberia/te/te_frame_anim.h"
 
 namespace Syberia {
 
-TeFrameAnim::TeFrameAnim() : _loopCount(-1), _nbFrames(1), _frameRate(25.0), _reversed(false) {
+TeFrameAnim::TeFrameAnim() : _nbFrames(0), _frameRate(25.0), _reversed(false), _minFrame(0), _numFramesToShow(-1) {
 }
 
 void TeFrameAnim::update(double amount) {
-	error("TODO: Implement TeFrameAnim::update");
+	int minFrame = MIN((long)_minFrame, _nbFrames);
+	int maxFrame = MIN((long)minFrame + _numFramesToShow, _nbFrames);
+	double frameNo = _frameRate * amount / 1000.0;
+
+	int loopsDone;
+	int framesToPlay = maxFrame - minFrame;
+	
+	int frameToShow;
+	if (framesToPlay == 0) {
+		frameToShow = 0;
+		loopsDone = -1;
+	} else {
+		loopsDone = (int)((int)frameNo / framesToPlay);
+		if (!_reversed) {
+			frameToShow = (int)frameNo % framesToPlay + minFrame;
+		} else {
+			frameToShow = (maxFrame - 1) - (int)frameNo % framesToPlay;
+		}
+	}
+	if (_loopCount == -1 || loopsDone < _loopCount) {
+		if (minFrame == _lastFrameShown)
+			return;
+
+		_lastFrameShown = minFrame;
+		_frameChangedSignal.call();
+	} else {
+		stop();
+		_onFinishedSignal.call();
+	}
 }
 
 // TODO: Add more functions here.

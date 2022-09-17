@@ -19,54 +19,39 @@
  *
  */
 
-#ifndef SYBERIA_TE_TE_ANIMATION_H
-#define SYBERIA_TE_TE_ANIMATION_H
+#ifndef SYBERIA_TE_TE_TEXT_BASE2_H
+#define SYBERIA_TE_TE_TEXT_BASE2_H
 
-#include "common/array.h"
-#include "engines/syberia/te/te_timer.h"
-#include "engines/syberia/te/te_signal.h"
+#include "syberia/te/te_color.h"
+#include "syberia/te/te_font3.h"
+#include "syberia/te/te_intrusive_ptr.h"
 
 namespace Syberia {
 
-class TeAnimation {
+class TeTextBase2 {
 public:
-	TeAnimation();
-	virtual ~TeAnimation() {};
-
-	void cont();
-	void pause();
-	void stop();
-	void reset();
-	void play() {
-		cont();
-	}
-	virtual void update(double time) = 0;
+	TeTextBase2();
 	
-	void seekToStart();
-	//void staticDestroy();
+	class Line {};
 
-	static void pauseAll();
-	static void resumeAll();
-	static void updateAll();
-
+	void build();
+	void clear();
+	void clearStyles();
+	void clearText();
 	
-	TeSignal0Param &onStop() { return _onStopSignal; }
-	TeSignal0Param &onFinished() { return _onFinishedSignal; }
-
-	TeTimer _runTimer;
-	int _repeatCount;
-
-protected:
-	TeSignal0Param _onStopSignal;
-	TeSignal0Param _onFinishedSignal;
+	bool computeLine(unsigned int i, Line &line);
+	void computeNbSpaces(Line &line, unsigned int x, unsigned int y);
+	TeColor currentColor(unsigned int i);
+	TeIntrusivePtr<TeFont3> currentFont(unsigned int i);
+	void draw();
+	void drawEmptyChar(unsigned int i);
+	// TODO add public members
 
 private:
-	void removeThisFromAnimations();
-
-	static Common::Array<TeAnimation *> _animations;
+	// TODO add private members
 
 };
 
 } // end namespace Syberia
 
-#endif // SYBERIA_TE_TE_ANIMATION_H
+#endif // SYBERIA_TE_TE_TEXT_BASE2_H

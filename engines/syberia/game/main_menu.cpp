@@ -19,19 +19,194 @@
  *
  */
 
+#include "common/system.h"
+#include "common/events.h"
+
+#include "syberia/syberia.h"
 #include "syberia/game/main_menu.h"
+#include "syberia/game/application.h"
+
+#include "syberia/te/te_button_layout.h"
+#include "syberia/te/te_sprite_layout.h"
+#include "syberia/te/te_text_layout.h"
+#include "syberia/te/te_music.h"
+
 
 namespace Syberia {
 
-MainMenu::MainMenu() {
+MainMenu::MainMenu() : _entered(false) {
+	onNewGameConfirmedSignal.add(this, &MainMenu::onNewGameConfirmed);
+	onActivatedTutoSignal.add(this, &MainMenu::onActivedTuto);
+	onDisabledTutoSignal.add(this, &MainMenu::onDisabledTuto);
+	onQuitSignal.add(this, &MainMenu::onQuit);
+	onFacebookLoggedSignal.add(this, &MainMenu::onFacebookLogged);
 }
 
 void MainMenu::enter() {
-	error("TODO: Implement MainMenu::enter.");
+	Application *app = g_engine->getApplication();
+	TeSpriteLayout &appSpriteLayout = app->appSpriteLayout();
+	appSpriteLayout.setVisible(true);
+	if (appSpriteLayout._tiledSurfacePtr->_frameAnim._runTimer._stopped) {
+		// Note: We have to add "PC-MacOSX-Xbox360-PS3" here.. maybe need customized searchman??
+		appSpriteLayout.load("menus/PC-MacOSX-Xbox360-PS3/menu.ogv");
+		appSpriteLayout._tiledSurfacePtr->_frameAnim._loopCount = -1;
+		appSpriteLayout._tiledSurfacePtr->play();
+	}
+	app->captureFade();
+	
+	_entered = true;
+	// Note: We have to add "PC-MacOSX" here.. maybe need customized searchman??
+	load("menus/mainMenu/PC-MacOSX/mainMenu.lua");
+	
+	TeLayout *menuLayout = layout("menu");
+	appSpriteLayout.addChild(menuLayout);
+	
+	app->mouseCursorLayout().setVisible(true);
+	app->mouseCursorLayout().load("pictures/cursor.png");
+	
+	TeMusic &music = app->music();
+	if (music.isPlaying()) {
+		// TODO: something here??
+	}
+	music.load(value("musicPath").toString());
+	music.play();
+	music.volume(1.0f);
+	
+	TeButtonLayout *newGameButton = buttonLayout("newGameButton");
+	if (newGameButton)
+		newGameButton->onMouseClickValidated().add(this, &MainMenu::onNewGameButtonValidated);
+
+	TeButtonLayout *continueGameButton = buttonLayout("continueGameButton");
+	if (continueGameButton) {
+		continueGameButton->onMouseClickValidated().add(this, &MainMenu::onContinueGameButtonValidated);
+		continueGameButton->setEnable(false);
+		warning("TODO: Set continue game button enabled state based on save game manager");
+	}
+
+	TeButtonLayout *loadGameButton = buttonLayout("loadGameButton");
+	if (loadGameButton)
+		loadGameButton->onMouseClickValidated().add(this, &MainMenu::onLoadGameButtonValidated);
+
+	TeButtonLayout *optionsButton = buttonLayout("optionsButton");
+	if (optionsButton)
+		optionsButton->onMouseClickValidated().add(this, &MainMenu::onOptionsButtonValidated);
+
+	TeButtonLayout *galleryButton = buttonLayout("galleryButton");
+	if (galleryButton)
+		galleryButton->onMouseClickValidated().add(this, &MainMenu::onGalleryButtonValidated);
+
+	TeButtonLayout *quitButton = buttonLayout("quitButton");
+	if (quitButton)
+		quitButton->onMouseClickValidated().add(this, &MainMenu::onQuitButtonValidated);
+
+	// TODO: confirmation (menus/confirm/confirmNotSound.lua)
+	// if TeSoundManager is not valid.
+
+	TeLayout *panel = layout("panel");
+	
+	if (panel) {
+		const Common::String panelTypoVal = value("panelTypo").toString();
+		for (auto *child : panel->childList()) {
+			TeTextLayout *childText = dynamic_cast<TeTextLayout *>(child);
+			if (!childText)
+				continue;
+			childText->setName(panelTypoVal + childText->name());
+		}
+	}
+	setCenterButtonsVisibility(true);
+	TeTextLayout *versionNum = textLayout("versionNumber");
+	if (versionNum) {
+		const Common::String versionSectionStr("<section style=\"left\" /><color r=\"255\" g=\"255\" b=\"255\"/><font file=\"Common/Fonts/arial.ttf\" size=\"12\" />");
+		versionNum->setText(versionSectionStr + app->getVersionString());
+	}
 }
 
 void MainMenu::leave() {
 	error("TODO: Implement MainMenu::leave.");
 }
+
+bool MainMenu::deleteFile(const Common::String &name) {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onActivedTuto() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onBFGRateIt2ButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onBFGRateItButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onBFGRateItQuitButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onBFGUnlockGameButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onContinueGameButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onDisabledTuto() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onEnterGameRotateAnimFinished() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onGalleryButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onHowToButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onLoadGameButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onNewGameButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onNewGameConfirmed() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onOptionsButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onQuit() {
+	g_engine->setWantToQuit();
+	leave();
+	return false;
+}
+
+bool MainMenu::onQuitButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::onUnlockGameButtonValidated() {
+	error("TODO: Implement MainMenu function");
+}
+
+void MainMenu::refresh() {
+	error("TODO: Implement MainMenu function");
+}
+
+bool MainMenu::setCenterButtonsVisibility(bool visible) {
+	error("TODO: Implement MainMenu function");
+}
+
+
 
 } // end namespace Syberia

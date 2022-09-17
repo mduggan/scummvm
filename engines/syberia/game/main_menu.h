@@ -24,6 +24,7 @@
 
 #include "common/str.h"
 #include "syberia/te/te_lua_gui.h"
+#include "syberia/te/te_signal.h"
 
 namespace Syberia {
 
@@ -65,6 +66,13 @@ public:
 
 private:
 	// TODO add private members
+	TeSignal0Param onNewGameConfirmedSignal;
+	TeSignal0Param onActivatedTutoSignal;
+	TeSignal0Param onDisabledTutoSignal;
+	TeSignal0Param onQuitSignal;
+	TeSignal0Param onFacebookLoggedSignal;
+	
+	bool _entered;
 
 };
 

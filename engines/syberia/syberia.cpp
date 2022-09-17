@@ -46,7 +46,7 @@ SyberiaEngine *g_engine;
 SyberiaEngine::SyberiaEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Syberia"), _resourceManager(nullptr),
 	_core(nullptr),	_application(nullptr), _game(nullptr), _renderer(nullptr),
-	_soundManager(nullptr) {
+	_soundManager(nullptr), _wantToQuit(false) {
 	g_engine = this;
 }
 
@@ -103,7 +103,7 @@ Common::String SyberiaEngine::getGameId() const {
 
 void SyberiaEngine::configureSearchPaths() {
 	const Common::FSNode gameDataDir(ConfMan.get("path"));
-	SearchMan.addSubDirectoryMatching(gameDataDir, "Resources", 0, 3);
+	SearchMan.addSubDirectoryMatching(gameDataDir, "Resources", 0, 4);
 }
 
 int SyberiaEngine::getDefaultScreenWidth() const {
@@ -136,7 +136,7 @@ Common::Error SyberiaEngine::run() {
 	// Simple event handling loop
 	Common::Event e;
 
-	while (!shouldQuit()) {
+	while (!shouldQuit() && !_wantToQuit) {
 		while (g_system->getEventManager()->pollEvent(e)) {
 			if (e.type == Common::EVENT_MOUSEMOVE)
 				_application->onMousePositionChanged(e);
