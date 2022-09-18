@@ -22,9 +22,14 @@
 #ifndef SYBERIA_TE_TE_TEXT_BASE2_H
 #define SYBERIA_TE_TE_TEXT_BASE2_H
 
+#include "common/str.h"
+#include "common/hashmap.h"
+
 #include "syberia/te/te_color.h"
 #include "syberia/te/te_font3.h"
 #include "syberia/te/te_intrusive_ptr.h"
+#include "syberia/te/te_mesh.h"
+#include "syberia/te/te_vector2s32.h"
 
 namespace Syberia {
 
@@ -33,6 +38,12 @@ public:
 	TeTextBase2();
 	
 	class Line {};
+	enum AlignStyle {
+		AlignStyle0
+	};
+	enum WrapMode {
+		WrapMode0
+	};
 
 	void build();
 	void clear();
@@ -45,11 +56,46 @@ public:
 	TeIntrusivePtr<TeFont3> currentFont(unsigned int i);
 	void draw();
 	void drawEmptyChar(unsigned int i);
-	// TODO add public members
+	void drawLine(unsigned int i, unsigned int j, const TeVector3f32 &pt, Line &line);
+	unsigned int endOfWord(unsigned int i);
+	void insertNewLine(unsigned int offset);
+	bool isASpace(unsigned int offset) const;
+	int newLines(unsigned int offset);
+	int nextNonSpaceChar(unsigned int start);
+	void setAlignStyle(AlignStyle style);
+	void setColor(unsigned int i, const TeColor &color);
+	void setFont(unsigned int i, const TeIntrusivePtr<TeFont3> &newfont);
+	void setFontSize(unsigned long size);
+	void setGlobalColor(const TeColor &color);
+	void setInterLine(float val);
+	void setRect(const TeVector2s32 &rect);
+	void setText(const Common::String &newText);
+	void setWrapMode(WrapMode &mode);
+	TeVector2s32 size();
+	void strikethrough(bool val);
+	bool strikethrough() const { return _strikethrough; }
+	const Common::String &text() const { return _text; }
+	WrapMode wrapMode() const { return _wrapMode; }
+	const TeVector2s32 &size() const { return _size; }
+	
 
 private:
-	// TODO add private members
-
+	AlignStyle _alignStyle;
+	WrapMode _wrapMode;
+	unsigned long _fontSize;
+	bool _valueWasSet;
+	TeColor _globalColor;
+	float _interLine;
+	TeVector2s32 _drawRect;
+	TeVector2s32 _size;
+	Common::String _text;
+	bool _strikethrough;
+	
+	TeMesh _mesh;
+	
+	Common::Array<unsigned int> _lineBreaks;
+	Common::HashMap<unsigned int, TeColor> _colors;
+	Common::HashMap<unsigned int, TeFont3> _fonts;
 };
 
 } // end namespace Syberia

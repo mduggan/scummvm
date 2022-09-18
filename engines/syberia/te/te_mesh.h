@@ -78,9 +78,9 @@ public:
 	void matrixIndex(uint num, unsigned short val);
 	unsigned short matrixIndex(uint num) const { return _matricies[num]; }
 	TeVector3f32 normal(uint idx) const;
-	
+
 	TeMesh &operator=(const TeMesh &other);
-	
+
 	void optimizeVerticies();
 	void resizeUpdatedTables(unsigned long newSize);
 
@@ -92,17 +92,17 @@ public:
 	void setTextureUV(unsigned int idx, const TeVector2f32 &val);
 	void setVertex(unsigned int idx, const TeVector3f32 &val);
 	void sortFaces();
-	
+
 	TeVector2f32 textureUV(uint idx) const { return _uvs[idx]; }
 	TeVector3f32 vertex(uint idx) const;
-	
-	
+
 	uint numIndexes() const { return _indexes.size(); }
 	uint numVerticies() const { return _verticies.size(); }
 	bool shouldDrawMaybe() const { return _shouldDrawMaybe; }
 	uint gltexenvMode() const { return _gltexEnvMode; }
-	
+
 	void setShouldDrawMaybe(bool val) { _shouldDrawMaybe = val; }
+	void setglTexEnv(unsigned int val) { _gltexEnvMode = val; }
 
 private:
 	Common::Array<unsigned char> _materialIndexes;
@@ -116,19 +116,17 @@ private:
 	Common::Array<unsigned short> _matricies;
 	Common::Array<TeColor> _colors;
 	Common::Array<TeMaterial> _materials;
-	
+
 	Mode _mode;
-	
+
 	bool _matrixForced;
 	TeMatrix4x4 _forceMatrix;
 	bool _hasAlpha;
 	uint _initialMaterialIndexCount;
 	bool _drawWires;
 	bool _shouldDrawMaybe;
-	
-	uint _gltexEnvMode;
 
-	// TODO add private members
+	unsigned int _gltexEnvMode;
 
 };
 

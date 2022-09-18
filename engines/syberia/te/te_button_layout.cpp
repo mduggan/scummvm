@@ -35,8 +35,9 @@ namespace Syberia {
 }
 
 TeButtonLayout::TeButtonLayout() :
-_currentState(BUTTON_STATE_DISABLED), _clickPassThrough(false), _validationSoundVolume(1.0),
-_someClickFlag(false) {
+_currentState(BUTTON_STATE_UP), _clickPassThrough(false), _validationSoundVolume(1.0),
+_someClickFlag(false), _doubleValidationProtectionEnabled(true), _upLayout(nullptr),
+_downLayout(nullptr), _rolloverLayout(nullptr) {
 	_onMousePositionChangedMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChangedMaxPriority, FLT_MAX));
 
 	_onMousePositionChangedCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChanged));
@@ -45,6 +46,8 @@ _someClickFlag(false) {
 	_onMouseLeftUpCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftUp));
 
 	setEditionColor(TeColor(128, 128, 128, 255));
+	if (getDoubleValidationProtectionTimer()->_stopped)
+		getDoubleValidationProtectionTimer()->start();
 }
 
 bool TeButtonLayout::isMouseIn(const TeVector2s32 &mouseloc) {
@@ -71,7 +74,7 @@ bool TeButtonLayout::onMousePositionChanged(uint flags) {
 
 void TeButtonLayout::reset() {
 	_intArr.clear();
-	State newState = (_currentState == BUTTON_STATE_UP ? BUTTON_STATE_UP : BUTTON_STATE_DISABLED);
+	State newState = (_currentState == BUTTON_STATE_DISABLED ? BUTTON_STATE_DISABLED : BUTTON_STATE_UP);
 	setState(newState);
 }
 
@@ -84,31 +87,81 @@ void TeButtonLayout::resetTimeFromLastValidation() {
 }
 
 long TeButtonLayout::timeFromLastValidation() {
-	error("TODO: Implement me.");
+	error("TODO: Implement TeButtonLayout::timeFromLastValidation.");
 }
 
 void TeButtonLayout::setDisabledLayout(TeLayout *disabledLayout) {
-	error("TODO: Implement me.");
+	if (_disabledLayout)
+		removeChild(_disabledLayout);
+	
+	_disabledLayout = disabledLayout;
+	if (_disabledLayout) {
+		addChild(_disabledLayout);
+		_disabledLayout->setColor(TeColor(0, 0, 0, 0));
+	}
+	
+	setState(_currentState);
 }
 
 void TeButtonLayout::setHitZone(TeLayout *hitZoneLayout) {
-	error("TODO: Implement me.");
+	error("TODO: Implement TeButtonLayout::setHitZone.");
 }
 
 void TeButtonLayout::setDownLayout(TeLayout *downLayout) {
-	error("TODO: Implement me.");
+	if (_downLayout)
+		removeChild(_downLayout);
+	
+	if (downLayout)
+		addChild(downLayout);
+	_downLayout = downLayout;
+	
+	if (sizeType() == RELATIVE_TO_PARENT &&
+			size().x() == 1.0f && size().y() == 1.0f &&
+			!_upLayout && _downLayout) {
+		setSize(_downLayout->size());
+	}
+
+	if (_downLayout)
+		_downLayout->setColor(TeColor(0, 0, 0, 0));
+	
+	setState(_currentState);
 }
 
 void TeButtonLayout::setRollOverLayout(TeLayout *rollOverLayout) {
-	error("TODO: Implement me.");
+	if (_rolloverLayout)
+		removeChild(_rolloverLayout);
+	
+	_rolloverLayout = rollOverLayout;
+	if (_rolloverLayout) {
+		addChild(_rolloverLayout);
+		_rolloverLayout->setColor(TeColor(0, 0, 0, 0));
+	}
+	
+	setState(_currentState);
 }
 
 void TeButtonLayout::setUpLayout(TeLayout *upLayout) {
-	error("TODO: Implement me.");
+	if (_upLayout)
+		removeChild(_upLayout);
+	
+	if (upLayout)
+		addChild(upLayout);
+	_upLayout = upLayout;
+
+	if (sizeType() == RELATIVE_TO_PARENT &&
+			size().x() == 1.0f && size().y() == 1.0f &&
+			!_downLayout && _upLayout) {
+		setSize(_upLayout->size());
+	}
+	
+	if (_upLayout)
+		_upLayout->setColor(TeColor(0, 0, 0, 0));
+	
+	setState(_currentState);
 }
 
 void TeButtonLayout::setDoubleValidationProtectionEnabled(bool enable) {
-	_doubleValidationProtectionEnabled = true;
+	_doubleValidationProtectionEnabled = enable;
 }
 
 void TeButtonLayout::setEnable(bool enable) {
@@ -123,22 +176,43 @@ void TeButtonLayout::setEnable(bool enable) {
 
 void TeButtonLayout::setPosition(const TeVector3f32 &pos) {
 	TeLayout::setPosition(pos);
-	if (_currentState != BUTTON_STATE_UP) {
+	if (_currentState != BUTTON_STATE_DISABLED) {
 		int somethingCount = 0;
 		if (!_intArr.empty()) {
-			error("TODO: Implement setPosition logic for not up.");
-
+			error("TODO: Implement setPosition logic for up/down state");
 		}
 		if (_someClickFlag) {
-			setState(somethingCount ? BUTTON_STATE_DISABLED : BUTTON_STATE_1);
+			setState(somethingCount ? BUTTON_STATE_DOWN : BUTTON_STATE_UP);
 		}
 	}
 }
 
 void TeButtonLayout::setState(State newState) {
-	error("TODO: Implement me.");
+	if (_currentState != newState) {
+		switch (newState) {
+		case BUTTON_STATE_UP:
+			_onButtonChangedToStateUpSignal.call();
+			break;
+		case BUTTON_STATE_DOWN:
+			_onButtonChangedToStateDownSignal.call();
+			break;
+		case BUTTON_STATE_ROLLOVER:
+			_onButtonChangedToStateRolloverSignal.call();
+			break;
+		default:
+			break;
+		}
+		_currentState = newState;
+	}
+	
+	if (_upLayout)
+		_upLayout->setVisible(_currentState == BUTTON_STATE_UP);
+	if (_downLayout)
+		_downLayout->setVisible(_currentState == BUTTON_STATE_DOWN);
+	if (_disabledLayout)
+		_disabledLayout->setVisible(_currentState == BUTTON_STATE_DISABLED);
+	if (_rolloverLayout)
+		_rolloverLayout->setVisible(_currentState == BUTTON_STATE_ROLLOVER);
 }
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

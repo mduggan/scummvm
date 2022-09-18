@@ -53,6 +53,8 @@ public:
 
 	TeMatrix4x4 &operator*=(const TeMatrix4x4 &mul);
 
+	TeVector3f32 operator*(const TeVector3f32 &mul) const;
+
 	void scale(const TeVector3f32 &vec);
 	void translate(const TeVector3f32 &vec);
 	TeVector3f32 mult3x3(const TeVector3f32 &vec) const;

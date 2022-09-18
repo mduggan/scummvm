@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/file.h"
 #include "common/textconsole.h"
 #include "common/xmlparser.h"
 
@@ -32,9 +33,24 @@ LocFile::LocFile() {
 
 void LocFile::load(const Common::Path &path) {
 	TeNameValXmlParser parser;
-	if (!parser.loadFile(path.toString()))
-		error("LocFile::load: failed to load xml.");
+	static const Common::String xmlHeader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	Common::File locFile;
+	if (!locFile.open(path))
+		error("LocFile::load: failed to open %s.", path.toString().c_str());
 	
+	int64 fileLen = locFile.size();
+	char *buf = new char[fileLen + 1];
+	buf[fileLen] = '\0';
+	locFile.read(buf, fileLen);
+	const Common::String xmlContents = xmlHeader + buf;
+	delete [] buf;
+	locFile.close();
+	if (!parser.loadBuffer((const byte *)xmlContents.c_str(), xmlContents.size()))
+		error("LocFile::load: failed to load %s.", path.toString().c_str());
+
+	if (!parser.parse())
+		error("LocFile::load: failed to parse %s.", path.toString().c_str());
+
 	_map = parser.getMap();
 }
 

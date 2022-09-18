@@ -115,8 +115,23 @@ TeVector3f32 TeMatrix4x4::mult3x3(const TeVector3f32 &vec) const {
 	return TeVector3f32(data[0] * f1 + data[4] * f2 + data[8] * f3,
 						data[1] * f1 + data[5] * f2 + data[9] * f3,
 						data[2] * f1 + data[6] * f2 + data[10] * f3);
-
 }
+
+TeVector3f32 TeMatrix4x4::operator*(const TeVector3f32 &mul) const {
+	float x = mul.x();
+	float y = mul.y();
+	float z = mul.z();
+	const float *d = getData();
+	float w = d[3] * x + d[7] * y + d[11] * z + d[15];
+	if (w == 0.0)
+	  w = 1e-09;
+
+	return TeVector3f32
+			  ((d[0] * x + d[4] * y + d[8] *  z + d[12]) / w,
+			   (d[1] * x + d[5] * y + d[9] *  z + d[13]) / w,
+			   (d[2] * x + d[6] * y + d[10] * z + d[14]) / w);
+}
+
 
 Common::String TeMatrix4x4::toString() const {
 	const float *data = getData();
