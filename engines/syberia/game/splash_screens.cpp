@@ -67,7 +67,7 @@ bool SplashScreens::onAlarm() {
 		app->_frontLayout.addChild(splash);
 
 		_timer.start();
-		_timer.setAlarmIn(1500000);
+		_timer.setAlarmIn(500000); // TODO: Revert to 1500000 after testing finished.
 	}
 
 	app->fade();

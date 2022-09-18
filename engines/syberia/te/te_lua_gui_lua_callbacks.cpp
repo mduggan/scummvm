@@ -499,7 +499,7 @@ int textLayoutBindings(lua_State *L) {
 			} else if (!strcmp(s, "color")) {
 				layout->setColor(TeLuaToTeColor(L, -1));
 			} else if (!strcmp(s, "wrapMode")) {
-				layout->setWrapMode(TeLuaToS32(L, -1));
+				layout->setWrapMode(static_cast<TeTextBase2::WrapMode>(TeLuaToS32(L, -1)));
 			} else if (!strcmp(s, "textSizeType")) {
 				layout->setTextSizeType(TeLuaToS32(L, -1));
 			} else if (!strcmp(s, "textSizeProportionalToWidth")) {
@@ -512,10 +512,27 @@ int textLayoutBindings(lua_State *L) {
 			} else {
 				warning("[TeLuaGUI.textLayoutBindings] Unreconized attribute : %s", s);
 			}
+			lua_settop(L, -2);
 		}
 	}
 
-	error("TODO: Implement textLayoutBindings.");
+	if (layout->name().empty()) {
+		layout->setName(Common::String::format("%p", (void *)layout));
+	}
+	lua_pushstring(L, "__TeLuaGUIThis");
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	
+	TeLuaGUI *gui = TeLuaTo<TeLuaGUI*>(L,-1);
+	TeLuaGUI::StringMap<TeLayout *> &layouts = gui->layouts();
+	if (!layouts.contains(layout->name())) {
+		layouts.setVal(layout->name(), layout);
+		lua_pushlightuserdata(L, static_cast<Te3DObject2*>(layout));
+		return true;
+	} else {
+		warning("textLayoutBindings:: multiple objects with name %s\n", layout->name().c_str());
+		delete layout;
+		return false;
+	}
 }
 
 int clipLayoutBindings(lua_State *L) {

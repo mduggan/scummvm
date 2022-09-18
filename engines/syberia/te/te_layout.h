@@ -96,6 +96,9 @@ public:
 	float ySize() override;
 	float zSize() override;
 
+protected:
+	bool _sizeChanged;
+
 private:
 	TeVector3f32 _anchor;
 	CoordinatesType _positionType;
@@ -106,7 +109,6 @@ private:
 
 	DrawMode _drawMode;
 	bool _autoz;
-	bool _sizeChanged;
 	bool _positionChanged;
 	bool _worldMatrixChanged;
 	bool _childChanged;

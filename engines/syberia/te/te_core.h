@@ -52,6 +52,8 @@ public:
 	const Common::String &language() const;
 	void language(const Common::String &val);
 	
+	TeILoc *loc() { return _loc; }
+	
 	bool onActivityTrackingAlarm();
 	void enableActivityTracking(bool enable);
 	void setActivityTrackingFolder(const Common::String &path);

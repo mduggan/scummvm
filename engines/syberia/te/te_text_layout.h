@@ -31,15 +31,30 @@ class TeTextLayout : public TeLayout {
 public:
 	TeTextLayout();
 
+	virtual ~TeTextLayout();
+
+	void clear() {
+		_base.clear();
+	}
+
 	void setText(const Common::String &val);
 	void setInterLine(float val);
-	void setWrapMode(int mode);
+	void setWrapMode(TeTextBase2::WrapMode mode);
 	void setTextSizeType(int type);
 	void setTextSizeProportionalToWidth(int val);
+	void strikethrough(bool val);
+	bool strikethrough() const;
+	const Common::String &text() const;
+	const TeVector2s32 &textSize() const;
+	int textSizeProportionalToWidth() const { return _textSizeProportionalToWidth; }
+	int textSizeType() const { return _textSizeType; }
+	void updateSize();
+	TeTextBase2::WrapMode wrapMode() const { return _base.wrapMode(); }
 
 private:
 	int _textSizeType;
 	int _textSizeProportionalToWidth;
+	int _baseFontSize;
 	
 	TeTextBase2 _base;
 	// TODO add private members

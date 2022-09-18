@@ -86,6 +86,7 @@ MODULE_OBJS := \
 	te/te_sprite_layout.o \
 	te/te_text_base2.o \
 	te/te_text_layout.o \
+	te/te_text_layout_xml_parser.o \
 	te/te_tga.o \
 	te/te_theora.o \
 	te/te_tiled_surface.o \

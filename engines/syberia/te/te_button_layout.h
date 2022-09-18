@@ -34,10 +34,10 @@ public:
 	TeButtonLayout();
 
 	enum State {
-		BUTTON_STATE_DISABLED = 0,
-		BUTTON_STATE_1 = 1,
-		BUTTON_STATE_UP = 2,
-		BUTTON_STATE_3 = 3
+		BUTTON_STATE_UP = 0,
+		BUTTON_STATE_DOWN = 1,
+		BUTTON_STATE_DISABLED = 2,
+		BUTTON_STATE_ROLLOVER = 3
 	};
 
 	long doubleValidationProtectionTimeoutTime() { return 500; }
@@ -102,11 +102,16 @@ private:
 	TeICallback1ParamPtr<unsigned int> _onMouseLeftDownCallback;
 	TeICallback1ParamPtr<unsigned int> _onMouseLeftUpMaxPriorityCallback;
 	TeICallback1ParamPtr<unsigned int> _onMouseLeftUpCallback;
+	
+	TeLayout *_upLayout;
+	TeLayout *_downLayout;
+	TeLayout *_rolloverLayout;
+	TeLayout *_disabledLayout;
 
 	TeSignal0Param _onMouseClickValidatedSignal;
-	TeSignal0Param _onButtonChangedToDisabledSignal;
-	TeSignal0Param _onButtonChangedToState1Signal;
-	TeSignal0Param _onButtonChangedToState3Signal;
+	TeSignal0Param _onButtonChangedToStateUpSignal;
+	TeSignal0Param _onButtonChangedToStateDownSignal;
+	TeSignal0Param _onButtonChangedToStateRolloverSignal;
 };
 
 } // end namespace Syberia
