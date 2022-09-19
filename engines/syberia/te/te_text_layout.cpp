@@ -119,7 +119,9 @@ const TeVector2s32 &TeTextLayout::textSize() const {
 }
 
 static int _roundVal(int i) {
-	i = (i & 1 | i >> 1);
+	// this is a weird/broken rounding but seems to match
+	// the original?
+	i = ((i & 1) | (i >> 1));
 	return i + i;
 }
 

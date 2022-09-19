@@ -49,7 +49,18 @@ public:
 	void removeResource(const TeIntrusivePtr<TeResource> &resource);
 	void removeResource(const TeResource *resource);
 	
-	template<class T> TeIntrusivePtr<T> getResource(const Common::Path &path) {
+	template<class T> TeIntrusivePtr<T> getResourceNoSearch(const Common::Path &path) {
+		for (TeIntrusivePtr<TeResource> &resource : this->_resources) {
+			if (resource->getAccessName() == path) {
+				return TeIntrusivePtr<T>(dynamic_cast<T *>(resource.get()));
+			}
+		}
+		TeIntrusivePtr<T> retval = new T();
+		addResource(retval.get());
+		return retval;
+	}
+
+	template<class T> TeIntrusivePtr<T> getResource(Common::Path &path) {
 		for (TeIntrusivePtr<TeResource> &resource : this->_resources) {
 			if (resource->getAccessName() == path) {
 				return TeIntrusivePtr<T>(dynamic_cast<T *>(resource.get()));
@@ -57,25 +68,11 @@ public:
 		}
 		
 		TeIntrusivePtr<T> retval;
+		// Note: original search logic here abstracted away in our version..
 		TeCore *core = g_engine->getCore();
-		if (!core->_coreNotReady) {
-			if (Common::File::exists(path)) {
-				retval = new T();
-			} else {
-				// Try path with langs
-				Common::Path parentPath = path.getParent();
-				Common::Path pathWithLang = parentPath.join(core->language()).joinInPlace(path.getLastComponent());
-				if (Common::File::exists(pathWithLang)) {
-					retval = new T();
-				}
-				Common::Path pathWithEn = parentPath.join("en").joinInPlace(path.getLastComponent());
-				if (Common::File::exists(pathWithEn)) {
-					retval = new T();
-				}
-			}
-		} else {
-			retval = new T();
-		}
+		path = core->findFile(path);
+		retval = new T();
+
 		if (retval.get())
 			addResource(retval.get());
 		return retval;

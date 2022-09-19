@@ -161,20 +161,12 @@ Common::String TeMusic::path() {
 void TeMusic::setFilePath(const Common::String &name) {
 	stop();
 	setAccessName(name);
-	const Common::Path namePath(name);
 	_rawPath = name;
-	_actualPath = namePath;
 	TeCore *core = g_engine->getCore();
-	if (!core->_coreNotReady) {
-		if (!Common::File::exists(_actualPath)) {
-			// try inserting language between path and file name
-			_actualPath = namePath.getParent().join(core->language()).joinInPlace(namePath.getLastComponent());
-			if (!Common::File::exists(_actualPath)) {
-				// try inserting "en" between path and file name
-				_actualPath = namePath.getParent().join("en").joinInPlace(namePath.getLastComponent());
-			}
-		}
-	}
+	const Common::Path namePath(name);
+	// Note: original search logic here abstracted away in our version..
+	Common::Path modPath = core->findFile(namePath);
+	_actualPath = modPath;
 }
 
 void TeMusic::update() {

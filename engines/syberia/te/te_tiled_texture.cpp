@@ -49,7 +49,7 @@ bool TeTiledTexture::load(const Common::Path &path) {
 	TeIntrusivePtr<TeImage> img;
 	TeResourceManager *resmgr = g_engine->getResourceManager();
 	if (resmgr->exists(path)) {
-		img = resmgr->getResource<TeImage>(path);
+		img = resmgr->getResourceNoSearch<TeImage>(path);
 	} else {
 		TeImage *newImg = new TeImage();
 		if (!newImg->load(path))
@@ -175,7 +175,11 @@ TeTiledTexture::Tile *TeTiledTexture::tile(const TeVector2s32 &loc) {
 }
 
 void TeTiledTexture::update(const TeImage &image) {
-	error("TODO: Implement TeTiledTexture::update");
+	//if (image.w == _totalSize._x && image.h == _totalSize._y) {
+	//	error("FIXME: Implement fast path of TeTiledTexture::update");
+	//} else {
+		load(image);
+	//}
 }
 
 

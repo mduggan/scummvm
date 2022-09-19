@@ -79,12 +79,12 @@ void Application::create() {
 	_mainWindow.setPositionType(TeILayout::ABSOLUTE);
 
 	TeResourceManager *resmgr = g_engine->getResourceManager();
-	_fontComic = resmgr->getResource<TeFont3>("Common/Fonts/ComicRelief.ttf");
-	_fontArgh = resmgr->getResource<TeFont3>("Common/Fonts/Argh.ttf");
-	_fontArial = resmgr->getResource<TeFont3>("Common/Fonts/arlia.ttf");
-	_fontChaucer = resmgr->getResource<TeFont3>("Common/Fonts/CHAUCER.TTF");
-	_fontColaborate = resmgr->getResource<TeFont3>("Common/Fonts/Colaborate-Regular.otf");
-	_fontProDisplay = resmgr->getResource<TeFont3>("Common/Fonts/ProDisplay.ttf");
+	_fontComic = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/ComicRelief.ttf");
+	_fontArgh = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/Argh.ttf");
+	_fontArial = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/arlia.ttf");
+	_fontChaucer = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/CHAUCER.TTF");
+	_fontColaborate = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/Colaborate-Regular.otf");
+	_fontProDisplay = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/ProDisplay.ttf");
 
 	// Prebuild some fonts.. cover letters, numbers, a few accented chars, and punctuation.
 	warning("TODO: Build some text with TeTextBase2 here.");
@@ -178,6 +178,7 @@ void Application::create() {
 	_frontLayout.addChild(&_appSpriteLayout);
 	_appSpriteLayout.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_appSpriteLayout.setSize(TeVector3f32(1.0f, 1.0f, 1.0f));
+	_appSpriteLayout.setVisible(false);
 
 	// Note: The games do some loading of a "version.ver" file here to add a
 	// watermark to the backLayout, but that file doesn't exist in any of the
@@ -202,11 +203,13 @@ void Application::create() {
 	_lockCursorButton.setSize(TeVector3f32(2.0f, 0.095f, 0.0f));
 	_lockCursorButton.setPositionType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorButton.setPosition(TeVector3f32(0.95f, 0.95f, 0.0f));
+	_lockCursorButton.setVisible(false);
 	_frontOrientationLayout.addChild(&_lockCursorButton);
 
 	_lockCursorFromActionButton.setName("lockCursorFromActionButton");
 	_lockCursorFromActionButton.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_lockCursorFromActionButton.setSize(TeVector3f32(2.0f, 2.0f, 0.0f));
+	_lockCursorFromActionButton.setVisible(false);
 	_frontOrientationLayout.addChild(&_lockCursorFromActionButton);
 
 	_autoSaveIcon1.setName("autosaveIcon");
@@ -214,6 +217,7 @@ void Application::create() {
 	_autoSaveIcon1.setPosition(TeVector3f32(0.2f, 0.9f, 0.0f));
 	_autoSaveIcon1.setSize(TeVector3f32(128.0f, 64.0f, 0.0f));
 	_autoSaveIcon1.load("menus/inGame/autosave_icon.png");
+	_autoSaveIcon1.setVisible(false);
 	_frontOrientationLayout.addChild(&_autoSaveIcon1);
 
 	_autoSaveIconAnim1._runTimer.pausable(false);
@@ -235,6 +239,7 @@ void Application::create() {
 	_autoSaveIcon2.setPosition(TeVector3f32(0.2f, 0.7f, 0.0f));
 	_autoSaveIcon2.setSize(TeVector3f32(68.0f, 86.0f, 0.0f));
 	_autoSaveIcon2.load("menus/inGame/NoCel.png");
+	_autoSaveIcon2.setVisible(false);
 	_frontOrientationLayout.addChild(&_autoSaveIcon2);
 
 	_autoSaveIconAnim2._runTimer.pausable(false);

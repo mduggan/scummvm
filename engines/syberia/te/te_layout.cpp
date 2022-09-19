@@ -200,7 +200,7 @@ void TeLayout::setParent(Te3DObject2 *parent) {
 			oldParent->onWorldTransformationMatrixChanged().remove(_onParentWorldTransformationMatrixChangedCallback);
 	}
 
-	warning("TODO: remove callback from main window");
+	//warning("TODO: remove callback from main window");
 	//TeMainWindow *mainWindow = g_engine->getMainWindow();
 
 	Te3DObject2::setParent(parent);
@@ -210,7 +210,7 @@ void TeLayout::setParent(Te3DObject2 *parent) {
 		if (_onParentWorldTransformationMatrixChangedCallback)
 			parent->onWorldTransformationMatrixChanged().insert(_onParentWorldTransformationMatrixChangedCallback);
 		// TODO: add a new callback to the MainWindow.
-		warning("TODO: update signal on main window");
+		//warning("TODO: update signal on main window");
 	}
 	_childOrParentChanged = true;
 	_sizeChanged = true;

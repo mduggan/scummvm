@@ -107,6 +107,7 @@ private:
 	TeLayout *_downLayout;
 	TeLayout *_rolloverLayout;
 	TeLayout *_disabledLayout;
+	TeLayout *_hitZoneLayout;
 
 	TeSignal0Param _onMouseClickValidatedSignal;
 	TeSignal0Param _onButtonChangedToStateUpSignal;

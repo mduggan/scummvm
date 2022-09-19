@@ -42,6 +42,9 @@ public:
 	int _lastFrameShown;
 	int _minFrame;
 	int _numFramesToShow;
+	
+	double _startTime;
+	double _endTime;
 
 private:
 	TeSignal0Param _frameChangedSignal;

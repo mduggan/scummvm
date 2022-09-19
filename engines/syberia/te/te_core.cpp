@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/file.h"
+
 #include "syberia/te/te_core.h"
 
 #include "syberia/te/te_png.h"
@@ -101,6 +103,44 @@ void TeCore::language(const Common::String &val) {
 
 bool TeCore::onActivityTrackingAlarm() {
 	error("TODO: Implement me");
+}
+
+static const char *_pathSuffixes[] = {
+	"PC-MacOSX",
+	"PC-PS3-Android-MacOSX",
+	"PC-MacOSX-Xbox360-PS3",
+	"PC-MacOSX-Xbox360-PS3/PC-MacOSX",
+	"HD",
+	"HD/PC-MacOSX-Xbox360-PS3"
+};
+
+Common::Path TeCore::findFile(const Common::Path &path) {
+	if (Common::File::exists(path))
+		return path;
+
+	const Common::Path fname = path.getLastComponent();
+	const Common::Path dir = path.getParent();
+
+	const Common::String langs[3] = {
+		"",
+		language(),
+		"en"
+	};
+	
+	for (int langtype = 0; langtype < 3; langtype++) {
+		for (int i = 0; i < ARRAYSIZE(_pathSuffixes); i++) {
+			Common::Path testPath = dir.join(_pathSuffixes[i]);
+			if (langs[langtype].size()) {
+				testPath.joinInPlace(langs[langtype]);
+			}
+			testPath.joinInPlace(fname);
+			if (Common::File::exists(testPath))
+				return testPath;
+		}
+	}
+	
+	// Didn't find it at all..
+	return path;
 }
 
 } // end namespace Syberia

@@ -37,7 +37,9 @@ namespace Syberia {
 TeButtonLayout::TeButtonLayout() :
 _currentState(BUTTON_STATE_UP), _clickPassThrough(false), _validationSoundVolume(1.0),
 _someClickFlag(false), _doubleValidationProtectionEnabled(true), _upLayout(nullptr),
-_downLayout(nullptr), _rolloverLayout(nullptr) {
+_downLayout(nullptr), _rolloverLayout(nullptr), _disabledLayout(nullptr),
+_hitZoneLayout(nullptr)
+{
 	_onMousePositionChangedMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChangedMaxPriority, FLT_MAX));
 
 	_onMousePositionChangedCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChanged));
@@ -51,7 +53,11 @@ _downLayout(nullptr), _rolloverLayout(nullptr) {
 }
 
 bool TeButtonLayout::isMouseIn(const TeVector2s32 &mouseloc) {
-	error("TODO: Implement me.");
+	if (!_hitZoneLayout) {
+		return TeLayout::isMouseIn(mouseloc);
+	} else {
+		return _hitZoneLayout->isMouseIn(mouseloc);
+	}
 }
 
 bool TeButtonLayout::onMouseLeftDown(uint flags) {
@@ -104,7 +110,14 @@ void TeButtonLayout::setDisabledLayout(TeLayout *disabledLayout) {
 }
 
 void TeButtonLayout::setHitZone(TeLayout *hitZoneLayout) {
-	error("TODO: Implement TeButtonLayout::setHitZone.");
+	if (_hitZoneLayout)
+		removeChild(_hitZoneLayout);
+	
+	_hitZoneLayout = hitZoneLayout;
+	if (_hitZoneLayout) {
+		addChild(_hitZoneLayout);
+		_hitZoneLayout->setColor(TeColor(0, 0, 0xff, 0xff));
+	}
 }
 
 void TeButtonLayout::setDownLayout(TeLayout *downLayout) {

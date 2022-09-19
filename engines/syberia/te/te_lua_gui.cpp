@@ -198,38 +198,63 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 }
 
 void TeLuaGUI::unload() {
-	warning("TeLuaGUI::unload: Fix the leaks!!");
-	//for (auto &iter : _layouts)
-	//	delete iter._value;
+	for (auto &iter : _layouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_layouts.clear();
-	//for (auto &iter : _buttonLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _buttonLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_buttonLayouts.clear();
-	//for (auto &iter : _checkboxLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _checkboxLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_checkboxLayouts.clear();
-	//for (auto &iter : _listLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _listLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_listLayouts.clear();
-	//for (auto &iter : _spriteLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _spriteLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_spriteLayouts.clear();
-	//for (auto &iter : _textLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _textLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_textLayouts.clear();
-	//for (auto &iter : _scrollingLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _scrollingLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_scrollingLayouts.clear();
-	//for (auto &iter : _clipLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _clipLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_clipLayouts.clear();
-	//for (auto &iter : _extendedTextLayouts)
-	//	delete iter._value;
+
+	for (auto &iter : _extendedTextLayouts) {
+		iter._value->setVisible(false);
+		delete iter._value;
+	}
 	_extendedTextLayouts.clear();
 }
 
-TeVariant TeLuaGUI::value(const Common::String &path) {
-	return _luaContext.global(path);
+TeVariant TeLuaGUI::value(const Common::String &globalName) {
+	return _luaContext.global(globalName);
 }
 
 } // end namespace Syberia

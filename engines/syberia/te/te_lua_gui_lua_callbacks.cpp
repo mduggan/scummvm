@@ -335,32 +335,17 @@ int spriteLayoutBindings(lua_State *L) {
 	} else {
 		layout->stop();
 	}
-	
-	warning("Finish codec bit of spriteLayoutBindings to make movies work.");
-	/*
+
 	TeICodec *codec = layout->_tiledSurfacePtr->_codec;
 	if (codec) {
-	  fVar15 = (float)(*(code *)(pTVar3->vptr).vptr[0x10])();
-	  pTVar6 = layout;
-	  (((pTVar5->tiledSurfacePtr).ptr)->frameAnim).field_0x70 =
-		   (double)(((float)startingFrame / fVar15) * 1000.0) * 1000.0;
-	  pTVar4 = (layout->tiledSurfacePtr).ptr;
-	  if (endingFrame == 0xffffffffffffffff) {
-		(pTVar4->frameAnim).field_0x78 = 0x488f3fffe0c00000;
-	  }
-	  else {
-		fVar15 = (float)(*(code *)(pTVar4->codec->vptr).vptr[0x10])();
-		if ((long)endingFrame < 0) {
-		  fVar16 = (float)(endingFrame & 1 | endingFrame >> 1);
-		  fVar16 = fVar16 + fVar16;
+		float frameRate = codec->frameRate();
+		layout->_tiledSurfacePtr->_frameAnim._startTime = (startingFrame / frameRate) * 1000.0 * 1000.0;
+		if (endingFrame == -1) {
+			layout->_tiledSurfacePtr->_frameAnim._endTime = FLT_MAX;
+		} else {
+			layout->_tiledSurfacePtr->_frameAnim._endTime = (endingFrame / frameRate) * 1000.0 * 1000.0;
 		}
-		else {
-		  fVar16 = (float)endingFrame;
-		}
-		(((pTVar6->tiledSurfacePtr).ptr)->frameAnim).field_0x78 =
-			 (double)((fVar16 / fVar15) * 1000.0) * 1000.0;
-	  }
-	}*/
+	}
 	
 	if (!gui->spriteLayout(layout->name())) {
 		TeLuaGUI::StringMap<TeSpriteLayout *> &spriteLayouts = gui->spriteLayouts();

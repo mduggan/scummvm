@@ -118,9 +118,10 @@ TeIntrusivePtr<Te3DTexture> Te3DTexture::load2(const Common::Path &path, uint si
 
 bool Te3DTexture::load(const Common::Path &path) {
 	TeResourceManager *resmgr = g_engine->getResourceManager();
-	TeIntrusivePtr<TeImage> img = resmgr->getResource<TeImage>(path);
+	Common::Path resPath = path;
+	TeIntrusivePtr<TeImage> img = resmgr->getResource<TeImage>(resPath);
 	load(*img);
-	setAccessName(path.append(".3dtex"));
+	setAccessName(resPath.append(".3dtex"));
 	return true;
 }
 

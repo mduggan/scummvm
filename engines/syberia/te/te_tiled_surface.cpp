@@ -58,14 +58,15 @@ bool TeTiledSurface::load(const Common::Path &path) {
 
 	TeIntrusivePtr<TeTiledTexture> texture;
 	if (resmgr->exists(path.append(".tt"))) {
-		texture = resmgr->getResource<TeTiledTexture>(path.append(".tt"));
+		texture = resmgr->getResourceNoSearch<TeTiledTexture>(path.append(".tt"));
 		// we don't own this one..
 	}
 
 	if (!texture) {
 		TeCore *core = g_engine->getCore();
 
-		_codec = core->createVideoCodec(path);
+		Common::Path foundPath = core->findFile(path);
+		_codec = core->createVideoCodec(foundPath);
 		if (!_codec)
 			return false;
 
@@ -97,7 +98,9 @@ bool TeTiledSurface::load(const Common::Path &path) {
 			if (_codec->update(0, img)) {
 				texture->load(img);
 			}
-	  }
+		} else {
+			warning("TeTiledSurface::load: failed to load %s", path.toString().c_str());
+		}
 	}
 
 	setTiledTexture(texture);
@@ -117,7 +120,7 @@ bool TeTiledSurface::load(const TeIntrusivePtr<Te3DTexture> &texture) {
 	const Common::Path ttPath = texture->getAccessName().append(".tt");
 
 	if (resmgr->exists(ttPath)) {
-		tiledTexture = resmgr->getResource<TeTiledTexture>(ttPath);
+		tiledTexture = resmgr->getResourceNoSearch<TeTiledTexture>(ttPath);
 	}
 
 	if (!tiledTexture) {
@@ -149,7 +152,7 @@ bool TeTiledSurface::onFrameAnimCurrentFrameChanged() {
 	
 	Common::SharedPtr<TePalette> nullPal;
 	img.create(vidSize._x, vidSize._y, nullPal, _imgFormat, bufxsize, bufysize);
-	if (!_codec->update(_frameAnim._lastFrameShown, img))
+	if (_codec->update(_frameAnim._lastFrameShown, img))
 		update(img);
 	return false;
 }

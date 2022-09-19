@@ -189,10 +189,10 @@ void TeSpriteLayout::updateMesh() {
 }
 
 void TeSpriteLayout::updateSize() {
-	if (!name().empty()) {
+	//if (!name().empty()) {
 		TeLayout::updateSize();
 		updatePosition();
-	}
+	//}
 }
 
 } // end namespace Syberia

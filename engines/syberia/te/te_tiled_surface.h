@@ -83,6 +83,7 @@ public:
 	void updateVideoProperties();
 
 	TeFrameAnim _frameAnim;
+	TeICodec *_codec;
 
 private:
 	float _bottomCrop;
@@ -100,7 +101,6 @@ private:
 
 	Common::Path _path;
 
-	TeICodec *_codec;
 	// TODO add private members
 
 };

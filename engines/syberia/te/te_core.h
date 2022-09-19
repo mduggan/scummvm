@@ -58,6 +58,11 @@ public:
 	void enableActivityTracking(bool enable);
 	void setActivityTrackingFolder(const Common::String &path);
 
+	// Note: this is not in the original, but it's not clear how the original
+	// adds things like "PC-MacOSX" to the path, and there is not clear logic
+	// to them, so here we are.
+	Common::Path findFile(const Common::Path &path);
+
 	bool _coreNotReady;
 private:
 	TeILoc *_loc;

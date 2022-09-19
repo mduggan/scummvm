@@ -24,7 +24,8 @@
 
 namespace Syberia {
 
-TeFrameAnim::TeFrameAnim() : _nbFrames(0), _frameRate(25.0), _reversed(false), _minFrame(0), _numFramesToShow(-1) {
+TeFrameAnim::TeFrameAnim() : _nbFrames(0), _frameRate(25.0), _reversed(false), _minFrame(0),
+_numFramesToShow(-1), _startTime(0), _endTime(FLT_MAX) {
 }
 
 void TeFrameAnim::update(double amount) {
@@ -34,31 +35,35 @@ void TeFrameAnim::update(double amount) {
 
 	int loopsDone;
 	int framesToPlay = maxFrame - minFrame;
+	if (framesToPlay <= 0 && _nbFrames > 0)
+		framesToPlay = _nbFrames;
 	
 	int frameToShow;
 	if (framesToPlay == 0) {
 		frameToShow = 0;
 		loopsDone = -1;
-	} else {
+	} else if (framesToPlay > 0) {
 		loopsDone = (int)((int)frameNo / framesToPlay);
 		if (!_reversed) {
 			frameToShow = (int)frameNo % framesToPlay + minFrame;
 		} else {
 			frameToShow = (maxFrame - 1) - (int)frameNo % framesToPlay;
 		}
+	} else {
+		// else, we don't know the total frames.. just keep asking for higher.
+		frameToShow = (int)frameNo;
 	}
+
 	if (_loopCount == -1 || loopsDone < _loopCount) {
-		if (minFrame == _lastFrameShown)
+		if (frameToShow == _lastFrameShown)
 			return;
 
-		_lastFrameShown = minFrame;
+		_lastFrameShown = frameToShow;
 		_frameChangedSignal.call();
 	} else {
 		stop();
 		_onFinishedSignal.call();
 	}
 }
-
-// TODO: Add more functions here.
 
 } // end namespace Syberia

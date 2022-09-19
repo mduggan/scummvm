@@ -23,6 +23,7 @@
 #include "common/events.h"
 
 #include "syberia/syberia.h"
+#include "syberia/game/confirm.h"
 #include "syberia/game/main_menu.h"
 #include "syberia/game/application.h"
 
@@ -126,19 +127,19 @@ void MainMenu::leave() {
 }
 
 bool MainMenu::deleteFile(const Common::String &name) {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::deleteFile");
 }
 
 bool MainMenu::onActivedTuto() {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onActivedTuto");
 }
 
 bool MainMenu::onBFGRateIt2ButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onBFGRateIt2ButtonValidated");
 }
 
 bool MainMenu::onBFGRateItButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onBFGRateItButtonValidated");
 }
 
 bool MainMenu::onBFGRateItQuitButtonValidated() {
@@ -178,7 +179,7 @@ bool MainMenu::onNewGameButtonValidated() {
 }
 
 bool MainMenu::onNewGameConfirmed() {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onNewGameConfirmed");
 }
 
 bool MainMenu::onOptionsButtonValidated() {
@@ -192,6 +193,7 @@ bool MainMenu::onQuit() {
 }
 
 bool MainMenu::onQuitButtonValidated() {
+	//Confirm::enter("menus/confirm/confirmQuit.lua", "");
 	error("TODO: Implement MainMenu function");
 }
 
@@ -200,11 +202,36 @@ bool MainMenu::onUnlockGameButtonValidated() {
 }
 
 void MainMenu::refresh() {
-	error("TODO: Implement MainMenu function");
+	// TODO: get a real value
+	bool haveSave = false;
+	TeButtonLayout *continueGameButton = buttonLayout("continueGameButton");
+	if (continueGameButton) {
+		continueGameButton->setEnable(haveSave);
+	}
 }
 
-bool MainMenu::setCenterButtonsVisibility(bool visible) {
-	error("TODO: Implement MainMenu function");
+void MainMenu::setCenterButtonsVisibility(bool visible) {
+	bool haveSave = false;
+
+	TeButtonLayout *continuegameunlockButton = buttonLayout("continuegameunlockButton");
+	if (continuegameunlockButton) {
+		continuegameunlockButton->setVisible(haveSave & visible);
+	}
+
+	TeButtonLayout *newGameUnlockButton = buttonLayout("newgameunlockButton");
+	if (newGameUnlockButton) {
+		newGameUnlockButton->setVisible(visible & !haveSave);
+	}
+
+	TeButtonLayout *unlockgameButton = buttonLayout("unlockgameButton");
+	if (unlockgameButton) {
+		unlockgameButton->setVisible(false);
+	}
+
+	TeLayout *rateItButton = layout("rateItButton");
+	if (rateItButton) {
+		rateItButton->setVisible(false);
+	}
 }
 
 

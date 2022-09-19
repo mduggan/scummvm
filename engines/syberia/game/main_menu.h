@@ -62,7 +62,7 @@ public:
 	bool onWalkThroughButtonValidated() { return false; };
 
 	void refresh();
-	bool setCenterButtonsVisibility(bool visible);
+	void setCenterButtonsVisibility(bool visible);
 
 private:
 	// TODO add private members

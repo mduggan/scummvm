@@ -62,15 +62,17 @@ TeVariant TeLuaContext::global(const Common::String &name) {
 	lua_getglobal(_luaState, name.c_str());
 	TeVariant retval;
 	int type = lua_type(_luaState, -1);
-	lua_settop(_luaState, -2);
 	if (type == LUA_TBOOLEAN) {
 		int result = lua_toboolean(_luaState,-1);
+		lua_settop(_luaState, -2);
 		return TeVariant(result > 0);
 	} else if (type == LUA_TNUMBER) {
 		double result = lua_tonumber(_luaState, -1);
+		lua_settop(_luaState, -2);
 		return TeVariant(result);
 	} else if (type == LUA_TSTRING) {
 		const char *str = lua_tolstring(_luaState, -1, nullptr);
+		lua_settop(_luaState, -2);
 		return TeVariant(str);
 	}
 	warning("Unexpected type %d for global %s", type, name.c_str());
