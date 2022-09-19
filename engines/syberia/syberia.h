@@ -46,6 +46,7 @@ class TeCore;
 class TeSoundManager;
 class TeRenderer;
 class TeResourceManager;
+class TeInputMgr;
 
 class SyberiaEngine : public Engine {
 private:
@@ -57,6 +58,7 @@ private:
 	TeSoundManager *_soundManager;
 	TeRenderer *_renderer;
 	TeResourceManager *_resourceManager;
+	TeInputMgr *_inputMgr;
 
 protected:
 	// Engine APIs
@@ -118,6 +120,7 @@ public:
 	TeSoundManager *getSoundManager();
 	TeRenderer *getRenderer();
 	TeResourceManager *getResourceManager();
+	TeInputMgr *getInputMgr();
 	void setWantToQuit() { _wantToQuit = true; }
 
 private:

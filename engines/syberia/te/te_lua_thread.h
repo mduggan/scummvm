@@ -37,6 +37,8 @@ class TeLuaThread {
 public:
 	TeLuaThread(TeLuaContext *context);
 
+	~TeLuaThread();
+
 	static TeLuaThread *create(TeLuaContext *context);
 
 	void execute(const Common::String &str);

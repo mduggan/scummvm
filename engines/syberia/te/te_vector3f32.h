@@ -23,6 +23,7 @@
 #define SYBERIA_TE_TE_VECTOR3F32_H
 
 #include "math/vector2d.h"
+#include "syberia/te/te_vector2s32.h"
 
 namespace Syberia {
 
@@ -37,6 +38,10 @@ public:
 	TeVector3f32 &operator=(const TeVector3f32 &other) {
 		Math::Vector3d::operator=(other);
 		return *this;
+	}
+	
+	explicit TeVector3f32(const TeVector2s32 &vec2d) {
+		set(vec2d._x, vec2d._y, 0.0);
 	}
 
 	static void deserialize(Common::ReadStream *stream, TeVector3f32 *dest) {
@@ -55,6 +60,9 @@ public:
 		return (x() * x() + y() * y() + z() * z());
 	}
 
+	Common::String dump() const {
+		return Common::String::format("TeVector3f32(%.02f %.02f %.02f)", x(), y(), z());
+	}
 	/*
 	 TODO: do we need anything not already provided by Vector3d?
 public:

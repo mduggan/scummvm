@@ -21,6 +21,7 @@
 
 #include "common/textconsole.h"
 #include "syberia/syberia.h"
+#include "syberia/game/application.h"
 #include "syberia/te/te_layout.h"
 #include "syberia/te/te_i_3d_object2.h"
 
@@ -108,7 +109,7 @@ bool TeLayout::isAutoZEnabled() {
 
 void TeLayout::draw() {
 	if (visible() && worldVisible()) {
-		debug("Drawing TeLayout %p (%s)", this, name().empty() ? "no name" : name().c_str());
+		//debug("Draw TeLayout %p (%s)", this, name().empty() ? "no name" : name().c_str());
 		// Ensure world transform is up-to-date.
 		worldTransformationMatrix();
 		for (auto &child : childList()) {
@@ -120,8 +121,8 @@ void TeLayout::draw() {
 static const float EPSILON = 1.192093e-07f;
 
 bool TeLayout::isMouseIn(const TeVector2s32 &mouseloc) {
-	TeVector3f32 transformedPos = transformMousePosition(mouseloc);
-	TeVector3f32 halfSize = size() / 2.0;
+	const TeVector3f32 transformedPos = transformMousePosition(mouseloc);
+	const TeVector3f32 halfSize = size() / 2.0;
 
 	return (   (transformedPos.x() >= -halfSize.x() - EPSILON)
 			&& (transformedPos.x() < halfSize.x() + EPSILON)
@@ -312,9 +313,13 @@ TeLayout::CoordinatesType TeLayout::sizeType() const {
 }
 
 TeVector3f32 TeLayout::transformMousePosition(const TeVector2s32 &mousepos) {
-	//TeMainWindow *mainWindow = g_engine->getMainWindow();
-	error("TODO: calc mouse pos based on main window");
-	return TeVector3f32();
+	//TeLayout &mainWindow = g_engine->getApplication()->getMainWindow();
+	TeMatrix4x4 transform = worldTransformationMatrix();
+	transform.inverse();
+	const TeVector3f32 transformpos = transform * TeVector3f32(mousepos);
+
+	//debug("transformMousePosition: result %f %f", transformpos.x(), transformpos.y());
+	return transformpos;
 }
 
 void TeLayout::updatePosition() {
@@ -369,7 +374,7 @@ void TeLayout::updateSize() {
 			TeVector3f32 newSize = _userSize * parentSize;
 			if (newSize.x() > 0.0f && newSize.y() > 0.0f && _ratio > 0.0f && _safeAreaRatio > 0.0f) {
 				float newSizeRatio = newSize.x() / newSize.y();
-				if (_ratioMode  == RATIO_MODE_2) {
+				if (_ratioMode  == RATIO_MODE_PAN_SCAN) {
 					if (_safeAreaRatio <= newSizeRatio) {
 						newSize.x() = _ratio * newSize.y();
 					} else {
@@ -377,7 +382,7 @@ void TeLayout::updateSize() {
 							(1.0f - (_safeAreaRatio - newSizeRatio) / _safeAreaRatio) *
 							_ratio * newSize.y();
 					}
-				} else if (_ratioMode == RATIO_MODE_1) {
+				} else if (_ratioMode == RATIO_MODE_LETTERBOX) {
 					if (_ratio < newSizeRatio)
 						newSize.x() = _ratio * newSize.y();
 					else

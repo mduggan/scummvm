@@ -133,7 +133,7 @@ bool Te3DTexture::load(const TeImage &img) {
 	_height = img.h;
 	_format = img._format;
 
-	warning("TODO: set some other fields from the image here.");
+	// FIXME: set some other fields from the image here.
 	// for now just set some good defaults.
 	_flipY = true;    //img._flipY;
 	_leftBorder = 0;  //img._leftBorder;

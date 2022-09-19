@@ -152,20 +152,8 @@ bool TeLuaGUI::load(const Common::String &pathStr) {
 	_scriptPath = Common::Path(pathStr);
 	TeCore *core = g_engine->getCore();
 	Common::Path path(pathStr);
-	if (!core->_coreNotReady) {
-		if (!Common::File::exists(pathStr)) {
-			path = pathStr;
-			Common::Path dir = path.getParent();
-			dir.joinInPlace(core->language());
-			path = dir.join(path.getLastComponent());
-			if (!Common::File::exists(pathStr)) {
-				path = pathStr;
-				dir = path.getParent();
-				dir.joinInPlace("en");
-				path = dir.join(path.getLastComponent());
-			}
-		}
-	}
+	// Not the same as original, we abstract the search logic a bit.
+	path = core->findFile(path);
 	_luaContext.setGlobal("Pixel", 0);
 	_luaContext.setGlobal("Percent", 1);
 	_luaContext.setGlobal("None", 0);

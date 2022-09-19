@@ -72,7 +72,7 @@ bool TeTiledSurface::load(const Common::Path &path) {
 
 		texture = new TeTiledTexture();
 
-		if (_codec->load(path)) {
+		if (_codec->load(foundPath)) {
 			texture->setAccessName(path);
 			resmgr->addResource(texture.get());
 			_imgFormat = _codec->imageFormat();
@@ -226,9 +226,9 @@ void TeTiledSurface::updateSurface() {
 	for (long row = 0; row < rows; row++) {
 		for (long col = 0; col < cols; col++) {
 			TeMesh &mesh = _meshes[meshno];
-			mesh.setConf(4, 4, TeMesh::MeshMode6, 0, 0);
+			mesh.setConf(4, 4, TeMesh::MeshMode_TriangleStrip, 0, 0);
 			
-			mesh.setShouldDrawMaybe(_shouldDraw);
+			mesh.setShouldDraw(_shouldDraw);
 			
 			TeTiledTexture::Tile *tile = _tiledTexture->tile(TeVector2s32(col, row));
 			mesh.defaultMaterial(tile->_texture);

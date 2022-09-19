@@ -20,7 +20,12 @@
  */
 
 #include "common/math.h"
+
+#include "syberia/syberia.h"
+
 #include "syberia/te/te_button_layout.h"
+//#include "syberia/te/te_sound_manager.h"
+#include "syberia/te/te_input_mgr.h"
 
 namespace Syberia {
 
@@ -40,16 +45,33 @@ _someClickFlag(false), _doubleValidationProtectionEnabled(true), _upLayout(nullp
 _downLayout(nullptr), _rolloverLayout(nullptr), _disabledLayout(nullptr),
 _hitZoneLayout(nullptr)
 {
-	_onMousePositionChangedMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChangedMaxPriority, FLT_MAX));
+	_onMousePositionChangedMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, const Common::Point &>(this, &TeButtonLayout::onMousePositionChangedMaxPriority, FLT_MAX));
 
-	_onMousePositionChangedCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMousePositionChanged));
-	_onMouseLeftDownCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftDown));
-	_onMouseLeftUpMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftUpMaxPriority, FLT_MAX));
-	_onMouseLeftUpCallback.reset(new TeCallback1Param<TeButtonLayout, unsigned int>(this, &TeButtonLayout::onMouseLeftUp));
+	_onMousePositionChangedCallback.reset(new TeCallback1Param<TeButtonLayout, const Common::Point &>(this, &TeButtonLayout::onMousePositionChanged));
+	_onMouseLeftDownCallback.reset(new TeCallback1Param<TeButtonLayout, const Common::Point &>(this, &TeButtonLayout::onMouseLeftDown));
+	_onMouseLeftUpMaxPriorityCallback.reset(new TeCallback1Param<TeButtonLayout, const Common::Point &>(this, &TeButtonLayout::onMouseLeftUpMaxPriority, FLT_MAX));
+	_onMouseLeftUpCallback.reset(new TeCallback1Param<TeButtonLayout, const Common::Point &>(this, &TeButtonLayout::onMouseLeftUp));
+	
+	TeInputMgr *inputmgr = g_engine->getInputMgr();
+	inputmgr->_mouseMoveSignal.insert(_onMousePositionChangedCallback);
+	inputmgr->_mouseMoveSignal.insert(_onMousePositionChangedMaxPriorityCallback);
+	inputmgr->_mouseLDownSignal.insert(_onMouseLeftDownCallback);
+	inputmgr->_mouseLUpSignal.insert(_onMouseLeftUpCallback);
+	inputmgr->_mouseLUpSignal.insert(_onMouseLeftUpMaxPriorityCallback);
 
 	setEditionColor(TeColor(128, 128, 128, 255));
 	if (getDoubleValidationProtectionTimer()->_stopped)
 		getDoubleValidationProtectionTimer()->start();
+}
+
+TeButtonLayout::~TeButtonLayout() {
+	TeInputMgr *inputmgr = g_engine->getInputMgr();
+	inputmgr->_mouseMoveSignal.remove(_onMousePositionChangedCallback);
+	inputmgr->_mouseMoveSignal.remove(_onMousePositionChangedMaxPriorityCallback);
+	inputmgr->_mouseLDownSignal.remove(_onMouseLeftDownCallback);
+	inputmgr->_mouseLUpSignal.remove(_onMouseLeftUpCallback);
+	inputmgr->_mouseLUpSignal.remove(_onMouseLeftUpMaxPriorityCallback);
+
 }
 
 bool TeButtonLayout::isMouseIn(const TeVector2s32 &mouseloc) {
@@ -60,22 +82,92 @@ bool TeButtonLayout::isMouseIn(const TeVector2s32 &mouseloc) {
 	}
 }
 
-bool TeButtonLayout::onMouseLeftDown(uint flags) {
+bool TeButtonLayout::onMouseLeftDown(const Common::Point &pt) {
 	if (!visible())
 		return false;
-	error("TODO: Implement me.");
+
+	// Note: This doesn't exactly reproduce the original behavior, it's
+	// very simplified.
+	bool mouseIn = isMouseIn(TeVector2s32(pt.x, pt.y));
+
+	enum State newState = _currentState;
+	switch (_currentState) {
+		break;
+	case BUTTON_STATE_DOWN:
+		newState = BUTTON_STATE_UP;
+		if (mouseIn) {
+			_onMouseClickValidatedSignal.call();
+			warning("TODO: play validated sound.");
+		}
+		break;
+	case BUTTON_STATE_ROLLOVER:
+	case BUTTON_STATE_UP:
+	case BUTTON_STATE_DISABLED:
+		break;
+	}
+	setState(newState);
+	return false;
 }
 
-bool TeButtonLayout::onMouseLeftUp(uint flags) {
+bool TeButtonLayout::onMouseLeftUp(const Common::Point &pt) {
 	if (!visible())
 		return false;
-	error("TODO: Implement me.");
+
+	// Note: This doesn't exactly reproduce the original behavior, it's
+	// very simplified.
+	bool mouseIn = isMouseIn(TeVector2s32(pt.x, pt.y));
+
+	enum State newState = _currentState;
+	switch (_currentState) {
+		break;
+	case BUTTON_STATE_DOWN:
+		newState = BUTTON_STATE_UP;
+		if (mouseIn) {
+			_onMouseClickValidatedSignal.call();
+			if (!_validationSound.empty()) {
+				//TeSoundManager *sndMgr = g_engine->getSoundManager();
+				//sndMgr->playFreeSound(_validationSound, _validationSoundVolume, "sfx");
+				warning("TODO: play validated sound %s.", _validationSound.c_str());
+			}
+		}
+		break;
+	case BUTTON_STATE_ROLLOVER:
+	case BUTTON_STATE_UP:
+	case BUTTON_STATE_DISABLED:
+		break;
+	}
+	setState(newState);
+	return false;
 }
 
-bool TeButtonLayout::onMousePositionChanged(uint flags) {
-	if (!visible())
+bool TeButtonLayout::onMousePositionChanged(const Common::Point &pt) {
+	if (!visible() || _someClickFlag)
 		return false;
-	error("TODO: Implement me.");
+	
+	// Note: This doesn't exactly reproduce the original behavior, it's
+	// very simplified.
+	bool mouseIn = isMouseIn(TeVector2s32(pt.x, pt.y));
+
+	enum State newState = _currentState;
+	switch (_currentState) {
+	case BUTTON_STATE_UP:
+		if (mouseIn) {
+			// debug("mouse entered button %s", name().c_str());
+			newState = BUTTON_STATE_ROLLOVER;
+		}
+		break;
+	case BUTTON_STATE_DOWN:
+	case BUTTON_STATE_ROLLOVER:
+		if (!mouseIn) {
+			// debug("mouse left button %s", name().c_str());
+			newState = BUTTON_STATE_UP;
+		}
+		break;
+	case BUTTON_STATE_DISABLED:
+		break;
+	}
+	setState(newState);
+	return false;
 }
 
 void TeButtonLayout::reset() {

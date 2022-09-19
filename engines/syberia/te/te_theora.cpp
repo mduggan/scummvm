@@ -39,6 +39,7 @@ bool TeTheora::matchExtension(const Common::String &extn) {
 }
 
 bool TeTheora::load(const Common::Path &path) {
+	_path = path;
 	return _decoder->loadFile(path);
 }
 
@@ -101,10 +102,20 @@ float TeTheora::frameRate() {
 }
 
 bool TeTheora::update(unsigned long i, TeImage &imgout) {
+	// TODO: Should this seek to frame i? Currently just continues.
 	const Graphics::Surface *frame = _decoder->decodeNextFrame();
-	// TODO: Maybe need to use i here.
-	imgout.copyFrom(*frame);
-	return true;
+	if (frame) {
+		imgout.copyFrom(*frame);
+		return true;
+	} else if (isAtEnd() && !_path.empty()) {
+		load(_path);
+		frame = _decoder->decodeNextFrame();
+		if (frame) {
+			imgout.copyFrom(*frame);
+			return true;
+		}
+	}
+	return false;
 }
 
 bool TeTheora::isAtEnd() {

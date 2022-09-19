@@ -403,9 +403,6 @@ int buttonLayoutBindings(lua_State *L) {
 			} else {
 				warning("[TeLuaGUI.buttonLayoutBindings] Unreconized attribute : %s\n", s);
 			}
-		} else if (type == LUA_TNUMBER) {
-			Te3DObject2 *obj = TeLuaTo<Te3DObject2*>(L, -1);
-			layout->addChild(obj);
 		}
 		lua_settop(L, -2);
 	}
@@ -497,8 +494,11 @@ int textLayoutBindings(lua_State *L) {
 			} else {
 				warning("[TeLuaGUI.textLayoutBindings] Unreconized attribute : %s", s);
 			}
-			lua_settop(L, -2);
+		} else if (type == LUA_TNUMBER) {
+			Te3DObject2 *obj = TeLuaTo<Te3DObject2*>(L, -1);
+			layout->addChild(obj);
 		}
+		lua_settop(L, -2);
 	}
 
 	if (layout->name().empty()) {

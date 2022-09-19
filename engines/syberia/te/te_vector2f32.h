@@ -37,6 +37,10 @@ public:
 
 	TeVector2f32(float x_, float y_) : Math::Vector2d(x_, y_) {};
 
+	Common::String dump() const {
+		return Common::String::format("TeVector2f32(%.02f %.02f)", getX(), getY());
+	}
+
 	/*
 	TODO: do we need anything that isn't already in Vector2d here?
 	TeVector2f32(const TeVector2f32 &other);
@@ -49,7 +53,7 @@ public:
 	float squaredLength() const;
 
 	void normalize();
-	
+
 	TeVector2f32 operator+(const TeVector2f32 &other) const;
 	TeVector2f32 operator-(const TeVector2f32 &other) const;
 	bool operator==(const TeVector2f32 &other) const;

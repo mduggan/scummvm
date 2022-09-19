@@ -26,13 +26,24 @@ namespace Syberia {
 
 TeTextBase2::TeTextBase2() : _drawRect(0, 0), _size(0, 0),
 _alignStyle(AlignStyle0), _interLine(0.0f), _globalColor(0xff, 0xff, 0xff, 0xff),
-_wrapMode(WrapMode0), _strikethrough(false), _fontSize(10), _valueWasSet(true)
+_wrapMode(WrapModeFixed), _strikethrough(false), _fontSize(10), _valueWasSet(true)
 {
 	_mesh.setglTexEnv(GL_BLEND);
-	_mesh.setShouldDrawMaybe(true);
+	_mesh.setShouldDraw(true);
 }
 
 void TeTextBase2::build() {
+	if (!_text.size())
+		return;
+	TeIntrusivePtr<TeFont3> font = _fonts[0];
+	
+	if (!font.get()) {
+		warning("[TeTextBase2::build()] Warning : font missing");
+		return;
+	}
+	
+	_valueWasSet = 0;
+	
 	warning("TODO: Implement TeTextBase2::build");
 }
 
@@ -112,11 +123,14 @@ void TeTextBase2::setAlignStyle(TeTextBase2::AlignStyle style) {
 	_valueWasSet = true;
 }
 
-void TeTextBase2::setColor(unsigned int i, const TeColor &color) {
-	error("TODO: Implement TeTextBase2::setColor");
+void TeTextBase2::setColor(unsigned int offset, const TeColor &color) {
+	_colors.setVal(offset, color);
+	_valueWasSet = true;
 }
-void TeTextBase2::setFont(unsigned int i, const TeIntrusivePtr<TeFont3> &newfont) {
-	error("TODO: Implement TeTextBase2::setFont");
+
+void TeTextBase2::setFont(unsigned int offset, const TeIntrusivePtr<TeFont3> &newfont) {
+	_fonts.setVal(offset, newfont);
+	_valueWasSet = true;
 }
 
 void TeTextBase2::setFontSize(unsigned long size) {
@@ -145,7 +159,7 @@ void TeTextBase2::setText(const Common::String &newText) {
 	_valueWasSet = true;
 	_text = newText;
 	int len = newText.size();
-	_mesh.setConf(len * 4, len * 6, TeMesh::MeshMode5, 1, len * 2);
+	_mesh.setConf(len * 4, len * 6, TeMesh::MeshMode_Triangles, 1, len * 2);
 }
 
 void TeTextBase2::setWrapMode(TeTextBase2::WrapMode &mode) {

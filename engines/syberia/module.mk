@@ -52,6 +52,7 @@ MODULE_OBJS := \
 	te/te_i_layout.o \
 	te/te_i_loc.o \
 	te/te_image.o \
+	te/te_input_mgr.o \
 	te/te_interpolation.o \
 	te/te_jpeg.o \
 	te/te_layout.o \

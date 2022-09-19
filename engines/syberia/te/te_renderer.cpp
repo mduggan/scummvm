@@ -33,13 +33,25 @@ TeRenderer::TeRenderer() : _textureEnabled(false), _shadowMode(ShadowMode0), _ma
 _numTransparentMeshes(0), _pendingTransparentMeshProperties(0) {
 }
 
+void TeRenderer::TransparentMeshProperties::setFromMaterial(const TeMaterial &material) {
+	_texture = material._texture;
+	_enableLights = material._enableLights;
+	_enableSomethingDefault0 = material._enableSomethingDefault0;
+	_shininess = material._shininess;
+	_emissionColor = material._emissionColor;
+	_specularColor = material._specularColor;
+	_diffuseColor = material._diffuseColor;
+	_ambientColor = material._ambientColor;
+	_materialMode = material._mode;
+}
+
 void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsigned long meshno, unsigned long materialno) {
-	const float zSomething = _currentCamera->_orthNearVal;
+	const float orthNearVal = _currentCamera->_orthNearVal;
 	const TeMesh::Mode meshMode = mesh.getMode();
 	if (!meshno) {
-		if (meshMode == TeMesh::MeshMode6) {
+		if (meshMode == TeMesh::MeshMode_TriangleStrip) {
 			meshno = mesh.numVerticies() - 2;
-		} else if (meshMode == TeMesh::MeshMode5) {
+		} else if (meshMode == TeMesh::MeshMode_Triangles) {
 			meshno = mesh.numIndexes() / 3;
 		} else {
 			return;
@@ -55,7 +67,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 	
 	int newPropsSize = mesh.shouldDrawMaybe() ? _pendingTransparentMeshProperties + meshno : _pendingTransparentMeshProperties + 1;
 	_transparentMeshProperties.resize(newPropsSize);
-	if (meshMode == TeMesh::MeshMode5 && meshno > 0) {
+	if (meshMode == TeMesh::MeshMode_Triangles && meshno > 0) {
 		for (unsigned int i = 0; i < meshno; i++) {
 			const uint meshNo0 = (i1 + i) * 3;
 			const uint meshPropNo = (_numTransparentMeshes + i) * 3;
@@ -84,18 +96,18 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 				_transparentMeshColors[meshPropNo + 2] = mesh.color(mesh.index(meshNo0) + 2);
 			}
 		}
-	} else if (meshMode == TeMesh::MeshMode6 && meshno > 0) {
+	} else if (meshMode == TeMesh::MeshMode_TriangleStrip && meshno > 0) {
 		for (unsigned int i = 0; i < meshno; i++) {
 			const uint meshNo0 = (i1 + i);  // TODO: This appears to be the only difference between this and the above?
 			const uint meshPropNo = (_numTransparentMeshes + i) * 3;
 
 			_transparentMeshVertexes[meshPropNo] = mesh.vertex(mesh.index(meshNo0));
 			_transparentMeshVertexes[meshPropNo + 1] = mesh.vertex(mesh.index(meshNo0 + 1));
-			_transparentMeshVertexes[meshPropNo + 1] = mesh.vertex(mesh.index(meshNo0 + 2));
+			_transparentMeshVertexes[meshPropNo + 2] = mesh.vertex(mesh.index(meshNo0 + 2));
 
 			_transparentMeshNormals[meshPropNo] = mesh.normal(mesh.index(meshNo0));
 			_transparentMeshNormals[meshPropNo + 1] = mesh.normal(mesh.index(meshNo0 + 1));
-			_transparentMeshNormals[meshPropNo + 1] = mesh.normal(mesh.index(meshNo0 + 2));
+			_transparentMeshNormals[meshPropNo + 2] = mesh.normal(mesh.index(meshNo0 + 2));
 
 			if (mesh.hasUvs()) {
 				_transparentMeshCoords[meshPropNo] = mesh.textureUV(mesh.index(meshNo0));;
@@ -116,21 +128,21 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 	}
 	
 	if (!mesh.shouldDrawMaybe()) {
-		const TeMatrix4x4 &currentMatrix = _matriciesStacks[1].currentMatrix();
+		// TODO: better variable names.
+		const TeMatrix4x4 &currentMatrix = _matriciesStacks[MM_GL_MODELVIEW].currentMatrix();
 		const TeVector3f32 local_268 = currentMatrix.mult4x3(_transparentMeshVertexes[_numTransparentMeshes * 3]);
 		const TeVector3f32 local_278 = currentMatrix.mult4x3(_transparentMeshVertexes[_numTransparentMeshes * 3 + 1]);
 		const TeVector3f32 local_288 = currentMatrix.mult4x3(_transparentMeshVertexes[_numTransparentMeshes * 3 + 2]);
-		const TeVector3f32 local_298 = (local_268 + local_278 + local_288) / 3.0;
-		TeVector3f32 local_198 = local_298;
+		TeVector3f32 local_298 = (local_268 + local_278 + local_288) / 3.0;
 		
-		local_198.z() -= zSomething;
+		local_298.z() -= orthNearVal;
 		float length;
 		if (_currentCamera->_projectionMatrixType < 4) {
-			length = -local_198.squaredLength();
+			length = -local_298.squaredLength();
 		} else if (_currentCamera->_projectionMatrixType == 4) {
-			length = local_198.z() * local_198.z();
+			length = local_298.z() * local_298.z();
 		} else {
-			length = local_198.squaredLength();
+			length = local_298.squaredLength();
 		}
 		
 		TransparentMeshProperties &destProperties = _transparentMeshProperties[_pendingTransparentMeshProperties];
@@ -139,14 +151,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 		destProperties._camera = _currentCamera;
 
 		const TeMaterial *material = mesh.material(materialno);
-		destProperties._texture = material->_texture;
-		destProperties._enableLights = material->_enableLights;
-		destProperties._shininess = material->_shininess;
-		destProperties._emissionColor = material->_emissionColor;
-		destProperties._specularColor = material->_specularColor;
-		destProperties._diffuseColor = material->_diffuseColor;
-		destProperties._ambientColor = material->_ambientColor;
-		destProperties._materialMode = material->_mode;
+		destProperties.setFromMaterial(*material);
 		destProperties._matrix = currentMatrix;
 
 		destProperties._glTexEnvMode = mesh.gltexenvMode();
@@ -159,9 +164,9 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 		destProperties._scissorWidth = _scissorWidth;
 		destProperties._scissorHeight = _scissorHeight;
 		destProperties._shouldDraw = false;
-	} else if (meshno) {
+	} else {
 		for (uint i = 0; i < meshno; i++) {
-			const TeMatrix4x4 &currentMatrix = _matriciesStacks[1].currentMatrix();
+			const TeMatrix4x4 &currentMatrix = _matriciesStacks[MM_GL_MODELVIEW].currentMatrix();
 		  
 			const int meshPropNo = (_numTransparentMeshes + i) * 3;
 			_transparentMeshVertexes[meshPropNo] = currentMatrix.mult4x3(_transparentMeshVertexes[meshPropNo]);
@@ -173,7 +178,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 			_transparentMeshNormals[meshPropNo + 2] = currentMatrix.mult3x3(_transparentMeshNormals[meshPropNo + 2]);
 		  
 			TeVector3f32 local_208 = (_transparentMeshVertexes[meshPropNo] + _transparentMeshVertexes[meshPropNo + 1] + _transparentMeshVertexes[meshPropNo + 2]) / 3.0;
-			local_208.z() -= zSomething;
+			local_208.z() -= orthNearVal;
 
 			float length;
 			if (_currentCamera->_projectionMatrixType < 4) {
@@ -189,15 +194,7 @@ void TeRenderer::addTransparentMesh(const TeMesh &mesh, unsigned long i1, unsign
 			destProperties._camera = _currentCamera;
 
 			const TeMaterial *material = mesh.material(materialno);
-			destProperties._texture = material->_texture;
-			destProperties._enableLights = material->_enableLights;
-			destProperties._shininess = material->_shininess;
-			destProperties._emissionColor = material->_emissionColor;
-			destProperties._specularColor = material->_specularColor;
-			destProperties._diffuseColor = material->_diffuseColor;
-			destProperties._ambientColor = material->_ambientColor;
-			destProperties._materialMode = material->_mode;
-		
+			destProperties.setFromMaterial(*material);
 			destProperties._glTexEnvMode = mesh.gltexenvMode();
 			destProperties._sourceTransparentMesh = meshPropNo;
 			destProperties._hasColor = mesh.hasColor();
@@ -266,7 +263,6 @@ void TeRenderer::init() {
 	glDisable(GL_CULL_FACE);
 	TeLight::disableAll();
 	glDisable(GL_COLOR_MATERIAL);
-	// FIXME: Work out why this results in nothing at all appearing.
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glShadeModel(GL_SMOOTH);
@@ -305,7 +301,7 @@ void TeRenderer::loadMatrix(const TeMatrix4x4 &matrix) {
 void TeRenderer::loadMatrixToGL(const TeMatrix4x4 &matrix) {
 	int mmode;
 	glGetIntegerv(GL_MATRIX_MODE, &mmode);
-	debug("loadMatrixToGL[0x%x]: %s", mmode, matrix.toString().c_str());
+	//debug("loadMatrixToGL[0x%x]: %s", mmode, matrix.toString().c_str());
 	glLoadMatrixf(matrix.getData());
 }
 
@@ -330,7 +326,7 @@ void TeRenderer::multiplyMatrix(const TeMatrix4x4 &matrix) {
 
 void TeRenderer::optimiseTransparentMeshProperties() {
 	if (!_transparentMeshProperties.empty()) {
-		warning("TODO: Implement TeRenderer::optimiseTransparentMeshProperties.");
+		//warning("FIXME: Implement TeRenderer::optimiseTransparentMeshProperties.");
 	}
 }
 
@@ -356,6 +352,20 @@ static int compareTransparentMeshProperties(const TeRenderer::TransparentMeshPro
 	return 1;
 }
 
+void TeRenderer::dumpTransparentMeshes() const {
+	debug("** Transparent Meshes: num:%ld pending:%d **", _numTransparentMeshes, _pendingTransparentMeshProperties);
+	debug("vert / normal / coord / color / trianglenum");
+	for (unsigned int i = 0; i < _transparentMeshVertexes.size(); i++) {
+		debug("%s %s %s %s %d",
+			  _transparentMeshVertexes[i].dump().c_str(),
+			  _transparentMeshNormals[i].dump().c_str(),
+			  _transparentMeshCoords[i].dump().c_str(),
+			  _transparentMeshColors[i].dump().c_str(),
+			  _transparentMeshTriangleNums[i]
+			  );
+	}
+}
+
 void TeRenderer::renderTransparentMeshes() {
 	if (!_numTransparentMeshes)
 		return;
@@ -371,21 +381,20 @@ void TeRenderer::renderTransparentMeshes() {
 			_transparentMeshTriangleNums[triangles + j] = (short)(_transparentMeshProperties[i]._sourceTransparentMesh + j);
 		triangles += tcount;
 	}
+
+	//dumpTransparentMeshes();
+
 	optimiseTransparentMeshProperties();
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
-	
-	//debug("sizeof TeVector3f32: %ld", sizeof(TeVector3f32));
-	//debug("sizeof TeVector2f32: %ld", sizeof(TeVector2f32));
-	//debug("sizeof TeColor: %ld", sizeof(TeColor));
 
 	glVertexPointer(3, GL_FLOAT, 12, _transparentMeshVertexes.data());
 	glNormalPointer(GL_FLOAT, 12, _transparentMeshNormals.data());
 	glTexCoordPointer(2, GL_FLOAT, 8, _transparentMeshCoords.data());
 	glColorPointer(4, GL_UNSIGNED_BYTE, 4, _transparentMeshColors.data());
-	
+
 	TeMaterial lastMaterial;
 
 	triangles = 0;
@@ -396,29 +405,28 @@ void TeRenderer::renderTransparentMeshes() {
 
 		const TeIntrusivePtr<Te3DTexture> &texture = meshProperties._texture;
 		
-		TeMaterial material;
-		material._texture = texture;
-		material._mode = TeMaterial::Mode0; //meshProperties._glTexEnvMode;
+		TeMaterial material(texture, meshProperties._materialMode);
 		material._ambientColor = meshProperties._ambientColor;
 		material._diffuseColor = meshProperties._diffuseColor;
 		material._specularColor = meshProperties._specularColor;
 		material._emissionColor = meshProperties._emissionColor;
 		material._shininess = meshProperties._shininess;
-		material._enableLights = true;
+		material._enableLights = meshProperties._enableLights;
+		material._enableSomethingDefault0 = meshProperties._enableSomethingDefault0;
 
 		meshProperties._camera->applyProjection();
 		glMatrixMode(GL_MODELVIEW);
 		_matrixMode = MM_GL_MODELVIEW;
 		glPushMatrix();
 		_matriciesStacks[_matrixMode].pushMatrix();
-		_matriciesStacks[_matrixMode].loadMatrix(_transparentMeshProperties[i]._matrix);
+		_matriciesStacks[_matrixMode].loadMatrix(meshProperties._matrix);
 		glPushMatrix();
 		loadCurrentMatrixToGL();
 		if (texture) {
 			glEnable(GL_TEXTURE_2D);
 			_textureEnabled = true;
 		}
-		if (false) { //material.enableSomethingDefault0) {
+		if (material._enableSomethingDefault0) {
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
 		}
@@ -441,7 +449,7 @@ void TeRenderer::renderTransparentMeshes() {
 		
 		triangles += meshProperties._triangleCount;
 		
-		if (false) { //material.enableSomethingDefault0) {
+		if (material._enableSomethingDefault0) {
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 			glEnableClientState(GL_COLOR_ARRAY);
 		}
@@ -462,6 +470,7 @@ void TeRenderer::renderTransparentMeshes() {
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	_numTransparentMeshes = 0;
 	_pendingTransparentMeshProperties = 0;
 	glDepthMask(GL_TRUE);
 	_transparentMeshProperties.clear();

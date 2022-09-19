@@ -71,7 +71,7 @@ public:
 	bool isFading();
 	bool onBlackFadeAnimationFinished();
 	bool onMainWindowSizeChanged();
-	bool onMousePositionChanged(const Common::Event &e);
+	bool onMousePositionChanged(const Common::Point &p);
 
 	bool isLockCursor();
 	bool isLockPad();
@@ -94,6 +94,7 @@ public:
 	TeSpriteLayout &appSpriteLayout() { return _appSpriteLayout; }
 	TeSpriteLayout &mouseCursorLayout() { return _mouseCursorLayout; }
 	const Common::String getVersionString() const { return _versionString; }
+	TeLayout &getMainWindow() { return _mainWindow; }
 
 	bool _finishedGame;
 	bool _finishedFremium;

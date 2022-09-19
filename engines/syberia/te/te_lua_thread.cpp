@@ -35,8 +35,18 @@ namespace Syberia {
 
 TeLuaThread::TeLuaThread(TeLuaContext *context) : _resumeCount(0), _lastResumeResult(0), _released(false) {
 	_luaThread = lua_newthread(context->luaState());
-	_bottomRef = luaL_ref(context->luaState(), LUA_REGISTRYINDEX);
+	_bottomRef = luaL_ref(_luaThread, LUA_REGISTRYINDEX);
 	_threadList.push_back(this);
+}
+
+TeLuaThread::~TeLuaThread() {
+	luaL_unref(_luaThread, LUA_REGISTRYINDEX, _bottomRef);
+	unsigned int i;
+	for (i = 0; i < _threadList.size(); i++)
+		if (_threadList[i] == this)
+			break;
+	if (i < _threadList.size())
+		_threadList.remove_at(i);
 }
 
 /*static*/ TeLuaThread *TeLuaThread::create(TeLuaContext *context) {
@@ -177,7 +187,7 @@ void TeLuaThread::pushValue(const TeVariant &val) {
 void TeLuaThread::release() {
 	_released = true;
 	if (_lastResumeResult != 1) {
-		warning("TeLuaThread:: deleting this??");
+		//warning("TeLuaThread:: deleting this??");
 		delete this;
 	}
 }

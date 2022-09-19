@@ -59,7 +59,7 @@ public:
 	
 	bool addAnimToSet(const Common::String &path);
 	void addArtworkUnlocked(const Common::String &name, bool bonus);
-	void addNoScale2Child(TeILayout *layout); // FIXME: check return type
+	void addNoScale2Child(TeILayout *layout);
 	void addNoScale2Children();
 	void addNoScaleChildren();
 	void addRandomSound(const Common::String &s1, const Common::String &s2, float f1, float f2);

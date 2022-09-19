@@ -42,14 +42,14 @@ public:
 	TeMesh();
 
 	enum Mode {
-		MeshMode0 = 0,
-		MeshMode1,
-		MeshMode2,
-		MeshMode3,
-		MeshMode4,
-		MeshMode5,
-		MeshMode6,
-		MeshMode7
+		MeshMode_None = 0,
+		MeshMode_Points,
+		MeshMode_Lines,
+		MeshMode_LineLoop,
+		MeshMode_LineStrip,
+		MeshMode_Triangles,
+		MeshMode_TriangleStrip,
+		MeshMode_TriangleFan
 	};
 
 	void attachMaterial(uint idx, const TeMaterial &material);
@@ -70,7 +70,7 @@ public:
 	bool hasAlpha(uint idx);
 	bool hasColor() const { return !_colors.empty(); }
 	bool hasUvs() const { return !_uvs.empty(); }
-	bool index(uint num) const { return _indexes[num]; }
+	unsigned short index(uint num) const { return _indexes[num]; }
 	TeMaterial *material(uint idx);
 	const TeMaterial *material(uint idx) const;
 	void materialIndex(uint idx, byte val);
@@ -98,10 +98,10 @@ public:
 
 	uint numIndexes() const { return _indexes.size(); }
 	uint numVerticies() const { return _verticies.size(); }
-	bool shouldDrawMaybe() const { return _shouldDrawMaybe; }
+	bool shouldDrawMaybe() const { return _shouldDraw; }
 	uint gltexenvMode() const { return _gltexEnvMode; }
 
-	void setShouldDrawMaybe(bool val) { _shouldDrawMaybe = val; }
+	void setShouldDraw(bool val) { _shouldDraw = val; }
 	void setglTexEnv(unsigned int val) { _gltexEnvMode = val; }
 
 private:
@@ -117,14 +117,14 @@ private:
 	Common::Array<TeColor> _colors;
 	Common::Array<TeMaterial> _materials;
 
-	Mode _mode;
+	unsigned int _glMeshMode;
 
 	bool _matrixForced;
 	TeMatrix4x4 _forceMatrix;
 	bool _hasAlpha;
 	uint _initialMaterialIndexCount;
 	bool _drawWires;
-	bool _shouldDrawMaybe;
+	bool _shouldDraw;
 
 	unsigned int _gltexEnvMode;
 

@@ -41,15 +41,17 @@ public:
 	enum AlignStyle {
 		AlignStyle0
 	};
+
 	enum WrapMode {
-		WrapMode0
+		WrapModeFixed,
+		WrapModeProportional
 	};
 
 	void build();
 	void clear();
 	void clearStyles();
 	void clearText();
-	
+
 	bool computeLine(unsigned int i, Line &line);
 	void computeNbSpaces(Line &line, unsigned int x, unsigned int y);
 	TeColor currentColor(unsigned int i);
@@ -77,7 +79,6 @@ public:
 	const Common::String &text() const { return _text; }
 	WrapMode wrapMode() const { return _wrapMode; }
 	const TeVector2s32 &size() const { return _size; }
-	
 
 private:
 	AlignStyle _alignStyle;
@@ -90,12 +91,12 @@ private:
 	TeVector2s32 _size;
 	Common::String _text;
 	bool _strikethrough;
-	
+
 	TeMesh _mesh;
-	
+
 	Common::Array<unsigned int> _lineBreaks;
 	Common::HashMap<unsigned int, TeColor> _colors;
-	Common::HashMap<unsigned int, TeFont3> _fonts;
+	Common::HashMap<unsigned int, TeIntrusivePtr<TeFont3>> _fonts;
 };
 
 } // end namespace Syberia

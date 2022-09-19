@@ -36,6 +36,7 @@
 #include "syberia/te/te_renderer.h"
 #include "syberia/te/te_resource_manager.h"
 //#include "syberia/te/te_sound_manager.h"
+#include "syberia/te/te_input_mgr.h"
 
 #include "graphics/opengl/system_headers.h"
 
@@ -46,7 +47,7 @@ SyberiaEngine *g_engine;
 SyberiaEngine::SyberiaEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Syberia"), _resourceManager(nullptr),
 	_core(nullptr),	_application(nullptr), _game(nullptr), _renderer(nullptr),
-	_soundManager(nullptr), _wantToQuit(false) {
+	_soundManager(nullptr), _inputMgr(nullptr), _wantToQuit(false) {
 	g_engine = this;
 }
 
@@ -57,6 +58,7 @@ SyberiaEngine::~SyberiaEngine() {
 	delete _game;
 	//delete _soundManager;
 	delete _resourceManager;
+	delete _inputMgr;
 }
 
 Application *SyberiaEngine::getApplication() {
@@ -91,6 +93,12 @@ TeResourceManager *SyberiaEngine::getResourceManager() {
 	if (_resourceManager == nullptr)
 		_resourceManager = new TeResourceManager();
 	return _resourceManager;
+}
+
+TeInputMgr *SyberiaEngine::getInputMgr() {
+	if (_inputMgr == nullptr)
+		_inputMgr = new TeInputMgr();
+	return _inputMgr;
 }
 
 uint32 SyberiaEngine::getFeatures() const {
@@ -138,8 +146,7 @@ Common::Error SyberiaEngine::run() {
 
 	while (!shouldQuit() && !_wantToQuit) {
 		while (g_system->getEventManager()->pollEvent(e)) {
-			if (e.type == Common::EVENT_MOUSEMOVE)
-				_application->onMousePositionChanged(e);
+			getInputMgr()->handleEvent(e);
 		}
 
 		_application->run();

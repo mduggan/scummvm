@@ -58,10 +58,11 @@ public:
 	virtual void setColorKeyTolerence(float val) override;
 
 	static bool matchExtension(const Common::String &extn);
-	// TODO add public members
 
 private:
 	Video::TheoraDecoder *_decoder;
+	
+	Common::Path _path;
 
 };
 

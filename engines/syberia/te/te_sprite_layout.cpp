@@ -44,10 +44,10 @@ void TeSpriteLayout::draw() {
 	if (!visible() || !worldVisible())
 		return;
 	
-	debug("Drawing TeSpriteLayout %p (%s, surface %s, size %fx%f, surface %fx%f)", this,
+	/*debug("Draw SpriteLayout %p (%s, surf %s, size %.01fx%.01f, surf %.01fx%.01f, %s)", this,
 		  name().empty() ? "no name" : name().c_str(), _tiledSurfacePtr->getAccessName().toString().c_str(),
 		  size().x(), size().y(),
-		  _tiledSurfacePtr->size().x(), _tiledSurfacePtr->size().y());
+		  _tiledSurfacePtr->size().x(), _tiledSurfacePtr->size().y(), color().dump().c_str());*/
 	TeMatrix4x4 matrix = worldTransformationMatrix();
 	
 	if (!_allowFloatTranslate) {

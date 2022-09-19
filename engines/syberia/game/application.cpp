@@ -33,6 +33,7 @@
 #include "syberia/te/te_resource_manager.h"
 #include "syberia/te/te_renderer.h"
 #include "syberia/te/te_font3.h"
+#include "syberia/te/te_input_mgr.h"
 //#include "syberia/te/te_textbase2.h"
 
 namespace Syberia {
@@ -87,8 +88,6 @@ void Application::create() {
 	_fontProDisplay = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/ProDisplay.ttf");
 
 	// Prebuild some fonts.. cover letters, numbers, a few accented chars, and punctuation.
-	warning("TODO: Build some text with TeTextBase2 here.");
-	/*
 	TeTextBase2 textBase;
 	textBase.setText("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/,*?;.:/!\xA7&\xE9\"'(-\xE8_\xE7\xE0)=");
 	textBase.setFont(0, _fontComic);
@@ -109,7 +108,6 @@ void Application::create() {
 	textBase.setFont(0, _fontProDisplay);
 	textBase.setFontSize(24);
 	textBase.build();
-	*/
 
 	TeCore *core = g_engine->getCore();
 	static const char allLangs[][3] = {"en", "fr", "de", "es", "it", "ru"};
@@ -253,7 +251,7 @@ void Application::create() {
 
 	_blackFadeAnimationFinishedSignal.add<Application>(this, &Application::onBlackFadeAnimationFinished);
 
-	warning("TODO: Register for onMousePositionChanged callback from inputmgr here.");
+	g_engine->getInputMgr()->_mouseMoveSignal.add(this, &Application::onMousePositionChanged);
 
 	onMainWindowSizeChanged();
 	_splashScreens.enter();
@@ -276,7 +274,8 @@ bool Application::run() {
 	if (_created) {
 		TeTimer::updateAll();
 		if (!_dontUpdateWhenApplicationPaused) {
-			warning("TODO: Application::run: finish commented-out bits.");
+			// TODO: finish commented-out bits??
+			// we run the inputmgr separately.. is that ok?
 			//_inputmgr->update();
 			TeAnimation::updateAll();
 			//TeVideo::updateAll();
@@ -420,9 +419,9 @@ bool Application::onMainWindowSizeChanged() {
 	return false;
 }
 
-bool Application::onMousePositionChanged(const Common::Event &e) {
+bool Application::onMousePositionChanged(const Common::Point &p) {
 	const TeVector3f32 mainWinSize = _mainWindow.size();
-	const TeVector3f32 newCursorPos(e.mouse.x / mainWinSize.x(), e.mouse.y / mainWinSize.y(), 0.0);
+	const TeVector3f32 newCursorPos(p.x / mainWinSize.x(), p.y / mainWinSize.y(), 0.0);
 	_mouseCursorLayout.setPosition(newCursorPos);
 	return false;
 }

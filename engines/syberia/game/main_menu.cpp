@@ -48,16 +48,14 @@ void MainMenu::enter() {
 	TeSpriteLayout &appSpriteLayout = app->appSpriteLayout();
 	appSpriteLayout.setVisible(true);
 	if (appSpriteLayout._tiledSurfacePtr->_frameAnim._runTimer._stopped) {
-		// Note: We have to add "PC-MacOSX-Xbox360-PS3" here.. maybe need customized searchman??
-		appSpriteLayout.load("menus/PC-MacOSX-Xbox360-PS3/menu.ogv");
+		appSpriteLayout.load("menus/menu.ogv");
 		appSpriteLayout._tiledSurfacePtr->_frameAnim._loopCount = -1;
 		appSpriteLayout._tiledSurfacePtr->play();
 	}
 	app->captureFade();
 	
 	_entered = true;
-	// Note: We have to add "PC-MacOSX" here.. maybe need customized searchman??
-	load("menus/mainMenu/PC-MacOSX/mainMenu.lua");
+	load("menus/mainMenu/mainMenu.lua");
 	
 	TeLayout *menuLayout = layout("menu");
 	appSpriteLayout.addChild(menuLayout);

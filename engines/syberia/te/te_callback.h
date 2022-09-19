@@ -32,7 +32,7 @@ public:
 	virtual bool operator()() = 0;
 	virtual bool call() = 0;
 	virtual float priority() const = 0;
-	virtual bool equals(const TeICallback0Param *other) = 0;
+	virtual bool equals(const TeICallback0Param *other) const = 0;
 };
 
 /**
@@ -54,7 +54,7 @@ public:
 
 	virtual float priority() const override { return _priority; }
 
-	bool equals(const TeICallback0Param *other) override {
+	bool equals(const TeICallback0Param *other) const override {
 		const TeCallback0Param<T> *o = dynamic_cast<const TeCallback0Param<T> *>(other);
 		return o && _object == o->_object && _method == o->_method;
 	}
@@ -67,7 +67,7 @@ public:
 	virtual bool operator()(T data) = 0;
 	virtual bool call(T data) = 0;
 	virtual float priority() const = 0;
-	virtual bool equals(const TeICallback1Param *other) = 0;
+	virtual bool equals(const TeICallback1Param *other) const = 0;
 };
 
 
@@ -81,12 +81,12 @@ protected:
 public:
 	TeCallback1Param(T *object, TMethod method, float priority_ = 0.0f): _object(object), _method(method), _priority(priority_) {}
 	virtual ~TeCallback1Param() {}
-	bool operator()(S data) { return (_object->*_method)(data); }
-	bool call(S data) { return (_object->*_method)(data); }
+	bool operator()(S data) override { return (_object->*_method)(data); }
+	bool call(S data) override { return (_object->*_method)(data); }
 
-	virtual float priority() const { return _priority; }
+	virtual float priority() const override { return _priority; }
 
-	bool equals(const TeICallback1Param<S> *other) {
+	bool equals(const TeICallback1Param<S> *other) const override {
 		const TeCallback1Param<T, S> *o = dynamic_cast<const TeCallback1Param<T, S> *>(other);
 		return o && _object == o->_object && _method == o->_method;
 	}

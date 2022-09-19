@@ -29,16 +29,16 @@
 
 namespace Syberia {
 
-TeMesh::TeMesh() : _matrixForced(false), _mode(MeshMode0),
+TeMesh::TeMesh() : _matrixForced(false), _glMeshMode(GL_POINTS),
 _hasAlpha(false), _gltexEnvMode(GL_MODULATE), _initialMaterialIndexCount(0),
-_drawWires(false), _shouldDrawMaybe(true) {
+_drawWires(false), _shouldDraw(true) {
 }
 
 
 void TeMesh::defaultMaterial(const TeIntrusivePtr<Te3DTexture> &texture) {
-	TeMaterial::Mode mode = TeMaterial::Mode1;
+	TeMaterial::Mode mode = TeMaterial::MaterialMode1;
 	if (texture && !texture->hasAlpha())
-		mode = TeMaterial::Mode0;
+		mode = TeMaterial::MaterialMode0;
 
 	_materials.resize(1);
 	_materials[0] = TeMaterial(texture, mode);
@@ -79,7 +79,7 @@ void TeMesh::draw() {
 	Common::Array<TeVector3f32> &verticies = (_updatedVerticies.empty() ? _verticies : _updatedVerticies);
 	if (renderer->shadowMode() != TeRenderer::ShadowMode1) {
 		if (_faceCounts.empty()) {
-			if (hasAlpha(0) && _shouldDrawMaybe) {
+			if (hasAlpha(0) && _shouldDraw) {
 				renderer->addTransparentMesh(*this, 0, 0, 0);
 				renderer->popMatrix();
 				return;
@@ -131,7 +131,7 @@ void TeMesh::draw() {
 		if (!_materials.empty())
 			_materials[0].apply();
 
-		glDrawElements(_mode, _indexes.size(), GL_UNSIGNED_SHORT, _indexes.data());
+		glDrawElements(_glMeshMode, _indexes.size(), GL_UNSIGNED_SHORT, _indexes.data());
 		if (!_materials.empty()) {
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			renderer->disableTexture();
@@ -140,9 +140,9 @@ void TeMesh::draw() {
 		int totalfacecount = 0;
 		for (unsigned int i = 0; i < _materials.size(); i++) {
 			if (_faceCounts[i]) {
-			if (!hasAlpha(i) || renderer->shadowMode() == TeRenderer::ShadowMode1 || !_shouldDrawMaybe) {
+			if (!hasAlpha(i) || renderer->shadowMode() == TeRenderer::ShadowMode1 || !_shouldDraw) {
 				_materials[i].apply();
-				glDrawElements(_mode, _faceCounts[i] * 3, GL_UNSIGNED_SHORT, _indexes.data() + totalfacecount * 3);
+				glDrawElements(_glMeshMode, _faceCounts[i] * 3, GL_UNSIGNED_SHORT, _indexes.data() + totalfacecount * 3);
 				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 				renderer->disableTexture();
 			}
@@ -197,35 +197,33 @@ void TeMesh::draw() {
 
 TeMesh::Mode TeMesh::getMode() const {
 	// Do the reverse translation of setMode... why? I dunno.. the game does that..
-	switch(_mode) {
-	case MeshMode0:
-		return MeshMode1;
-	case MeshMode1:
-		return MeshMode2;
-	case MeshMode2:
-		return MeshMode3;
-	case MeshMode3:
-		return MeshMode4;
-	case MeshMode4:
-		return MeshMode5;
-	case MeshMode5:
-		return MeshMode6;
-	case MeshMode6:
-		return MeshMode7;
+	switch(_glMeshMode) {
+	case GL_POINTS:
+		return MeshMode_Points;
+	case GL_LINES:
+		return MeshMode_Lines;
+	case GL_LINE_LOOP:
+		return MeshMode_LineLoop;
+	case GL_LINE_STRIP:
+		return MeshMode_LineStrip;
+	case GL_TRIANGLES:
+		return MeshMode_Triangles;
+	case GL_TRIANGLE_STRIP:
+		return MeshMode_TriangleStrip;
+	case GL_TRIANGLE_FAN:
+		return MeshMode_TriangleFan;
 	default:
-		return MeshMode0;
+		return MeshMode_None;
 	}
 }
 
 bool TeMesh::hasAlpha(uint idx) {
 	// FIXME: this logic is a bit sketchy.  Check it again.
 	bool retval = _hasAlpha && !_colors.empty();
-	return retval;
 
 	for (const TeMaterial &material : _materials) {
-		//if (!material._someFlagDefault0 == 0)
-		retval = true;
-		if (material._mode != TeMaterial::Mode1 && material._ambientColor.a() == 255)
+		retval = !material._enableSomethingDefault0;
+		if (material._mode != TeMaterial::MaterialMode1 && material._ambientColor.a() == 255)
 			retval = (material._diffuseColor.a() != 255);
 	}
 	return retval;
@@ -247,7 +245,7 @@ void TeMesh::setColor(const TeColor &col) {
 	Te3DObject2::setColor(col);
 
 	if (!_verticies.empty()) {
-		TeColor colnow = Te3DObject2::color();
+		const TeColor colnow = Te3DObject2::color();
 		_colors.resize(_verticies.size());
 		if (colnow.a() != 255)
 			_hasAlpha = true;
@@ -273,29 +271,30 @@ void TeMesh::setConf(unsigned long vertexCount, unsigned long indexCount, enum M
 	_indexes.resize(indexCount);
 	_materials.resize(materialCount);
 	_matricies.resize(vertexCount);
-	// TODO: This can't be right.. what's going on with this translation??
 	switch(mode) {
-	case MeshMode0:
-	case MeshMode1:
-	  _mode = MeshMode0;
-	  break;
-	case MeshMode2:
-	  _mode = MeshMode1;
-	  break;
-	case MeshMode3:
-	  _mode = MeshMode2;
-	  break;
-	case MeshMode4:
-	  _mode = MeshMode3;
-	  break;
-	case MeshMode5:
-	  _mode = MeshMode4;
-	  break;
-	case MeshMode6:
-	  _mode = MeshMode5;
-	  break;
-	case MeshMode7:
-	  _mode = MeshMode6;
+	case MeshMode_Points:
+		_glMeshMode = GL_POINTS;
+		break;
+	case MeshMode_Lines:
+		_glMeshMode = GL_LINES;
+		break;
+	case MeshMode_LineLoop:
+		_glMeshMode = GL_LINE_LOOP;
+		break;
+	case MeshMode_LineStrip:
+		_glMeshMode = GL_LINE_STRIP;
+		break;
+	case MeshMode_Triangles:
+		_glMeshMode = GL_TRIANGLES;
+		break;
+	case MeshMode_TriangleStrip:
+		_glMeshMode = GL_TRIANGLE_STRIP;
+		break;
+	case MeshMode_TriangleFan:
+		_glMeshMode = GL_TRIANGLE_FAN;
+		break;
+	default:
+		error("Setting invalid mesh mode.");
 	}
 }
 

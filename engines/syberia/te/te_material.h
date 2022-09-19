@@ -35,10 +35,8 @@ namespace Syberia {
 class TeMaterial {
 public:
 	enum Mode {
-		Mode0,
-		Mode1,
-		Mode2,
-		Mode3
+		MaterialMode0,
+		MaterialMode1
 	};
 
 	TeMaterial();
@@ -48,13 +46,15 @@ public:
 	void defaultValues();
 	static void deserialize(Common::SeekableReadStream &stream, TeMaterial &material, const Common::Path &path);
 	static void serialize(Common::SeekableWriteStream &stream, TeMaterial &material);
-	
+
 	bool operator==(const TeMaterial &other) const;
 	bool operator!=(const TeMaterial &other) const {
 		return !operator==(other);
 	}
-	
+
 	TeMaterial &operator=(const TeMaterial &other);
+
+	Common::String dump() const;
 
 	TeIntrusivePtr<Te3DTexture> _texture;
 	Mode _mode;

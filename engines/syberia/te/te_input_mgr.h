@@ -19,36 +19,31 @@
  *
  */
 
-#ifndef SYBERIA_TE_TE_I_LAYOUT_H
-#define SYBERIA_TE_TE_I_LAYOUT_H
+#ifndef SYBERIA_TE_TE_INPUT_MGR_H
+#define SYBERIA_TE_TE_INPUT_MGR_H
+
+#include "common/events.h"
+
+#include "syberia/te/te_signal.h"
 
 namespace Syberia {
 
-class TeILayout {
+class TeInputMgr {
 public:
-	TeILayout();
+	TeInputMgr();
 
-	enum CoordinatesType {
-		ABSOLUTE, // use User Position?
-		RELATIVE_TO_PARENT // scale based on parent size
-	};
+	void handleEvent(const Common::Event &e);
 
-	enum DrawMode {
-		DrawMode0
-	};
-
-	enum RatioMode {
-		RATIO_MODE_NONE,
-		RATIO_MODE_LETTERBOX,
-		RATIO_MODE_PAN_SCAN
-	};
-	// TODO add public members
-
-private:
-	// TODO add private members
+	TeSignal1Param<const Common::KeyState &> _keyDownSignal;
+	TeSignal1Param<const Common::KeyState &> _keyUpSignal;
+	TeSignal1Param<const Common::Point &> _mouseMoveSignal;
+	TeSignal1Param<const Common::Point &> _mouseLDownSignal;
+	TeSignal1Param<const Common::Point &> _mouseLUpSignal;
+	TeSignal1Param<const Common::Point &> _mouseRDownSignal;
+	TeSignal1Param<const Common::Point &> _mouseRUpSignal;
 
 };
 
 } // end namespace Syberia
 
-#endif // SYBERIA_TE_TE_I_LAYOUT_H
+#endif // SYBERIA_TE_TE_INPUT_MGR_H

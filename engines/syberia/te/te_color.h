@@ -57,7 +57,7 @@ public:
 		return !operator==(c);
 	}
 
-	Common::String toString() const {
+	Common::String dump() const {
 		return Common::String::format("TeColor(%d %d %d %d)",
 									  _c[0], _c[1], _c[2], _c[3]);
 	}

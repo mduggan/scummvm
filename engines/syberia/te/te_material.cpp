@@ -33,7 +33,7 @@ namespace Syberia {
 
 TeMaterial::TeMaterial() {
 	defaultValues();
-	_mode = Mode1;
+	_mode = MaterialMode1;
 }
 
 TeMaterial::TeMaterial(TeIntrusivePtr<Te3DTexture> texture, Mode mode) {
@@ -52,7 +52,20 @@ void TeMaterial::defaultValues() {
 	_enableSomethingDefault0 = false;
 }
 
+Common::String TeMaterial::dump() const {
+	return Common::String::format
+			("amb:%s dif:%s spe:%s emi:%s mode:%d tex:%s shin:%.02f lights:%s",
+			  _ambientColor.dump().c_str(),
+			  _diffuseColor.dump().c_str(),
+			  _specularColor.dump().c_str(),
+			  _emissionColor.dump().c_str(),
+			  (int)_mode,
+			 _texture ? _texture->getAccessName().toString().c_str() : "None",
+			  _shininess, _enableLights ? "on" : "off");
+}
+
 void TeMaterial::apply() {
+	//debug("TeMaterial::apply (%s)", dump().c_str());
 	static const float constColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	TeRenderer *renderer = g_engine->getRenderer();
 	if (renderer->shadowMode() == TeRenderer::ShadowMode0) {
@@ -68,7 +81,7 @@ void TeMaterial::apply() {
 		}
 
 		glDisable(GL_ALPHA_TEST);
-		if (_mode == Mode0) {
+		if (_mode == MaterialMode0) {
 			glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, constColor);
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
@@ -79,7 +92,7 @@ void TeMaterial::apply() {
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
 		} else {
 			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			if (_mode == Mode1) {
+			if (_mode == MaterialMode1) {
 				glEnable(GL_ALPHA_TEST);
 				glAlphaFunc(GL_GREATER, 0.5);
 			}
@@ -97,21 +110,23 @@ void TeMaterial::apply() {
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
 		
 		glMaterialf(GL_FRONT, GL_SHININESS, _shininess);
-		
+
 		const float diffuse[4] = { _diffuseColor.r() / 255.0f, _diffuseColor.g() / 255.0f,
 			_diffuseColor.b() / 255.0f, _diffuseColor.a() / 255.0f };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-		
+
 		renderer->setCurrentColor(_diffuseColor);
 	} else if (renderer->shadowMode() == TeRenderer::ShadowMode1) {
-			static const float fullColor[4] = { 255.0f, 255.0f, 255.0f, 255.0f };
-			TeLight::disableAll();
-			glDisable(GL_ALPHA_TEST);
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, fullColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, fullColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, fullColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, fullColor);
+		// NOTE: Diverge from original here, it sets 255.0 but the
+		// colors should be scaled -1.0 .. 1.0.
+		static const float fullColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		TeLight::disableAll();
+		glDisable(GL_ALPHA_TEST);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, fullColor);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, fullColor);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, fullColor);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, fullColor);
 	}
 
 	//warning("TODO: Work out what TeMaterial::_enableSomethingDefault0 actually is.");
@@ -135,7 +150,7 @@ void TeMaterial::apply() {
 		const float diffuse[4] = { _diffuseColor.r() / 255.0f, _diffuseColor.g() / 255.0f,
 			_diffuseColor.b() / 255.0f, _diffuseColor.a() / 255.0f };
 
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, diffuse);
@@ -152,7 +167,7 @@ bool TeMaterial::operator==(const TeMaterial &other) const {
 TeMaterial &TeMaterial::operator=(const TeMaterial &other) {
 	if (&other == this)
 		return *this;
-	
+
 	_texture = other._texture;
 	_ambientColor = other._ambientColor;
 	_diffuseColor = other._diffuseColor;
@@ -162,7 +177,8 @@ TeMaterial &TeMaterial::operator=(const TeMaterial &other) {
 	_shininess = other._shininess;
 	_mode = other._mode;
 	_enableLights = other._enableLights;
-	
+	_enableSomethingDefault0 = other._enableSomethingDefault0;
+
 	return *this;
 }
 

@@ -27,11 +27,17 @@
 #include "syberia/te/te_signal.h"
 #include "syberia/te/te_timer.h"
 
+namespace Common {
+class Point;
+}
+
 namespace Syberia {
 
 class TeButtonLayout : public TeLayout {
 public:
 	TeButtonLayout();
+	
+	virtual ~TeButtonLayout();
 
 	enum State {
 		BUTTON_STATE_UP = 0,
@@ -44,12 +50,12 @@ public:
 	long frozenValidationTimeoutTime() { return 500; }
 
 	virtual bool isMouseIn(const TeVector2s32 &mouseloc) override;
-	bool onMouseLeftDown(uint flags);
-	bool onMouseLeftDownMaxPriority(uint flags) { return false; }
-	bool onMouseLeftUp(uint flags);
-	bool onMouseLeftUpMaxPriority(uint flags) { return false; }
-	bool onMousePositionChanged(uint flags);
-	bool onMousePositionChangedMaxPriority(uint flags) {
+	bool onMouseLeftDown(const Common::Point &pt);
+	bool onMouseLeftDownMaxPriority(const Common::Point &pt) { return false; }
+	bool onMouseLeftUp(const Common::Point &pt);
+	bool onMouseLeftUpMaxPriority(const Common::Point &pt) { return false; }
+	bool onMousePositionChanged(const Common::Point &pt);
+	bool onMousePositionChangedMaxPriority(const Common::Point &pt) {
 		_mousePositionChangedCatched = false;
 		return false;
 	}
@@ -97,11 +103,11 @@ private:
 
 	Common::Array<unsigned int> _intArr;
 
-	TeICallback1ParamPtr<unsigned int> _onMousePositionChangedMaxPriorityCallback;
-	TeICallback1ParamPtr<unsigned int> _onMousePositionChangedCallback;
-	TeICallback1ParamPtr<unsigned int> _onMouseLeftDownCallback;
-	TeICallback1ParamPtr<unsigned int> _onMouseLeftUpMaxPriorityCallback;
-	TeICallback1ParamPtr<unsigned int> _onMouseLeftUpCallback;
+	TeICallback1ParamPtr<const Common::Point &> _onMousePositionChangedMaxPriorityCallback;
+	TeICallback1ParamPtr<const Common::Point &> _onMousePositionChangedCallback;
+	TeICallback1ParamPtr<const Common::Point &> _onMouseLeftDownCallback;
+	TeICallback1ParamPtr<const Common::Point &> _onMouseLeftUpMaxPriorityCallback;
+	TeICallback1ParamPtr<const Common::Point &> _onMouseLeftUpCallback;
 	
 	TeLayout *_upLayout;
 	TeLayout *_downLayout;

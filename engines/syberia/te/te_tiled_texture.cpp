@@ -131,8 +131,8 @@ bool TeTiledTexture::load(const TeIntrusivePtr<Te3DTexture> &texture) {
 	_tileArray.resize(1);
 	Tile *tileData = tile(TeVector2s32(0, 0));
 	tileData->_texture = texture;
-	tileData->_vec1 = TeVector3f32(1.0, 1.0, 0.0);
-	tileData->_vec2 = TeVector3f32(0.0, 0.0, 0.0);
+	tileData->_vec2 = TeVector3f32(1.0, 1.0, 0.0);
+	tileData->_vec1 = TeVector3f32(0.0, 0.0, 0.0);
 	setAccessName(texture->getAccessName().append(".tt"));
 	return true;
 }

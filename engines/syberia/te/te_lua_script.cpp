@@ -40,7 +40,7 @@ void TeLuaScript::execute() {
 		if (state) {
 			TeLuaThread *thread = TeLuaThread::create(_luaContext);
 			thread->executeFile(_scriptPath);
-			thread->resume();
+			thread->release();
 			_started = true;
 		}
 	}

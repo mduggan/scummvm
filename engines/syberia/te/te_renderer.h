@@ -36,8 +36,8 @@ public:
 
 	enum MatrixMode {
 		MM_GL_PROJECTION = 0,
-		MM_GL_TEXTURE = 1,
-		MM_GL_MODELVIEW = 2
+		MM_GL_MODELVIEW = 1,
+		MM_GL_TEXTURE = 2
 	};
 	
 	enum ShadowMode {
@@ -48,11 +48,14 @@ public:
 	
 	class TransparentMeshProperties {
 	public:
+		void setFromMaterial(const TeMaterial &material);
+		
 		TeIntrusivePtr<Te3DTexture> _texture;
 		TeCamera *_camera;
 		int _triangleCount;
 		TeMatrix4x4 _matrix;
 		bool _enableLights;
+		bool _enableSomethingDefault0;
 		
 		enum TeMaterial::Mode _materialMode;
 		
@@ -123,7 +126,9 @@ public:
 	enum ShadowMode shadowMode() const { return _shadowMode; }
 	void translate(float x, float y, float z);
 	Common::String vendor();
-	
+
+	void dumpTransparentMeshes() const;
+
 private:
 	TeCamera *_currentCamera;
 	TeColor _currentColor;

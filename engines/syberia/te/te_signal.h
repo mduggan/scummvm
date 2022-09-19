@@ -80,11 +80,11 @@ template<class T> class TeSignal1Param : public Common::SortedArray<TeICallback1
 public:
 	TeSignal1Param() : Common::SortedArray<TeICallback1ParamPtr<T>, const TeICallback1ParamPtr<T> &>(_teCallbackSorter) {};
 
-	void call() {
+	void call(T t) {
 		typename Common::Array<TeICallback1ParamPtr<T>>::iterator i = this->begin();
 		typename Common::Array<TeICallback1ParamPtr<T>>::iterator end_ = this->end();
 		for (; i < end_; i++) {
-			i->call();
+			(*i)->call(t);
 		}
 	}
 
@@ -92,7 +92,7 @@ public:
 		typename Common::Array<TeICallback1ParamPtr<T>>::iterator i = this->begin();
 		typename Common::Array<TeICallback1ParamPtr<T>>::iterator end_ = this->end();
 		for (; i < end_; i++) {
-			if (i->equals(item)) {
+			if ((*i)->equals(item.get())) {
 				this->erase(i);
 				break;
 			}
