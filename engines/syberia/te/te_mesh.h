@@ -40,6 +40,7 @@ namespace Syberia {
 class TeMesh : public Te3DObject2 {
 public:
 	TeMesh();
+	TeMesh(const TeMesh &other) = default;
 
 	enum Mode {
 		MeshMode_None = 0,

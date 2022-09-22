@@ -28,7 +28,7 @@
 #include "syberia/te/te_timer.h"
 
 namespace Common {
-class Point;
+struct Point;
 }
 
 namespace Syberia {

@@ -20,6 +20,7 @@
  */
 
 #include "common/lua/lua.h"
+#include "common/math.h"
 #include "common/textconsole.h"
 #include "syberia/te/te_lua_gui_lua_callbacks.h"
 #include "syberia/te/te_layout.h"

@@ -34,6 +34,7 @@ public:
 	TeVector3f32(float x_, float y_, float z_) {
 		set(x_, y_, z_);
 	}
+	TeVector3f32(const TeVector3f32 &other) : Math::Vector3d(other) {}
 	TeVector3f32(const Math::Vector3d &v) : Math::Vector3d(v) {}
 	TeVector3f32 &operator=(const TeVector3f32 &other) {
 		Math::Vector3d::operator=(other);

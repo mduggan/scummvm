@@ -40,7 +40,7 @@
 #include "syberia/te/te_font3.h"
 
 namespace Common {
-class Event;
+struct Event;
 }
 
 namespace Syberia {

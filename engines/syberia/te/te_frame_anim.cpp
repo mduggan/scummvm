@@ -20,6 +20,7 @@
  */
 
 #include "common/util.h"
+#include "common/math.h"
 #include "syberia/te/te_frame_anim.h"
 
 namespace Syberia {

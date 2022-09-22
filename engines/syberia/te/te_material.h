@@ -40,6 +40,7 @@ public:
 	};
 
 	TeMaterial();
+	TeMaterial(const TeMaterial &other) = default;
 	TeMaterial(TeIntrusivePtr<Te3DTexture> texture, Mode mode);
 
 	void apply();
