@@ -115,11 +115,11 @@ void SyberiaEngine::configureSearchPaths() {
 }
 
 int SyberiaEngine::getDefaultScreenWidth() const {
-	return 800;
+	return 1024;
 }
 
 int SyberiaEngine::getDefaultScreenHeight() const {
-	return 600;
+	return 768;
 }
 
 Common::Error SyberiaEngine::run() {

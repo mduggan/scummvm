@@ -41,7 +41,7 @@ bool Credits::onAnimFinished() {
 }
 
 bool Credits::onBackgroundAnimFinished() {
-	TeLayout *buttonsLayout = _gui.layout("buttons");
+	//TeLayout *buttonsLayout = _gui.layout("buttons");
 	error("TODO: Credits: implement me");
 }
 

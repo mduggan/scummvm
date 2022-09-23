@@ -37,9 +37,11 @@ class TeTextBase2 {
 public:
 	TeTextBase2();
 	
-	class Line {};
-	enum AlignStyle {
-		AlignStyle0
+	struct  Line {
+		unsigned int _startOffset;
+		unsigned int _endOffset;
+		float _height;
+		float _width;
 	};
 
 	enum WrapMode {
@@ -52,21 +54,17 @@ public:
 	void clearStyles();
 	void clearText();
 
-	bool computeLine(unsigned int i, Line &line);
-	void computeNbSpaces(Line &line, unsigned int x, unsigned int y);
-	TeColor currentColor(unsigned int i);
-	TeIntrusivePtr<TeFont3> currentFont(unsigned int i);
+	TeColor currentColor(unsigned int offset) const;
+	TeIntrusivePtr<TeFont3> currentFont(unsigned int offset);
 	void draw();
-	void drawEmptyChar(unsigned int i);
-	void drawLine(unsigned int i, unsigned int j, const TeVector3f32 &pt, Line &line);
-	unsigned int endOfWord(unsigned int i);
+	unsigned int endOfWord(unsigned int i) const;
 	void insertNewLine(unsigned int offset);
 	bool isASpace(unsigned int offset) const;
-	int newLines(unsigned int offset);
+	int newLines(unsigned int offset) const;
 	int nextNonSpaceChar(unsigned int start);
-	void setAlignStyle(AlignStyle style);
-	void setColor(unsigned int i, const TeColor &color);
-	void setFont(unsigned int i, const TeIntrusivePtr<TeFont3> &newfont);
+	void setAlignStyle(TeFont3::AlignStyle style);
+	void setColor(unsigned int offset, const TeColor &color);
+	void setFont(unsigned int offset, const TeIntrusivePtr<TeFont3> &newfont);
 	void setFontSize(unsigned long size);
 	void setGlobalColor(const TeColor &color);
 	void setInterLine(float val);
@@ -81,7 +79,11 @@ public:
 	const TeVector2s32 &size() const { return _size; }
 
 private:
-	AlignStyle _alignStyle;
+	void computeNbSpaces(Line &line, unsigned int startOffset, unsigned int endOffset);
+	void drawEmptyChar(unsigned int offset);
+	void drawLine(TeImage &img, const Common::String &str, int yoffset);
+
+	TeFont3::AlignStyle _alignStyle;
 	WrapMode _wrapMode;
 	unsigned long _fontSize;
 	bool _valueWasSet;
@@ -93,6 +95,8 @@ private:
 	bool _strikethrough;
 
 	TeMesh _mesh;
+	
+	Common::Array<Common::String> _wrappedLines;
 
 	Common::Array<unsigned int> _lineBreaks;
 	Common::HashMap<unsigned int, TeColor> _colors;

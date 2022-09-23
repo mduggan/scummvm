@@ -48,14 +48,13 @@ bool GalleryMenu::onQuitButton() {
 }
 
 bool GalleryMenu::onVideoFinished() {
-	error("TODO: work out what field this is.");
-	//if ((this->super).field_0x350 != 0) {
-	Application *app = g_engine->getApplication();
-	app->captureFade();
-	onSkipVideoButtonValidated();
-	app->music().play();
-	app->fade();
-	//}
+	if (_loaded) {
+		Application *app = g_engine->getApplication();
+		app->captureFade();
+		onSkipVideoButtonValidated();
+		app->music().play();
+		app->fade();
+	}
 	return false;
 }
 

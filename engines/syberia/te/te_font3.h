@@ -22,37 +22,73 @@
 #ifndef SYBERIA_TE_TE_FONT3_H
 #define SYBERIA_TE_TE_FONT3_H
 
+#include "common/file.h"
 #include "common/str.h"
+#include "common/path.h"
 #include "common/types.h"
+#include "common/hashmap.h"
+#include "common/rect.h"
 
 #include "syberia/te/te_resource.h"
 #include "syberia/te/te_vector3f32.h"
+#include "syberia/te/te_image.h"
+#include "syberia/te/te_intrusive_ptr.h"
+#include "syberia/te/te_3d_texture.h"
 
 struct FT_FaceRec_;
+struct FT_LibraryRec_;
+
+namespace Graphics {
+class Font;
+}
 
 namespace Syberia {
 
 class TeFont3 : public TeResource {
 public:
 	TeFont3();
+	~TeFont3();
+	
+	enum AlignStyle {
+		AlignLeft,
+		AlignRight,
+		AlignJustify,
+		AlignCenter
+	};
 
 	class FontSizeData {};
-	class GlyphData {};
+	struct GlyphData {
+		uint32 _charcode;
+		Common::Rect _bitmapSize;
+		TeIntrusivePtr<TeImage> _img;
+	};
 
-	bool load(const Common::String &path);
+	bool load(const Common::Path &path);
 	void unload();
 	void init();
 	
-	GlyphData glyph(uint size, uint charcode);
+	GlyphData glyph(unsigned int size, unsigned int charcode);
 
-	float ascender(uint pxSize);
-	float descender(uint pxSize);
-	float height(uint pxSize);
-	TeVector3f32 kerning(uint pxSize, uint isocode1, uint isocode2);
+	float ascender(unsigned int pxSize);
+	float descender(unsigned int pxSize);
+	float height(unsigned int pxSize);
+	TeVector3f32 kerning(unsigned int pxSize, unsigned int isocode1, unsigned int isocode2);
+	TeIntrusivePtr<Te3DTexture> getFontSizeData(int size) const {
+		return _fontSizeData[size];
+	}
+
+	int wordWrapText(const Common::String &str, int fontSize, int maxWidth, Common::Array<Common::String> &lines);
+	Common::Rect getBoundingBox(const Common::String &str, int fontSize);
+	
+	void draw(TeImage &destImage, const Common::String &str, int fontSize, int yoff, const TeColor &col, AlignStyle alignMode);
 
 private:
-	FT_FaceRec_ *_ftFace;
-
+	Graphics::Font *getAtSize(unsigned int size);
+	
+	Common::File _fontFile;
+	Common::HashMap<unsigned int, Graphics::Font *> _fonts;
+	Common::Path _loadedPath;
+	Common::HashMap<unsigned int, TeIntrusivePtr<Te3DTexture>> _fontSizeData;
 };
 
 } // end namespace Syberia

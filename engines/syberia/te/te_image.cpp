@@ -72,7 +72,9 @@ void TeImage::fill(byte val)  {
 }
 
 void TeImage::fill(byte r, byte g, byte b, byte a)  {
-	error("TODO: TeImage: Implement me.");
+	Common::Rect wholeSurf(0, 0, w, h);
+	uint32 col = (r << 24) | (g << 16) | (b << 8) | a;
+	Graphics::Surface::fillRect(wholeSurf, col);
 }
 
 void TeImage::getBuff(uint x, uint y, byte *pout, uint w_, uint h_)  {

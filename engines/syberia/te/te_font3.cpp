@@ -26,7 +26,8 @@
 #include "syberia/syberia.h"
 #include "syberia/te/te_font3.h"
 #include "syberia/te/te_core.h"
-#include "graphics/fonts/freetype.h"
+#include "graphics/font.h"
+#include "graphics/fonts/ttf.h"
 
 namespace Syberia {
 
@@ -67,84 +68,126 @@ static uint getUnicodeFromISO(uint chr)
 }
 
 TeFont3::TeFont3() {
+	init();
+}
+
+TeFont3::~TeFont3() {
+	unload();
+}
+
+Graphics::Font *TeFont3::getAtSize(unsigned int size) {
+	if (_fonts.contains(size))
+		return _fonts.getVal(size);
+	
+	if (!_fontFile.isOpen())
+		load(getAccessName());
+
+	if (!_fontFile.isOpen())
+		error("TeFont3::: Couldn't open font file %s.", getAccessName().toString().c_str());
+	
+	_fontFile.seek(0);
+	Graphics::Font *newFont = Graphics::loadTTFFont(_fontFile, size);
+	if (!newFont) {
+		error("TeFont3::: Couldn't load font %s at size %d.", _loadedPath.toString().c_str(), size);
+	}
+	_fonts.setVal(size, newFont);
+	return newFont;
+}
+
+TeFont3::GlyphData TeFont3::glyph(unsigned int pxSize, unsigned int charcode) {
+	Graphics::Font *font = getAtSize(pxSize);
+	Common::Rect bbox = font->getBoundingBox(charcode);
+	TeImage *img = new TeImage();
+	Common::SharedPtr<TePalette> nullpal;
+	img->create(bbox.width(), bbox.height(), nullpal, TeImage::RGBA8);
+	font->drawChar(img, charcode, 0, 0, 0xffffffff);
+	GlyphData retval;
+	retval._charcode = charcode;
+	retval._bitmapSize = bbox;
+	retval._img = img;
+	return retval;
+}
+
+int TeFont3::wordWrapText(const Common::String &str, int fontSize, int maxWidth, Common::Array<Common::String> &lines) {
+	Graphics::Font *font = getAtSize(fontSize);
+	return font->wordWrapText(str, maxWidth, lines);
+}
+
+Common::Rect TeFont3::getBoundingBox(const Common::String &str, int fontSize) {
+	Graphics::Font *font = getAtSize(fontSize);
+	return font->getBoundingBox(str);
+}
+
+void TeFont3::draw(TeImage &destImage, const Common::String &str, int fontSize, int yoff, const TeColor &col, TeFont3::AlignStyle align) {
+	Graphics::Font *font = getAtSize(fontSize);
+	Graphics::TextAlign talign;
+	switch (align) {
+		case AlignLeft:
+			talign = Graphics::kTextAlignLeft;
+			break;
+		case AlignRight:
+			talign = Graphics::kTextAlignRight;
+			break;
+		case AlignJustify:
+			talign = Graphics::kTextAlignCenter;
+			break;
+		case AlignCenter:
+			talign = Graphics::kTextAlignCenter;
+			break;
+	}
+	uint32 uintcol = (col.r() << 24) | (col.r() << 16) | (col.r() << 8) | col.r();
+	font->drawString(&destImage, str, 0, yoff, destImage.w, uintcol, talign);
 }
 
 
-bool TeFont3::load(const Common::String &path) {
-	// TODO: implement me.
-	return false;
+bool TeFont3::load(const Common::Path &path) {
+	setAccessName(path);
+	_loadedPath = path;
+
+	if (!Common::File::exists(path)) {
+		warning("TeFont3::load: File %s doesn't exist", path.toString().c_str());
+		return false;
+	}
+	
+	if (!_fontFile.open(path)) {
+		warning("TeFont3::load: can't open %s", path.toString().c_str());
+		return false;
+	}
+	return true;
 }
 
 void TeFont3::unload() {
-	if (_ftFace) {
-		Graphics::FreeType::Done_Face(_ftFace);
+	for (auto &entry : _fonts) {
+		delete entry._value;
 	}
-	// TODO: implement me.
+	_fonts.clear();
+	_fontFile.close();
 }
 
 void TeFont3::init() {
-	// TODO: implement me.
 }
 
-float TeFont3::ascender(uint pxSize) {
-	float size = 0.0;
-	if (_ftFace) {
-		FT_Error result = Graphics::FreeType::Set_Pixel_Sizes(_ftFace, pxSize, pxSize);
-		if (result < 1) {
-			size = _ftFace->ascender;
-		} else {
-			warning("TeFont3::glyph: FT_Set_Pixel_Sizes error %x\n", result);
-		}
-	}
-	return size;
+float TeFont3::ascender(unsigned int pxSize) {
+	Graphics::Font *font = getAtSize(pxSize);
+	return font->getFontAscent();
 }
 
-float TeFont3::descender(uint pxSize) {
-	float size = 0.0;
-	if (_ftFace) {
-		FT_Error result = Graphics::FreeType::Set_Pixel_Sizes(_ftFace, pxSize, pxSize);
-		if (result < 1) {
-			size = _ftFace->descender;
-		} else {
-			warning("TeFont3::glyph: FT_Set_Pixel_Sizes error %x\n", result);
-		}
-	}
-	return size;
+float TeFont3::descender(unsigned int pxSize) {
+	error("TeFont3::descender: Implement me.");
 }
 
-float TeFont3::height(uint pxSize) {
-	float size = 0.0;
-	if (_ftFace) {
-		FT_Error result = Graphics::FreeType::Set_Pixel_Sizes(_ftFace, pxSize, pxSize);
-		if (result < 1) {
-			size = _ftFace->height;
-		} else {
-			warning("TeFont3::glyph: FT_Set_Pixel_Sizes error %x\n", result);
-		}
-	}
-	return size;
+float TeFont3::height(unsigned int pxSize) {
+	Graphics::Font *font = getAtSize(pxSize);
+	return font->getFontHeight();
 }
 
-TeVector3f32 TeFont3::kerning(uint pxSize, uint isocode1, uint isocode2) {
-	uint uni1 = getUnicodeFromISO(isocode1);
-	uint uni2 = getUnicodeFromISO(isocode2);
-	if (_ftFace) {
-		FT_Error result = Graphics::FreeType::Set_Pixel_Sizes(_ftFace, pxSize, pxSize);
-	  if ((int)result < 1) {
-		  FT_Vector kern;
-		result = Graphics::FreeType::Get_Kerning(_ftFace, uni1, uni2, 0, &kern);
-		if ((int)result < 1) {
-		  float xf = (float)(kern.x >> 6);
-		  float yf = (float)(kern.y >> 6);
-			return TeVector3f32(xf, yf, 0.0f);
-		}
-		warning("TeFont3::glyph: FT_Get_Kerning error %x\n", result);
-	  } else {
-		  warning("TeFont3::glyph: FT_Set_Pixel_Sizes error %x\n", result);
-	  }
-	}
-
-	return TeVector3f32(0.0f, 0.0f, 0.0f);
+TeVector3f32 TeFont3::kerning(unsigned int pxSize, unsigned int isocode1, unsigned int isocode2) {
+	uint32 uni1 = getUnicodeFromISO(isocode1);
+	uint32 uni2 = getUnicodeFromISO(isocode2);
+	Graphics::Font *font = getAtSize(pxSize);
+	int offset = font->getKerningOffset(uni1, uni2);
+	// note: not perfect because we have no Y, but it's ok..
+	return TeVector3f32(offset, 0.0f, 0.0f);
 }
 
 

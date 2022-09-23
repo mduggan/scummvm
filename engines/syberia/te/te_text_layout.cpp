@@ -22,6 +22,8 @@
 #include "syberia/syberia.h"
 #include "syberia/te/te_core.h"
 #include "syberia/te/te_i_loc.h"
+#include "syberia/te/te_resource_manager.h"
+#include "syberia/te/te_renderer.h"
 #include "syberia/te/te_text_layout.h"
 #include "syberia/te/te_text_layout_xml_parser.h"
 
@@ -36,6 +38,34 @@ TeTextLayout::~TeTextLayout() {
 
 void TeTextLayout::setInterLine(float val) {
 	_base.setInterLine(val);
+}
+
+void TeTextLayout::draw() {
+	if (!visible() || !worldVisible())
+		return;
+	
+	updateSize();
+	TeMatrix4x4 matrix = worldTransformationMatrix();
+	TeRenderer *renderer = g_engine->getRenderer();
+	renderer->pushMatrix();
+	renderer->loadMatrix(matrix);
+	_base.draw();
+	renderer->popMatrix();
+	TeLayout::draw();
+
+}
+
+static TeFont3::AlignStyle _alignNameToEnum(const Common::String &name) {
+	if (name == "left")
+		return TeFont3::AlignLeft;
+	else if (name == "right")
+		return TeFont3::AlignRight;
+	else if (name == "justify")
+		return TeFont3::AlignJustify;
+	else if (name =="center")
+		return TeFont3::AlignCenter;
+	warning("Unknown text align style: %s", name.c_str());
+	return TeFont3::AlignLeft;
 }
 
 void TeTextLayout::setText(const Common::String &val) {
@@ -75,11 +105,14 @@ void TeTextLayout::setText(const Common::String &val) {
 	if (parser.fontSize())
 		_baseFontSize = parser.fontSize();
 
-	warning("TODO: Set font file and style in TeTextLayout::load");
-	//if (parser.fontFile().size())
-	//	_base.setFont(0, parser.fontFile());
-	//if (parser.style().size())
-	//	_base.setAlignStyle(style);
+	if (parser.fontFile().size()) {
+		Common::Path fontPath(parser.fontFile());
+		TeIntrusivePtr<TeFont3> font = g_engine->getResourceManager()->getResource<TeFont3>(fontPath);
+		font->load(fontPath);
+		_base.setFont(0, font);
+	}
+	if (parser.style().size())
+		_base.setAlignStyle(_alignNameToEnum(parser.style()));
 	for (unsigned int offset : parser.lineBreaks())
 		_base.insertNewLine(offset);
 }
@@ -133,8 +166,8 @@ void TeTextLayout::updateSize() {
 	
 	TeMatrix4x4 transform = transformationMatrix();
 	static const TeVector3f32 zeroVec(0, 0, 0);
-	static const TeVector3f32 xUnitVec(0, 0, 0);
-	static const TeVector3f32 yUnitVec(0, 0, 0);
+	static const TeVector3f32 xUnitVec(1, 0, 0);
+	static const TeVector3f32 yUnitVec(0, 1, 0);
 
 	const TeVector3f32 v1 = transform * zeroVec;
 	const TeVector3f32 v2 = transform * xUnitVec;
@@ -166,14 +199,15 @@ void TeTextLayout::updateSize() {
 		newFontSize = (thisSize.x() / sizeProportionalToWidth) * newFontSize;
 	}
 	
-	newFontSize *= thisSize.y();
+	//newFontSize *= thisSize.y();
 	
 	_base.setFontSize(newFontSize);
 	_base.build();
+	//TeVector2s32 renderedSize = _base.size();
 	
-	const TeVector3f32 thisUserSize = TeLayout::userSize();
+	/*const TeVector3f32 thisUserSize = */TeLayout::userSize();
 	
-	warning("TODO: finish the last bit of TeTextLayout::updateSize");
+	//warning("TODO: finish the last bit of TeTextLayout::updateSize");
 }
 
 } // end namespace Syberia

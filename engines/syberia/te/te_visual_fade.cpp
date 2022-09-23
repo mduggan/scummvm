@@ -84,7 +84,7 @@ void TeVisualFade::init() {
 	// create an image the size of the window, no palette, format 6.
 	Common::SharedPtr<TePalette> nullpal;
 	_image.destroy();
-	_image.create(800, 600, nullpal, TeImage::RGBA8);
+	_image.create(1024, 768, nullpal, TeImage::RGBA8);
 	_texturePtr->load(_image);
 	g_engine->getRenderer()->enableTexture();
 	_texturePtr->load(_image);

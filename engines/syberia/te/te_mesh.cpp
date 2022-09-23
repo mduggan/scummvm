@@ -39,19 +39,18 @@ void TeMesh::defaultMaterial(const TeIntrusivePtr<Te3DTexture> &texture) {
 	TeMaterial::Mode mode = TeMaterial::MaterialMode1;
 	if (texture && !texture->hasAlpha())
 		mode = TeMaterial::MaterialMode0;
-
 	_materials.resize(1);
 	_materials[0] = TeMaterial(texture, mode);
 }
 
 const TeMaterial *TeMesh::material(uint index) const {
+	assert(!_materials.empty());
 	if (index < _materials.size()) {
 		return &_materials[index];
 	} else {
 		return &_materials[0];
 	}
 }
-
 
 void TeMesh::destroy() {
 	_hasAlpha = false;
@@ -226,7 +225,7 @@ bool TeMesh::hasAlpha(uint idx) {
 	if (idx < _materials.size()) {
 		const TeMaterial &material = _materials[idx];
 		if (material._enableSomethingDefault0)
-			retval = true;;
+			retval = true;
 		//if (material._mode == TeMaterial::MaterialMode1)
 		//	return false;
 		if (material._ambientColor.a() == 255)

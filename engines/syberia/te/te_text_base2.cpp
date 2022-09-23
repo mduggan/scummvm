@@ -19,79 +19,191 @@
  *
  */
 
+#ifdef DUMP_RENDERED_FONTS
+#include "image/png.h"
+#endif
+
 #include "syberia/te/te_text_base2.h"
 #include "graphics/opengl/system_headers.h"
 
 namespace Syberia {
 
 TeTextBase2::TeTextBase2() : _drawRect(0, 0), _size(0, 0),
-_alignStyle(AlignStyle0), _interLine(0.0f), _globalColor(0xff, 0xff, 0xff, 0xff),
+_alignStyle(TeFont3::AlignLeft), _interLine(0.0f), _globalColor(0xff, 0xff, 0xff, 0xff),
 _wrapMode(WrapModeFixed), _strikethrough(false), _fontSize(10), _valueWasSet(true)
 {
 	_mesh.setglTexEnv(GL_BLEND);
 	_mesh.setShouldDraw(true);
 }
 
+#ifdef DUMP_RENDERED_FONTS
+static int dumpCount = 0;
+#endif
+
 void TeTextBase2::build() {
-	if (!_text.size())
+	if (!_text.size() || !_fontSize)
 		return;
+
 	TeIntrusivePtr<TeFont3> font = _fonts[0];
-	
 	if (!font.get()) {
 		warning("[TeTextBase2::build()] Warning : font missing");
 		return;
 	}
+
+	_valueWasSet = false;
+	_size = TeVector2s32(0, 0);
+	_wrappedLines.clear();
 	
-	_valueWasSet = 0;
+	font->wordWrapText(_text, _fontSize, _drawRect._x, _wrappedLines);
+
+	Common::Array<float> lineoffsets;
+	float height = 0;
+	for (const Common::String &line : _wrappedLines) {
+		if (_alignStyle == TeFont3::AlignJustify) {
+			warning("TODO: Implement TeTextBase2::computeNbSpaces for Justify");
+			//computeNbSpaces(&line, offset, line.endOffset);
+		}
+		Common::Rect lineSize = font->getBoundingBox(line, _fontSize);
+		if (lineSize.right > _size._x)
+			_size._x = lineSize.right;
+
+		lineoffsets.push_back(height);
+		height += lineSize.bottom + _interLine;
+	}
+	_size._y = (int)ceilf(height);
 	
-	warning("TODO: Implement TeTextBase2::build");
+	TeImage img;
+	Common::SharedPtr<TePalette> nullpal;
+	img.create(_size._x, _size._y, nullpal, TeImage::RGBA8);
+	img.fill(0, 0, 0, 0);
+
+	for (unsigned int i = 0; i < _wrappedLines.size(); i++) {
+		drawLine(img, _wrappedLines[i], lineoffsets[i]);
+	}
+
+	TeIntrusivePtr<Te3DTexture> texture = new Te3DTexture();
+	texture->load(img);
+	
+#if DUMP_RENDERED_FONTS
+	Common::DumpFile dumpFile;
+	dumpFile.open(Common::String::format("/Users/stauff/tmp/%04d.png", dumpCount));
+	dumpCount++;
+	Image::writePNG(dumpFile, img);
+#endif
+
+	_mesh.setConf(4, 4, TeMesh::MeshMode_TriangleStrip, 0, 0);
+	_mesh.defaultMaterial(texture);
+
+	TeColor col(255, 255, 255, 255);
+	_mesh.setShouldDraw(true);
+	_mesh.setColor(col);
+	_mesh.setVertex(0, TeVector3f32(_size._x * -0.5f, _size._y * -0.5f, 0.0f));
+	_mesh.setTextureUV(0, TeVector2f32(0, 1));
+	_mesh.setNormal(0, TeVector3f32(0.0f, 0.0f, 1.0f));
+	_mesh.setColor(0, col);
+	_mesh.setVertex(1, TeVector3f32(_size._x * 0.5f, _size._y * -0.5f, 0.0f));
+	_mesh.setTextureUV(1, TeVector2f32(1, 1));
+	_mesh.setNormal(1, TeVector3f32(0.0f, 0.0f, 1.0f));
+	_mesh.setColor(1, col);
+	_mesh.setVertex(2, TeVector3f32(_size._x * 0.5f, _size._y * 0.5f, 0.0f));
+	_mesh.setTextureUV(2, TeVector2f32(1, 0));
+	_mesh.setNormal(2, TeVector3f32(0.0f, 0.0f, 1.0f));
+	_mesh.setColor(2, col);
+	_mesh.setVertex(3, TeVector3f32(_size._x * -0.5f, _size._y * 0.5f, 0.0f));
+	_mesh.setTextureUV(3, TeVector2f32(0, 0));
+	_mesh.setNormal(3, TeVector3f32(0.0f, 0.0f, 1.0f));
+	_mesh.setColor(3, col);
+	_mesh.setIndex(0, 0);
+	_mesh.setIndex(1, 1);
+	_mesh.setIndex(2, 3);
+	_mesh.setIndex(3, 2);
+	//_mesh.setHasAlpha(true);
 }
 
 void TeTextBase2::clear() {
 	clearText();
 	clearStyles();
+	_valueWasSet = true;
 }
 
 void TeTextBase2::clearStyles() {
 	_lineBreaks.clear();
 	_fonts.clear();
 	_colors.clear();
+	_valueWasSet = true;
 }
 
 void TeTextBase2::clearText() {
 	_text.clear();
+	_valueWasSet = true;
 }
 
-bool TeTextBase2::computeLine(unsigned int i, TeTextBase2::Line &line) {
-	error("TODO: Implement TeTextBase2::computeLine");
-
-}
-void TeTextBase2::computeNbSpaces(Line &line, unsigned int x, unsigned int y) {
+void TeTextBase2::computeNbSpaces(Line &line, unsigned int startOffset, unsigned int endOffset) {
 	error("TODO: Implement TeTextBase2::computeNbSpaces");
 }
 
-TeColor TeTextBase2::currentColor(unsigned int i) {
-	error("TODO: Implement TeTextBase2::currentColor");
+TeColor TeTextBase2::currentColor(unsigned int offset) const {
+	if (_colors.size() == 0)
+		return _globalColor;
+	int closest_off = -1;
+	TeColor result;
+	// Find closest without going over.
+	for (auto &pair : _colors) {
+		if ((int)pair._key > closest_off && pair._key <= offset) {
+			result = pair._value;
+			closest_off = pair._key;
+		}
+	}
+	if (closest_off == -1)
+		return _globalColor;
+	return result;
 }
 
-TeIntrusivePtr<TeFont3> TeTextBase2::currentFont(unsigned int i) {
-	error("TODO: Implement TeTextBase2::currentFont");
+TeIntrusivePtr<TeFont3> TeTextBase2::currentFont(unsigned int offset) {
+	if (_fonts.size() == 0)
+		return TeIntrusivePtr<TeFont3>();
+	int closest_off = -1;
+	TeIntrusivePtr<TeFont3> result;
+	// Find closest without going over.
+	for (auto &pair : _fonts) {
+		if ((int)pair._key > closest_off && pair._key <= offset) {
+			result = pair._value;
+			closest_off = pair._key;
+		}
+	}
+	if (closest_off == -1)
+		return TeIntrusivePtr<TeFont3>();
+	return result;
 }
 
 void TeTextBase2::draw() {
-	error("TODO: Implement TeTextBase2::draw");
+	if (_text.empty() || (_drawRect._x <= 0 && _wrapMode == WrapModeFixed))
+		return;
+
+	if (_valueWasSet)
+		build();
+
+	_mesh.draw();
+
+	//if (_strikethrough)
+	//	warning("TODO: Implement TeTextBase2::draw strikethrough support");
 }
 
-void TeTextBase2::drawEmptyChar(unsigned int i) {
+void TeTextBase2::drawEmptyChar(unsigned int offset) {
 	error("TODO: Implement TeTextBase2::drawEmptychar");
 }
 
-void TeTextBase2::drawLine(unsigned int i, unsigned int j, const TeVector3f32 &pt, TeTextBase2::Line &line) {
-	error("TODO: Implement TeTextBase2::drawLine");
+void TeTextBase2::drawLine(TeImage &img, const Common::String &str, int yoffset) {
+	TeIntrusivePtr<TeFont3> font = _fonts[0];
+
+	// FIXME: Add multi-color support if needed.
+	font->draw(img, str, _fontSize, yoffset, _globalColor, _alignStyle);
 }
 	
-unsigned int TeTextBase2::endOfWord(unsigned int i) {
-	error("TODO: Implement TeTextBase2::endOfWord");
+unsigned int TeTextBase2::endOfWord(unsigned int offset) const {
+	while (offset < _text.size() && !newLines(offset) && !isASpace(offset))
+		offset++;
+	return offset;
 }
 
 void TeTextBase2::insertNewLine(unsigned int offset) {
@@ -103,7 +215,7 @@ bool TeTextBase2::isASpace(unsigned int offset) const {
 	return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
-int TeTextBase2::newLines(unsigned int offset) {
+int TeTextBase2::newLines(unsigned int offset) const {
 	int result = 0;
 	for (unsigned int off : _lineBreaks) {
 		if (off == offset)
@@ -118,7 +230,7 @@ int TeTextBase2::nextNonSpaceChar(unsigned int offset) {
 	return offset; // TODO: or offset - 1?
 }
 
-void TeTextBase2::setAlignStyle(TeTextBase2::AlignStyle style) {
+void TeTextBase2::setAlignStyle(TeFont3::AlignStyle style) {
 	_alignStyle = style;
 	_valueWasSet = true;
 }
@@ -134,6 +246,7 @@ void TeTextBase2::setFont(unsigned int offset, const TeIntrusivePtr<TeFont3> &ne
 }
 
 void TeTextBase2::setFontSize(unsigned long size) {
+	size *= 1.8;
 	if (_fontSize != size) {
 		_fontSize = size;
 		_valueWasSet = true;
@@ -158,8 +271,8 @@ void TeTextBase2::setRect(const TeVector2s32 &rect) {
 void TeTextBase2::setText(const Common::String &newText) {
 	_valueWasSet = true;
 	_text = newText;
-	int len = newText.size();
-	_mesh.setConf(len * 4, len * 6, TeMesh::MeshMode_Triangles, 1, len * 2);
+	//int len = newText.size();
+	//_mesh.setConf(len * 4, len * 6, TeMesh::MeshMode_Triangles, 1, len * 2);
 }
 
 void TeTextBase2::setWrapMode(TeTextBase2::WrapMode &mode) {
@@ -178,6 +291,8 @@ void TeTextBase2::strikethrough(bool val) {
 		_strikethrough = val;
 		_valueWasSet = true;
 	}
+	if (val)
+		warning("TODO: Implement TeTextBase2::draw strikethrough support");
 }
 
 

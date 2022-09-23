@@ -106,6 +106,7 @@ bool TeCore::onActivityTrackingAlarm() {
 }
 
 static const char *_pathSuffixes[] = {
+	"",
 	"PC-MacOSX",
 	"PC-PS3-Android-MacOSX",
 	"PC-MacOSX-Xbox360-PS3",
@@ -121,13 +122,14 @@ Common::Path TeCore::findFile(const Common::Path &path) {
 	const Common::Path fname = path.getLastComponent();
 	const Common::Path dir = path.getParent();
 
-	const Common::String langs[3] = {
+	const Common::String langs[] = {
 		"",
 		language(),
-		"en"
+		"en",
+		"de-es-fr-it-en"
 	};
 	
-	for (int langtype = 0; langtype < 3; langtype++) {
+	for (int langtype = 0; langtype < ARRAYSIZE(langs); langtype++) {
 		for (int i = 0; i < ARRAYSIZE(_pathSuffixes); i++) {
 			Common::Path testPath = dir.join(_pathSuffixes[i]);
 			if (langs[langtype].size()) {

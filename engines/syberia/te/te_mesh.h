@@ -104,6 +104,7 @@ public:
 
 	void setShouldDraw(bool val) { _shouldDraw = val; }
 	void setglTexEnv(unsigned int val) { _gltexEnvMode = val; }
+	void setHasAlpha(bool val) { _hasAlpha = val; }
 
 private:
 	Common::Array<unsigned char> _materialIndexes;

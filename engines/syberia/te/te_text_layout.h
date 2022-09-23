@@ -37,6 +37,7 @@ public:
 		_base.clear();
 	}
 
+	void draw() override;
 	void setText(const Common::String &val);
 	void setInterLine(float val);
 	void setWrapMode(TeTextBase2::WrapMode mode);
@@ -48,7 +49,7 @@ public:
 	const TeVector2s32 &textSize() const;
 	int textSizeProportionalToWidth() const { return _textSizeProportionalToWidth; }
 	int textSizeType() const { return _textSizeType; }
-	void updateSize();
+	void updateSize() override;
 	TeTextBase2::WrapMode wrapMode() const { return _base.wrapMode(); }
 
 private:

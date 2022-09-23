@@ -81,13 +81,21 @@ void Application::create() {
 
 	TeResourceManager *resmgr = g_engine->getResourceManager();
 	_fontComic = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/ComicRelief.ttf");
+	_fontComic->load("Common/Fonts/ComicRelief.ttf");
 	_fontArgh = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/Argh.ttf");
-	_fontArial = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/arlia.ttf");
+	_fontArgh->load("Common/Fonts/Argh.ttf");
+	_fontArial = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/arial.ttf");
+	_fontArial->load("Common/Fonts/arial.ttf");
 	_fontChaucer = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/CHAUCER.TTF");
+	_fontChaucer->load("Common/Fonts/CHAUCER.ttf");
 	_fontColaborate = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/Colaborate-Regular.otf");
+	_fontColaborate->load("Common/Fonts/Colaborate-Regular.ttf");
 	_fontProDisplay = resmgr->getResourceNoSearch<TeFont3>("Common/Fonts/ProDisplay.ttf");
+	_fontProDisplay->load("Common/Fonts/ProDisplay.ttf");
 
-	// Prebuild some fonts.. cover letters, numbers, a few accented chars, and punctuation.
+	// The app prebuilds some fonts.. cover letters, numbers, a few accented chars, and punctuation.
+	// Skip that here.
+	/*
 	TeTextBase2 textBase;
 	textBase.setText("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/,*?;.:/!\xA7&\xE9\"'(-\xE8_\xE7\xE0)=");
 	textBase.setFont(0, _fontComic);
@@ -108,6 +116,7 @@ void Application::create() {
 	textBase.setFont(0, _fontProDisplay);
 	textBase.setFontSize(24);
 	textBase.build();
+	 */
 
 	TeCore *core = g_engine->getCore();
 	static const char allLangs[][3] = {"en", "fr", "de", "es", "it", "ru"};

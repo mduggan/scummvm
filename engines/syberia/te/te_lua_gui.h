@@ -88,11 +88,12 @@ public:
 
 	Common::Path _scriptPath;
 
+protected:
+	bool _loaded;
+
 private:
 	TeLuaContext _luaContext;
 	TeLuaScript _luaScript;
-
-	bool _loaded;
 
 	StringMap<TeLayout *> _layouts;
 	StringMap<TeButtonLayout *> _buttonLayouts;
