@@ -35,6 +35,10 @@ _numFrames(1), _frameRate(0), _format(TeImage::INVALID), _glPixelFormat(GL_INVAL
 	create();
 }
 
+Te3DTexture::~Te3DTexture() {
+	destroy();
+}
+
 void Te3DTexture::bind() {
 	TeRenderer *renderer = g_engine->getRenderer();
 	glBindTexture(GL_TEXTURE_2D, _glTexture);
@@ -88,6 +92,7 @@ void Te3DTexture::destroy() {
 	}
 	_createdTexture = false;
 	_loaded = false;
+	_glTexture = NO_TEXTURE;
 }
 
 void Te3DTexture::ForceTexData(uint gltextures, uint xsize, uint ysize) {

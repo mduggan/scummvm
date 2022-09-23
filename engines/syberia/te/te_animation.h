@@ -63,7 +63,9 @@ protected:
 private:
 	void removeThisFromAnimations();
 
-	static Common::Array<TeAnimation *> _animations;
+	static Common::Array<TeAnimation *> *animations();
+
+	static Common::Array<TeAnimation *> *_animations;
 
 };
 

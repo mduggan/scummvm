@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/rect.h"
 #include "syberia/te/te_image.h"
 
 namespace Syberia {
@@ -50,6 +51,7 @@ void TeImage::create(uint xsize, uint ysize, Common::SharedPtr<TePalette> &pal,
 									  Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0) : Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
 	
 	Graphics::Surface::create(xsize, ysize, pxformat);
+	Graphics::Surface::fillRect(Common::Rect(0, 0, xsize, ysize), 0xff883311);
 }
 
 void TeImage::deSerialize(Common::ReadStream &stream) {
@@ -57,7 +59,8 @@ void TeImage::deSerialize(Common::ReadStream &stream) {
 }
 
 void TeImage::destroy() {
-	error("TODO: TeImage: Implement me.");
+	Graphics::Surface::free();
+	_format = INVALID;
 }
 
 void TeImage::drawPlot(void *outbuf, int x, int y, const TeVector2s32 &bufsize, const TeColor &col) {

@@ -381,6 +381,7 @@ void Application::performRender() {
 	renderer->renderTransparentMeshes();
 	// What gets called here??
 	//_inGameScene.removeModel(const Common::String &name)
+	g_system->updateScreen();
 }
 
 //void Application::preloadTextrue(); does nothing..

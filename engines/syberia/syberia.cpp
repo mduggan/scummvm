@@ -150,7 +150,6 @@ Common::Error SyberiaEngine::run() {
 		}
 
 		_application->run();
-		g_system->updateScreen();
 
 		// Delay for a bit. All events loops should have a delay
 		// to prevent the system being unduly loaded

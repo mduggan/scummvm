@@ -219,11 +219,17 @@ TeMesh::Mode TeMesh::getMode() const {
 
 bool TeMesh::hasAlpha(uint idx) {
 	// FIXME: this logic is a bit sketchy.  Check it again.
-	bool retval = _hasAlpha && !_colors.empty();
+	if (_hasAlpha && !_colors.empty())
+		return true;
 
-	for (const TeMaterial &material : _materials) {
-		retval = !material._enableSomethingDefault0;
-		if (material._mode != TeMaterial::MaterialMode1 && material._ambientColor.a() == 255)
+	bool retval = false;
+	if (idx < _materials.size()) {
+		const TeMaterial &material = _materials[idx];
+		if (material._enableSomethingDefault0)
+			retval = true;;
+		//if (material._mode == TeMaterial::MaterialMode1)
+		//	return false;
+		if (material._ambientColor.a() == 255)
 			retval = (material._diffuseColor.a() != 255);
 	}
 	return retval;

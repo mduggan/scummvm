@@ -92,7 +92,7 @@ void TeMaterial::apply() {
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
 		} else {
 			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			if (_mode == MaterialMode1) {
+			if (_mode != MaterialMode1) {
 				glEnable(GL_ALPHA_TEST);
 				glAlphaFunc(GL_GREATER, 0.5);
 			}

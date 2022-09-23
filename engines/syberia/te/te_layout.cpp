@@ -429,9 +429,9 @@ void TeLayout::updateZ() {
 	_childOrParentChanged = false;
 	_updatingZ = true;
 
-	float ztotal = 0.1f;
+	/*float ztotal = 0.1f;*/
 	for (auto &child : childList()) {
-		ztotal += child->zSize();
+		/*ztotal += */child->zSize();
 	}
 	_updatingZ = false;
 }

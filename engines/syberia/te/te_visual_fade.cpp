@@ -34,6 +34,7 @@ void TeVisualFade::animateBlackFade() {
 }
 
 void TeVisualFade::animateFade() {
+	//debug("visual fade %p animate", this);
 	_animateFadeCurveAnim.stop();
 	_animateFadeCurveAnim._runTimer.pausable(false);
 	_fadeCaptureSprite.setVisible(true);
@@ -50,6 +51,7 @@ void TeVisualFade::animateFade() {
 }
 
 void TeVisualFade::captureFrame() {
+	//debug("visual fade %p capture", this);
 	TeRenderer *renderer = g_engine->getRenderer();
 	renderer->enableTexture();
 	_texturePtr->copyCurrentRender(0, 0, 0, 0);
@@ -58,10 +60,13 @@ void TeVisualFade::captureFrame() {
 }
 
 void TeVisualFade::init() {
+	//debug("visual fade %p init", this);
 	_fadeCaptureSprite.setName("fadeCaptureSprite");
 	_fadeCaptureSprite.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
 	_fadeCaptureSprite.setSize(TeVector3f32(1.0, 1.0, 0.0));
+	_fadeCaptureSprite.setColor(TeColor(255, 255, 255, 0));
 	_fadeCaptureSprite.setVisible(false);
+	_fadeCaptureSprite.unload();
 
 	_blackFadeSprite.setName("blackFadeSprite");
 	_blackFadeSprite.setSizeType(TeLayout::CoordinatesType::RELATIVE_TO_PARENT);
@@ -70,9 +75,15 @@ void TeVisualFade::init() {
 	_blackFadeSprite.setColor(TeColor(255, 255, 255, 0));
 	_blackFadeSprite.setVisible(false);
 
-	_texturePtr = new Te3DTexture();
+	if (_texturePtr) {
+		_texturePtr->destroy();
+	} else {
+		_texturePtr = new Te3DTexture();
+	}
+	_texturePtr->create();
 	// create an image the size of the window, no palette, format 6.
 	Common::SharedPtr<TePalette> nullpal;
+	_image.destroy();
 	_image.create(800, 600, nullpal, TeImage::RGBA8);
 	_texturePtr->load(_image);
 	g_engine->getRenderer()->enableTexture();

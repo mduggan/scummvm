@@ -37,7 +37,7 @@ namespace Syberia {
 class Te3DTexture : public TeResource {
 public:
 	Te3DTexture();
-	virtual ~Te3DTexture() {}
+	virtual ~Te3DTexture();
 
 	void bind();
 	void copyCurrentRender(uint xoffset, uint yoffset, uint x, uint y);
