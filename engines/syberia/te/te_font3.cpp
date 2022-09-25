@@ -148,7 +148,10 @@ bool TeFont3::load(const Common::Path &path) {
 		warning("TeFont3::load: File %s doesn't exist", path.toString().c_str());
 		return false;
 	}
-	
+
+	if (_fontFile.isOpen())
+		_fontFile.close();
+
 	if (!_fontFile.open(path)) {
 		warning("TeFont3::load: can't open %s", path.toString().c_str());
 		return false;

@@ -509,7 +509,7 @@ int textLayoutBindings(lua_State *L) {
 	lua_gettable(L, LUA_REGISTRYINDEX);
 	
 	TeLuaGUI *gui = TeLuaTo<TeLuaGUI*>(L,-1);
-	TeLuaGUI::StringMap<TeLayout *> &layouts = gui->layouts();
+	TeLuaGUI::StringMap<TeTextLayout *> &layouts = gui->textLayouts();
 	if (!layouts.contains(layout->name())) {
 		layouts.setVal(layout->name(), layout);
 		lua_pushlightuserdata(L, static_cast<Te3DObject2*>(layout));

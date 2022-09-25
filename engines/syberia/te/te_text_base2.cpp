@@ -246,7 +246,8 @@ void TeTextBase2::setFont(unsigned int offset, const TeIntrusivePtr<TeFont3> &ne
 }
 
 void TeTextBase2::setFontSize(unsigned long size) {
-	size *= 1.8;
+	// Bit of a hack here to get the right font size.
+	size *= 1.5;
 	if (_fontSize != size) {
 		_fontSize = size;
 		_valueWasSet = true;

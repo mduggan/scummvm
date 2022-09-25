@@ -32,6 +32,7 @@
 #include "syberia/game/game_achievements.h"
 #include "syberia/game/object3d.h"
 #include "syberia/te/te_variant.h"
+#include "syberia/te/te_input_mgr.h"
 
 namespace Syberia {
 
@@ -173,13 +174,15 @@ void Game::draw() {
 }
 
 void Game::enter(bool newgame) {
-	warning("TODO: set field_0x42f0 true here");
+	warning("TODO: Game::enter set field_0x42f0 true here");
 	_entered = true;
 	_luaShowOwnerError = false;
 	_score = 0;
 	Application *app = g_engine->getApplication();
 	app->visualFade().init();
-	warning("TODO: add onMouseClick handler and set some other fields here");
+	Common::SharedPtr<TeCallback1Param<Game, const Common::Point &>> callbackptr(new TeCallback1Param<Game, const Common::Point &>(this, &Game::onMouseClick, -1000.0f));
+	g_engine->getInputMgr()->_mouseLUpSignal.insert(callbackptr);
+	warning("TODO: Game::enter set some other fields here");
 	_sceneCharacterVisibleFromLoad = false;
 	Character::loadSettings("models/ModelsSettings.xml");
 	Object3D::loadSettings("objects/ObjectsSettings.xml");
@@ -190,7 +193,7 @@ void Game::enter(bool newgame) {
 	}
 	bool loaded = loadPlayerCharacter("Kate");
 	if (!loaded)
-		warning("[Game::enter] Can\'t load player character");
+		warning("[Game::enter] Can't load player character");
 
 	_running = true;
 	_luaContext.create();
@@ -342,7 +345,9 @@ bool Game::loadCharacter(const Common::String &name) {
 		bool loaded = _scene.loadCharacter(name);
 		if (loaded) {
 			character = _scene.character(name);
-			error("TODO: Implement the signal setup here.");
+			character->_onCharacterAnimFinishedSignal.remove<Game>(this, &Game::onCharacterAnimationFinished);
+			character->_onCharacterAnimFinishedSignal.add<Game>(this, &Game::onCharacterAnimationFinished);
+			character->onFinished().add<Game>(this, &Game::onDisplacementFinished);
 		}
 	}
 	return result;
@@ -351,7 +356,10 @@ bool Game::loadCharacter(const Common::String &name) {
 bool Game::loadPlayerCharacter(const Common::String &name) {
 	bool result = _scene.loadPlayerCharacter(name);
 	if (result) {
-		error("TODO: Implement the signal setup here.");
+		_scene._character->_characterAnimPlayerFinishedSignal.remove<Game>(this, &Game::onCharacterAnimationPlayerFinished);
+		_scene._character->_characterAnimPlayerFinishedSignal.add<Game>(this, &Game::onCharacterAnimationPlayerFinished);
+		_scene._character->onFinished().remove<Game>(this, &Game::onDisplacementFinished);
+		_scene._character->onFinished().add<Game>(this, &Game::onDisplacementFinished);
 	}
 	return result;
 }
@@ -419,7 +427,7 @@ bool Game::onMarkersVisible(TeCheckboxLayout::State state) {
 	return false;
 }
 
-bool Game::onMouseClick(uint flags)  {
+bool Game::onMouseClick(const Common::Point &pt)  {
 	error("TODO: Implemet me");
 }
 

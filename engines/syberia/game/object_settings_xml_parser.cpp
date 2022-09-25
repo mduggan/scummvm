@@ -19,55 +19,24 @@
  *
  */
 
-#ifndef SYBERIA_TE_TE_ANIMATION_H
-#define SYBERIA_TE_TE_ANIMATION_H
-
-#include "common/array.h"
-#include "engines/syberia/te/te_timer.h"
-#include "engines/syberia/te/te_signal.h"
+#include "syberia/game/object_settings_xml_parser.h"
 
 namespace Syberia {
 
-class TeAnimation {
-public:
-	TeAnimation();
-	virtual ~TeAnimation() {};
+bool ObjectSettingsXmlParser::parserCallback_ObjectSettings(ParserNode *node) {
+	return true;
+}
 
-	void cont();
-	void pause();
-	void stop();
-	void reset();
-	void play() {
-		cont();
-	}
-	virtual void update(double time) = 0;
-	
-	void seekToStart();
-	//void staticDestroy();
+bool ObjectSettingsXmlParser::parserCallback_Object(ParserNode *node) {
+	return true;
+}
 
-	static void pauseAll();
-	static void resumeAll();
-	static void updateAll();
+bool ObjectSettingsXmlParser::parserCallback_modelFileName(ParserNode *node) {
+	return true;
+}
 
-	
-	TeSignal0Param &onStop() { return _onStopSignal; }
-	TeSignal0Param &onFinished() { return _onFinishedSignal; }
-
-	TeTimer _runTimer;
-	int _repeatCount;
-
-protected:
-	TeSignal0Param _onStopSignal;
-	TeSignal0Param _onFinishedSignal;
-
-private:
-	void removeThisFromAnimations();
-
-	static Common::Array<TeAnimation *> *animations();
-	static Common::Array<TeAnimation *> *_animations;
-
-};
+bool ObjectSettingsXmlParser::parserCallback_defaultScale(ParserNode *node) {
+	return true;
+}
 
 } // end namespace Syberia
-
-#endif // SYBERIA_TE_TE_ANIMATION_H

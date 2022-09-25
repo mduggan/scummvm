@@ -144,6 +144,9 @@ TeTextLayout *TeLuaGUI::textLayout(const Common::String &name) {
 	StringMap<TeTextLayout *>::iterator iter = _textLayouts.find(name);
 	if (iter != _textLayouts.end())
 		return iter->_value;
+	StringMap<TeExtendedTextLayout *>::iterator iter2 = _extendedTextLayouts.find(name);
+	if (iter2 != _extendedTextLayouts.end())
+		return iter2->_value;
 	return nullptr;
 }
 

@@ -19,8 +19,10 @@
  *
  */
 
+#include "common/config-manager.h"
 #include "common/system.h"
 #include "common/events.h"
+#include "common/savefile.h"
 
 #include "syberia/syberia.h"
 #include "syberia/game/confirm.h"
@@ -35,11 +37,13 @@
 
 namespace Syberia {
 
-MainMenu::MainMenu() : _entered(false) {
-	onNewGameConfirmedSignal.add(this, &MainMenu::onNewGameConfirmed);
-	onActivatedTutoSignal.add(this, &MainMenu::onActivedTuto);
-	onDisabledTutoSignal.add(this, &MainMenu::onDisabledTuto);
-	onQuitSignal.add(this, &MainMenu::onQuit);
+static const char *LAST_SAVE_CONF = "lastSaveSlot";
+
+MainMenu::MainMenu() : _entered(false), _confirmingTuto(false) {
+	_newGameConfirm._onButtonYesSignal.add(this, &MainMenu::onNewGameConfirmed);
+	_tutoConfirm._onButtonYesSignal.add(this, &MainMenu::onActivedTuto);
+	_tutoConfirm._onButtonNoSignal.add(this, &MainMenu::onDisabledTuto);
+	_quitConfirm._onButtonYesSignal.add(this, &MainMenu::onQuit);
 	onFacebookLoggedSignal.add(this, &MainMenu::onFacebookLogged);
 }
 
@@ -78,8 +82,7 @@ void MainMenu::enter() {
 	TeButtonLayout *continueGameButton = buttonLayout("continueGameButton");
 	if (continueGameButton) {
 		continueGameButton->onMouseClickValidated().add(this, &MainMenu::onContinueGameButtonValidated);
-		continueGameButton->setEnable(false);
-		warning("TODO: Set continue game button enabled state based on save game manager");
+		continueGameButton->setEnable(ConfMan.hasKey(LAST_SAVE_CONF));
 	}
 
 	TeButtonLayout *loadGameButton = buttonLayout("loadGameButton");
@@ -101,6 +104,7 @@ void MainMenu::enter() {
 	// TODO: confirmation (menus/confirm/confirmNotSound.lua)
 	// if TeSoundManager is not valid.
 
+	_confirmingTuto = false;
 	TeLayout *panel = layout("panel");
 	
 	if (panel) {
@@ -121,7 +125,18 @@ void MainMenu::enter() {
 }
 
 void MainMenu::leave() {
-	error("TODO: Implement MainMenu::leave.");
+	if (!_entered)
+		return;
+	
+	Application	*app = g_engine->getApplication();
+	app->captureFade();
+	warning("TODO: MainMenu::leave Stop some game sounds here.");
+	//Game *game = g_engine->getGame();
+	//game->stopSound("sounds/Ambiances/b_automatebike.ogg");
+	//game->stopSound("sounds/Ambiances/b_engrenagebg.ogg");
+	TeLuaGUI::unload();
+	app->fade();
+	_entered= false;
 }
 
 bool MainMenu::deleteFile(const Common::String &name) {
@@ -129,7 +144,14 @@ bool MainMenu::deleteFile(const Common::String &name) {
 }
 
 bool MainMenu::onActivedTuto() {
-	error("TODO: Implement MainMenu::onActivedTuto");
+	Application *app = g_engine->getApplication();
+	app->setTutoActivated(true);
+	// TODO: Set game val false too?
+	app->captureFade();
+	leave();
+	app->startGame(true, 1);
+	app->fade();
+	return false;
 }
 
 bool MainMenu::onBFGRateIt2ButtonValidated() {
@@ -148,12 +170,47 @@ bool MainMenu::onBFGUnlockGameButtonValidated() {
 	error("TODO: Implement MainMenu function");
 }
 
+void MainMenu::tryDisableButton(const Common::String &btnName) {
+	TeButtonLayout *button = buttonLayout(btnName);
+	if (button)
+		button->setEnable(false);
+}
+
 bool MainMenu::onContinueGameButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	Application *app = g_engine->getApplication();
+	const Common::String lastSave = ConfMan.get(LAST_SAVE_CONF);
+	if (!lastSave.empty()) {
+		int saveSlot = lastSave.asUint64();
+		g_engine->loadGameState(saveSlot);
+		return false;
+	}
+	
+	tryDisableButton("newGameButton");
+	tryDisableButton("continueGameButton");
+	tryDisableButton("loadGameButton");
+	tryDisableButton("optionsButton");
+	tryDisableButton("galleryButton");
+	tryDisableButton("quitButton");
+
+	if (_confirmingTuto)
+	  return false;
+
+	app->captureFade();
+	leave();
+	app->startGame(false, 1);
+	app->fade();
+	return false;
 }
 
 bool MainMenu::onDisabledTuto() {
-	error("TODO: Implement MainMenu function");
+	Application *app = g_engine->getApplication();
+	app->setTutoActivated(false);
+	// TODO: Set game val false too?
+	app->captureFade();
+	leave();
+	app->startGame(true, 1);
+	app->fade();
+	return false;
 }
 
 bool MainMenu::onEnterGameRotateAnimFinished() {
@@ -165,38 +222,51 @@ bool MainMenu::onGalleryButtonValidated() {
 }
 
 bool MainMenu::onHowToButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	onContinueGameButtonValidated();
+	_confirmingTuto = false;
+	return false;
 }
 
 bool MainMenu::onLoadGameButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	g_engine->loadGameDialog();
+	return false;
 }
 
 bool MainMenu::onNewGameButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	// Note: Original confirms whether to start new game here
+	// with "menus/confirm/confirmNewGame.lua"
+	// because only one save is allowed.  We just clear last
+	// save slot number and go ahead and start.
+	ConfMan.set(LAST_SAVE_CONF, "");
+	onNewGameConfirmed();
+	return false;
 }
 
 bool MainMenu::onNewGameConfirmed() {
-	error("TODO: Implement MainMenu::onNewGameConfirmed");
+	// Note: Original game deletes saves here.  Don't do that..
+	_confirmingTuto = true;
+	_tutoConfirm.enter("menus/confirm/confirmTuto.lua", "");
+	onContinueGameButtonValidated();
+	return false;
 }
 
 bool MainMenu::onOptionsButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onOptionsButtonValidated");
 }
 
 bool MainMenu::onQuit() {
-	g_engine->setWantToQuit();
+	g_engine->quitGame();
 	leave();
 	return false;
 }
 
 bool MainMenu::onQuitButtonValidated() {
 	//Confirm::enter("menus/confirm/confirmQuit.lua", "");
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onQuitButtonValidated");
 }
 
 bool MainMenu::onUnlockGameButtonValidated() {
-	error("TODO: Implement MainMenu function");
+	error("TODO: Implement MainMenu::onUnlockGameButtonValidated");
 }
 
 void MainMenu::refresh() {

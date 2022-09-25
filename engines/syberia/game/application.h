@@ -52,7 +52,7 @@ public:
 	void create();
 	void destroy();
 
-	void startGame();
+	void startGame(bool newGame, int difficulty);
 	void resume();
 	bool run();
 	void suspend();
@@ -95,6 +95,7 @@ public:
 	TeSpriteLayout &mouseCursorLayout() { return _mouseCursorLayout; }
 	const Common::String getVersionString() const { return _versionString; }
 	TeLayout &getMainWindow() { return _mainWindow; }
+	void setTutoActivated(bool val) { _tutoActivated = val; }
 
 	bool _finishedGame;
 	bool _finishedFremium;
@@ -144,6 +145,7 @@ private:
 
 	bool _captureFade;
 	bool _created;
+	bool _tutoActivated;
 
 	int _difficulty;
 

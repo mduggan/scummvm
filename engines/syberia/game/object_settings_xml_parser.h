@@ -19,55 +19,38 @@
  *
  */
 
-#ifndef SYBERIA_TE_TE_ANIMATION_H
-#define SYBERIA_TE_TE_ANIMATION_H
+#ifndef SYBERIA_GAME_OBJECT_SETTINGS_XML_PARSER_H
+#define SYBERIA_GAME_OBJECT_SETTINGS_XML_PARSER_H
 
-#include "common/array.h"
-#include "engines/syberia/te/te_timer.h"
-#include "engines/syberia/te/te_signal.h"
+#include "common/xmlparser.h"
 
 namespace Syberia {
 
-class TeAnimation {
+class ObjectSettingsXmlParser : public Common::XMLParser {
 public:
-	TeAnimation();
-	virtual ~TeAnimation() {};
+	// Parser
+	CUSTOM_XML_PARSER(ObjectSettingsXmlParser) {
+		XML_KEY(ObjectSettings)
+			XML_KEY(Object)
+				XML_PROP(name, true)
+				XML_KEY(modelFileName)
+				KEY_END()
+				XML_KEY(defaultScale)
+				KEY_END()
+			KEY_END()
+		KEY_END()
+	} PARSER_END()
 
-	void cont();
-	void pause();
-	void stop();
-	void reset();
-	void play() {
-		cont();
-	}
-	virtual void update(double time) = 0;
-	
-	void seekToStart();
-	//void staticDestroy();
-
-	static void pauseAll();
-	static void resumeAll();
-	static void updateAll();
-
-	
-	TeSignal0Param &onStop() { return _onStopSignal; }
-	TeSignal0Param &onFinished() { return _onFinishedSignal; }
-
-	TeTimer _runTimer;
-	int _repeatCount;
-
-protected:
-	TeSignal0Param _onStopSignal;
-	TeSignal0Param _onFinishedSignal;
+	// Parser callback methods
+	bool parserCallback_ObjectSettings(ParserNode *node);
+	bool parserCallback_Object(ParserNode *node);
+	bool parserCallback_modelFileName(ParserNode *node);
+	bool parserCallback_defaultScale(ParserNode *node);
 
 private:
-	void removeThisFromAnimations();
-
-	static Common::Array<TeAnimation *> *animations();
-	static Common::Array<TeAnimation *> *_animations;
 
 };
 
 } // end namespace Syberia
 
-#endif // SYBERIA_TE_TE_ANIMATION_H
+#endif // SYBERIA_GAME_OBJECT_SETTINGS_XML_PARSER_H

@@ -109,7 +109,7 @@ bool Character::loadModel(const Common::String &name, bool param_2) {
 }
 
 /*static*/ bool Character::loadSettings(const Common::String &path) {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::loadSettings.");
 	return false;
 }
 

@@ -101,7 +101,7 @@ void InGameScene::unloadPlayerCharacter(const Common::String &name) {
 }
 
 void InGameScene::unloadCharacter(const Common::String &name) {
-	error("TODO: Implement me");
+	error("TODO: Implement InGameScene::unloadCharacter");
 }
 
 bool InGameScene::findKate() {

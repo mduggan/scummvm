@@ -104,7 +104,9 @@ public:
 	void walkTo(float param_1, bool param_2);
 
 	Common::SharedPtr<TeModel> _model;
-	
+	TeSignal1Param<const Common::String &> _characterAnimPlayerFinishedSignal;
+	TeSignal1Param<const Common::String &> _onCharacterAnimFinishedSignal;
+
 private:
 	float _curveOffset;
 	TeBezierCurve _curve;
@@ -116,6 +118,7 @@ private:
 	static Common::Array<AnimCacheElement> _animCache;
 	static uint _animCacheSize;
 	static Common::Array<CharacterSettings> _characterSettings;
+	
 };
 
 } // end namespace Syberia

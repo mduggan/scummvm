@@ -121,16 +121,13 @@ public:
 	TeRenderer *getRenderer();
 	TeResourceManager *getResourceManager();
 	TeInputMgr *getInputMgr();
-	void setWantToQuit() { _wantToQuit = true; }
 
 private:
 	void configureSearchPaths();
-	bool _wantToQuit;
 
 };
 
 extern SyberiaEngine *g_engine;
-#define SHOULD_QUIT ::Syberia::g_engine->shouldQuit()
 
 } // namespace Syberia
 

@@ -47,7 +47,7 @@ SyberiaEngine *g_engine;
 SyberiaEngine::SyberiaEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Syberia"), _resourceManager(nullptr),
 	_core(nullptr),	_application(nullptr), _game(nullptr), _renderer(nullptr),
-	_soundManager(nullptr), _inputMgr(nullptr), _wantToQuit(false) {
+	_soundManager(nullptr), _inputMgr(nullptr) {
 	g_engine = this;
 }
 
@@ -144,7 +144,7 @@ Common::Error SyberiaEngine::run() {
 	// Simple event handling loop
 	Common::Event e;
 
-	while (!shouldQuit() && !_wantToQuit) {
+	while (!shouldQuit()) {
 		while (g_system->getEventManager()->pollEvent(e)) {
 			getInputMgr()->handleEvent(e);
 		}

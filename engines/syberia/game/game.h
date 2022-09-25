@@ -109,7 +109,7 @@ public:
 	bool onInventoryButtonValidated();
 	bool onLockVideoButtonValidated();
 	bool onMarkersVisible(TeCheckboxLayout::State state);
-	bool onMouseClick(uint flags);
+	bool onMouseClick(const Common::Point &pt);
 	bool onMouseMove();
 	bool onSkipVideoButtonValidated();
 	bool onVideoFinished();

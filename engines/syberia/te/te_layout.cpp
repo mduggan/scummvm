@@ -313,18 +313,16 @@ TeLayout::CoordinatesType TeLayout::sizeType() const {
 }
 
 TeVector3f32 TeLayout::transformMousePosition(const TeVector2s32 &mousepos) {
-	int screenwidth = g_system->getWidth();
-	int screenheight = g_system->getHeight();
 	TeVector3f32 relativeMouse(mousepos);
-	relativeMouse.x() /= screenwidth;
-	relativeMouse.x() -= 0.5;
-	relativeMouse.y() /= screenheight;
-	relativeMouse.y() -= 0.5;
+
+	relativeMouse.x() -= g_system->getWidth() / 2;
+	relativeMouse.y() -= g_system->getHeight() / 2;
+
 	TeMatrix4x4 transform = worldTransformationMatrix();
 	transform.inverse();
-	const TeVector3f32 transformpos = transform * relativeMouse;
+	TeVector3f32 transformpos = transform * relativeMouse;
 
-	//debug("transformMousePosition: result %f %f", transformpos.x(), transformpos.y());
+	//debug("transformMousePosition: %d %d -> %f %f", mousepos._x, mousepos._y, transformpos.x(), transformpos.y());
 	return transformpos;
 }
 

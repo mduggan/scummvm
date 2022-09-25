@@ -39,7 +39,6 @@ public:
 	bool onButtonNo();
 	bool onButtonYes();
 
-private:
 	TeSignal0Param _onButtonNoSignal;
 	TeSignal0Param _onButtonYesSignal;
 	TeLuaGUI _gui;

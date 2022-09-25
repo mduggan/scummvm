@@ -33,6 +33,8 @@ Confirm::Confirm() {
 void Confirm::enter(const Common::String &guiPath, const Common::String &y) {
 	_gui.load(guiPath);
 	TeLayout *backgroundLayout = _gui.layout("background");
+	if (!backgroundLayout)
+		error("No background in gui loaded from %s", guiPath.c_str());
 	backgroundLayout->setRatioMode(TeILayout::RATIO_MODE_NONE);
 
 	Application *app = g_engine->getApplication();
@@ -62,25 +64,31 @@ void Confirm::enter(const Common::String &guiPath, const Common::String &y) {
 		}
 				
 		TeTextLayout *yesUpLayout = _gui.textLayout("yesUpLayout");
-		yesUpLayout->setText(textAttributs + *okButtonLoc);
+		if (yesUpLayout)
+			yesUpLayout->setText(textAttributs + *okButtonLoc);
 
 		TeTextLayout *yesDownLayout = _gui.textLayout("yesDownLayout");
-		yesDownLayout->setText(textAttributsDown + *okButtonLoc);
+		if (yesDownLayout)
+			yesDownLayout->setText(textAttributsDown + *okButtonLoc);
 		
 		TeTextLayout *yesRollOverLayout = _gui.textLayout("yesRollOverLayout");
-		yesRollOverLayout->setText(textAttributs + *okButtonLoc);
+		if (yesRollOverLayout)
+			yesRollOverLayout->setText(textAttributs + *okButtonLoc);
 		
 		TeTextLayout *noUpLayout = _gui.textLayout("noUpLayout");
-		noUpLayout->setText(textAttributs + *cancelButtonLoc);
+		if (noUpLayout)
+			noUpLayout->setText(textAttributs + *cancelButtonLoc);
 
 		TeTextLayout *noDownLayout = _gui.textLayout("noDownLayout");
-		noDownLayout->setText(textAttributsDown + *cancelButtonLoc);
+		if (noDownLayout)
+			noDownLayout->setText(textAttributsDown + *cancelButtonLoc);
 	
 		TeTextLayout *noRollOverLayout = _gui.textLayout("noRollOverLayout");
-		noRollOverLayout->setText(textAttributs + *cancelButtonLoc);
+		if (noRollOverLayout)
+			noRollOverLayout->setText(textAttributs + *cancelButtonLoc);
 	}
 
-	warning("TODO: Remove mouse cursor here.");
+	warning("TODO: change mouse cursor here??");
 }
 
 void Confirm::leave() {

@@ -56,7 +56,7 @@ void TeInputMgr::handleEvent(const Common::Event &e) {
 			break;
 		case Common::EVENT_RETURN_TO_LAUNCHER:
 		case Common::EVENT_QUIT:
-			g_engine->setWantToQuit();
+			g_engine->quitGame();
 			break;
 		default:
 			break;

@@ -40,7 +40,8 @@ namespace Syberia {
 
 bool Application::_dontUpdateWhenApplicationPaused = false;
 
-Application::Application() : _finishedGame(false), _finishedFremium(false), _captureFade(false), _difficulty(1), _created(false) {
+Application::Application() : _finishedGame(false), _finishedFremium(false),
+_captureFade(false), _difficulty(1), _created(false), _tutoActivated(false) {
 	TeCore *core = g_engine->getCore();
 	core->_coreNotReady = true;
 	core->fileFlagSystemSetFlag("platform", "MacOSX");
@@ -271,8 +272,13 @@ void Application::destroy() {
 	error("TODO: Implement me.");
 }
 
-void Application::startGame() {
-	error("TODO: Implement me.");
+void Application::startGame(bool newGame, int difficulty) {
+	_appSpriteLayout.setVisible(false);
+	// TODO: there's another virtual call to appsprite surface here here.. not needed?
+	_appSpriteLayout.unload();
+	if (newGame)
+		_difficulty = difficulty;
+	g_engine->getGame()->enter(newGame);
 }
 
 void Application::resume() {

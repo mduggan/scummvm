@@ -90,6 +90,9 @@ bool TeButtonLayout::onMouseLeftDown(const Common::Point &pt) {
 	// very simplified.
 	bool mouseIn = isMouseIn(TeVector2s32(pt.x, pt.y));
 
+	if (mouseIn)
+		debug("mouse down on button %s (current state %d)", name().c_str(), _currentState);
+
 	enum State newState = _currentState;
 	switch (_currentState) {
 		break;
@@ -101,6 +104,8 @@ bool TeButtonLayout::onMouseLeftDown(const Common::Point &pt) {
 		}
 		break;
 	case BUTTON_STATE_ROLLOVER:
+		newState = BUTTON_STATE_DOWN;
+		break;
 	case BUTTON_STATE_UP:
 	case BUTTON_STATE_DISABLED:
 		break;
@@ -117,6 +122,9 @@ bool TeButtonLayout::onMouseLeftUp(const Common::Point &pt) {
 	// very simplified.
 	bool mouseIn = isMouseIn(TeVector2s32(pt.x, pt.y));
 
+	if (mouseIn)
+		debug("mouse up on button %s (current state %d)", name().c_str(), _currentState);
+
 	enum State newState = _currentState;
 	switch (_currentState) {
 		break;
@@ -124,6 +132,7 @@ bool TeButtonLayout::onMouseLeftUp(const Common::Point &pt) {
 		newState = BUTTON_STATE_UP;
 		if (mouseIn) {
 			_onMouseClickValidatedSignal.call();
+			debug("mouse clicked button %s", name().c_str());
 			if (!_validationSound.empty()) {
 				//TeSoundManager *sndMgr = g_engine->getSoundManager();
 				//sndMgr->playFreeSound(_validationSound, _validationSoundVolume, "sfx");
@@ -152,14 +161,14 @@ bool TeButtonLayout::onMousePositionChanged(const Common::Point &pt) {
 	switch (_currentState) {
 	case BUTTON_STATE_UP:
 		if (mouseIn) {
-			// debug("mouse entered button %s", name().c_str());
+			//debug("mouse entered button %s", name().c_str());
 			newState = BUTTON_STATE_ROLLOVER;
 		}
 		break;
 	case BUTTON_STATE_DOWN:
 	case BUTTON_STATE_ROLLOVER:
 		if (!mouseIn) {
-			// debug("mouse left button %s", name().c_str());
+			//debug("mouse exit button %s", name().c_str());
 			newState = BUTTON_STATE_UP;
 		}
 		break;

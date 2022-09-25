@@ -22,11 +22,11 @@
 #ifndef SYBERIA_TE_TE_EXTENDED_TEXT_LAYOUT_H
 #define SYBERIA_TE_TE_EXTENDED_TEXT_LAYOUT_H
 
-#include "syberia/te/te_layout.h"
+#include "syberia/te/te_text_layout.h"
 
 namespace Syberia {
 
-class TeExtendedTextLayout : public TeLayout {
+class TeExtendedTextLayout : public TeTextLayout {
 public:
 	TeExtendedTextLayout();
 

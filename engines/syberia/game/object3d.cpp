@@ -28,7 +28,7 @@ Object3D::Object3D() {
 }
 
 /*static*/ bool Object3D::loadSettings(const Common::String &path) {
-	error("TODO: Implement me.");
+	error("TODO: Implement Object3D::loadSettings.");
 	return false;
 }
 

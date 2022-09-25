@@ -23,7 +23,7 @@
 #define SYBERIA_GAME_MAIN_MENU_H
 
 #include "common/str.h"
-#include "syberia/te/te_lua_gui.h"
+#include "syberia/game/confirm.h"
 #include "syberia/te/te_signal.h"
 
 namespace Syberia {
@@ -65,14 +65,18 @@ public:
 	void setCenterButtonsVisibility(bool visible);
 
 private:
+	
+	void tryDisableButton(const Common::String &btnName);
+	
+	Confirm _newGameConfirm;
+	Confirm _tutoConfirm;
+	Confirm _quitConfirm;
+
 	// TODO add private members
-	TeSignal0Param onNewGameConfirmedSignal;
-	TeSignal0Param onActivatedTutoSignal;
-	TeSignal0Param onDisabledTutoSignal;
-	TeSignal0Param onQuitSignal;
 	TeSignal0Param onFacebookLoggedSignal;
 	
 	bool _entered;
+	bool _confirmingTuto;
 
 };
 

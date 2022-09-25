@@ -7,6 +7,7 @@ MODULE_OBJS := \
 	game/bonus_menu.o \
 	game/cellphone.o \
 	game/character.o \
+	game/character_settings_xml_parser.o \
 	game/characters_shadow.o \
 	game/confirm.o \
 	game/credits.o \
@@ -29,6 +30,7 @@ MODULE_OBJS := \
 	game/main_menu.o \
 	game/notifier.o \
 	game/object3d.o \
+	game/object_settings_xml_parser.o \
 	game/options_menu.o \
 	game/owner_error_menu.o \
 	game/question2.o \
