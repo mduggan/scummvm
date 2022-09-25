@@ -96,9 +96,11 @@ void TeLayout::removeChild(Te3DObject2 *child) {
 const TeVector3f32 &TeLayout::anchor() {
 	return _anchor;
 }
+
 void TeLayout::disableAutoZ() {
 	_autoz = false;
 }
+
 void TeLayout::enableAutoZ() {
 	_autoz = true;
 }

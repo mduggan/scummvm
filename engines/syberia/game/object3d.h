@@ -23,20 +23,35 @@
 #define SYBERIA_GAME_OBJECT3D_H
 
 #include "common/str.h"
+#include "common/hashmap.h"
+
+#include "syberia/te/te_model.h"
+#include "syberia/te/te_vector3f32.h"
 
 namespace Syberia {
 
 class Object3D {
 public:
+	struct ObjectSettings {
+		Common::String _name;
+		Common::String _modelFileName;
+		TeVector3f32 _defaultScale;
+
+		void clear();
+	};
+
 	Object3D();
+
+	bool loadModel(const Common::String &name);
 
 	static bool loadSettings(const Common::String &path);
 
-	// TODO add public members
-
 private:
-	// TODO add private members
+	static Common::HashMap<Common::String, ObjectSettings> *_objectSettings;
 
+	TeIntrusivePtr<TeModel> _modelPtr;
+	Common::String _modelFileName;
+	TeVector3f32 _defaultScale;
 };
 
 } // end namespace Syberia

@@ -61,7 +61,7 @@ public:
 	TeCurveAnim2<TeI3DObject2, TeColor> *colorLinearAnimation(const Common::String &name);
 	TeExtendedTextLayout *extendedTextLayout(const Common::String &name);
 	TeLayout *layout(const Common::String &name);
-	TeCurveAnim2<TeILayout, TeVector3f32> *layoutAnchorLinearAnimation(const Common::String &name);
+	TeCurveAnim2<TeLayout, TeVector3f32> *layoutAnchorLinearAnimation(const Common::String &name);
 	TeCurveAnim2<TeI3DObject2, TeVector3f32> *layoutPositionLinearAnimation(const Common::String &name);
 	TeListLayout *listLayout(const Common::String &name);
 	TeCurveAnim2<TeI3DObject2, TeQuaternion> *rotationLinearAnimation(const Common::String &name);

@@ -21,17 +21,38 @@
 
 #include "common/textconsole.h"
 #include "syberia/game/object3d.h"
+#include "syberia/game/object_settings_xml_parser.h"
 
 namespace Syberia {
+
+/*static*/ Common::HashMap<Common::String, Object3D::ObjectSettings> *Object3D::_objectSettings = nullptr;
+
 
 Object3D::Object3D() {
 }
 
 /*static*/ bool Object3D::loadSettings(const Common::String &path) {
-	error("TODO: Implement Object3D::loadSettings.");
+	ObjectSettingsXmlParser parser;
+	parser.setAllowText();
+
+	if (_objectSettings)
+		delete _objectSettings;
+	_objectSettings = new Common::HashMap<Common::String, ObjectSettings>();
+	parser.setObjectSettings(_objectSettings);
+
+	if (!parser.loadFile(path))
+		error("Object3D::loadSettings: Can't load %s", path.c_str());
+	if (!parser.parse())
+		error("Object3D::loadSettings: Can't parse %s", path.c_str());
+
 	return false;
 }
 
-// TODO: Add more functions here.
+void Object3D::ObjectSettings::clear() {
+	_name.clear();
+	_modelFileName.clear();
+	_defaultScale = TeVector3f32();
+}
+
 
 } // end namespace Syberia

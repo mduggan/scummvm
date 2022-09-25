@@ -28,15 +28,21 @@
 
 namespace Syberia {
 
-class Question2 : TeLayout {
+class Question2 : public TeLayout {
 public:
 	Question2();
+	~Question2();
 
-	class Answer : public TeLuaGUI {
+	class Answer {
+	public:
 		TeLayout *layout();
 		void load(const Common::String &name, const Common::String &unk, const Common::String &path);
 		void unload();
 		bool onButtonValidated();
+
+		TeLuaGUI _gui;
+		Common::String _str;
+		TeSignal1Param<Question2::Answer &> _onButtonValidatedSignal;
 	};
 
 	void enter();
@@ -48,6 +54,8 @@ public:
 
 private:
 	TeLuaGUI _gui;
+	Common::Array<Answer *> _answers;
+	TeSignal1Param<const Common::String &> _onAnswerSignal;
 
 };
 

@@ -22,6 +22,8 @@
 #ifndef SYBERIA_TE_TE_I_LAYOUT_H
 #define SYBERIA_TE_TE_I_LAYOUT_H
 
+#include "syberia/te/te_vector3f32.h"
+
 namespace Syberia {
 
 class TeILayout {
@@ -42,7 +44,6 @@ public:
 		RATIO_MODE_LETTERBOX,
 		RATIO_MODE_PAN_SCAN
 	};
-	// TODO add public members
 
 private:
 	// TODO add private members

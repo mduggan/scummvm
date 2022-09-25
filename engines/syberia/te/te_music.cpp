@@ -109,7 +109,7 @@ void TeMusic::stop() {
 		mixer->stopHandle(_sndHandle);
 		_sndHandleValid = false;
 		_sndHandle = Audio::SoundHandle();
-		error("TODO: Call onStopSignal callbacks");
+		_onStopSignal.call();
 	}
 	return;
 }

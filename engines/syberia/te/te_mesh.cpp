@@ -328,6 +328,17 @@ TeVector3f32 TeMesh::vertex(uint idx) const {
 		return _verticies[idx];
 }
 
-// TODO: Add more functions here.
+void TeMesh::attachMaterial(uint idx, const TeMaterial &material) {
+	error("TODO: Implement TeMesh::attachMaterial");
+}
+
+void TeMesh::facesPerMaterial(uint idx, unsigned short value) {
+	_faceCounts.resize(_materials.size());
+	_faceCounts[idx] = value;
+}
+
+void TeMesh::matrixIndex(uint num, unsigned short val) {
+	_matricies[num] = val;
+}
 
 } // end namespace Syberia

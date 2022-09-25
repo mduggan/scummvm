@@ -121,6 +121,8 @@ public:
 	TeRenderer *getRenderer();
 	TeResourceManager *getResourceManager();
 	TeInputMgr *getInputMgr();
+	
+	static Common::StringArray splitString(const Common::String &text, char c);
 
 private:
 	void configureSearchPaths();

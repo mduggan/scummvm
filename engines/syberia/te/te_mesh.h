@@ -106,6 +106,8 @@ public:
 	void setglTexEnv(unsigned int val) { _gltexEnvMode = val; }
 	void setHasAlpha(bool val) { _hasAlpha = val; }
 
+	Common::Array<TeMaterial> &materials() { return _materials; }
+
 private:
 	Common::Array<unsigned char> _materialIndexes;
 	Common::Array<TeVector3f32> _verticies;

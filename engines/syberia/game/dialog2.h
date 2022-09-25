@@ -23,17 +23,19 @@
 #define SYBERIA_GAME_DIALOG2_H
 
 #include "syberia/te/te_timer.h"
+#include "syberia/te/te_music.h"
+#include "syberia/te/te_lua_gui.h"
 
 namespace Syberia {
 
-class Dialog2 {
+class Dialog2 : public TeLayout {
 public:
 	Dialog2();
-	
+
 	class DialogData {
 		bool operator=(const DialogData &other);
 	};
-	
+
 	bool isDialogPlaying();
 	void launchNextDialog();
 	void load();
@@ -41,7 +43,7 @@ public:
 	bool onAnimationDownFinished();
 	bool onAnimationUpFinished();
 	bool onMinimumTimeTimer();
-	bool onSkip();
+	bool onSkipButton();
 	bool onSoundFinished();
 
 	void pushDialog(const Common::String &param_1, const Common::String &param_2, const Common::String &param_3, int param_4);
@@ -50,13 +52,18 @@ public:
 	//void saveToBackup(TiXmlNode *node)
 	void startDownAnimation();
 	void unload();
-	
+
 	Common::String _prevSceneName;
-	// TODO add public members
 
 private:
 	TeTimer _minimumTimeTimer;
 
+	Common::String _animDownFinishedResultString;
+
+	TeLuaGUI _gui;
+	TeMusic _music;
+
+	TeSignal1Param<const Common::String &> _onAnimationDownFinishedSignal;
 };
 
 } // end namespace Syberia

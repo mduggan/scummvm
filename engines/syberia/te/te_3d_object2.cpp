@@ -75,39 +75,51 @@ long Te3DObject2::childIndex(Te3DObject2 *child) {
 	return -1;
 }
 
-/*static*/ void Te3DObject2::deserialize(Common::ReadStream *stream, Te3DObject2 *dest) {
-	char buf[256];
-	uint slen = stream->readUint32LE();
-	stream->read(buf, slen);
-	buf[slen] = 0;
-	Common::String str(buf);
-	dest->setName(str);
+/*static*/ Common::String Te3DObject2::deserializeString(Common::ReadStream &stream) {
+	uint slen = stream.readUint32LE();
+	if (slen > 1024 * 1024)
+		error("Improbable string size %d", slen);
 
-	TeVector3f32 vect;
-	TeVector3f32::deserialize(stream, &vect);
-	dest->setPosition(vect);
-
-	TeQuaternion quat;
-	TeQuaternion::deserialize(stream, &quat);
-	dest->setRotation(quat);
-
-	TeVector3f32::deserialize(stream, &vect);
-	dest->setScale(vect);
+	if (slen) {
+		char *buf = new char[slen + 1];
+		buf[slen] = '\0';
+		stream.read(buf, slen);
+		Common::String str(buf);
+		delete[] buf;
+		return str;
+	}
+	return Common::String();
 }
 
-/*static*/ void Te3DObject2::serialize(Common::WriteStream *stream, Te3DObject2 *src) {
-	const Common::String &name = src->name();
-	stream->writeUint32LE(name.size());
-	stream->write(name.c_str(), name.size());
+/*static*/ void Te3DObject2::deserialize(Common::ReadStream &stream, Te3DObject2 &dest) {
+	Common::String str = deserializeString(stream);
+	dest.setName(str);
 
-	const TeVector3f32 pos = src->position();
-	TeVector3f32::serialize(stream, &pos);
+	TeVector3f32 vect;
+	TeVector3f32::deserialize(stream, vect);
+	dest.setPosition(vect);
 
-	const TeQuaternion rot = src->rotation();
-	TeQuaternion::serialize(stream, &rot);
+	TeQuaternion quat;
+	TeQuaternion::deserialize(stream, quat);
+	dest.setRotation(quat);
 
-	const TeVector3f32 sca = src->scale();
-	TeVector3f32::serialize(stream, &sca);
+	TeVector3f32::deserialize(stream, vect);
+	dest.setScale(vect);
+}
+
+/*static*/ void Te3DObject2::serialize(Common::WriteStream &stream, Te3DObject2 &src) {
+	const Common::String &name = src.name();
+	stream.writeUint32LE(name.size());
+	stream.write(name.c_str(), name.size());
+
+	const TeVector3f32 pos = src.position();
+	TeVector3f32::serialize(stream, pos);
+
+	const TeQuaternion rot = src.rotation();
+	TeQuaternion::serialize(stream, rot);
+
+	const TeVector3f32 sca = src.scale();
+	TeVector3f32::serialize(stream, sca);
 }
 
 bool Te3DObject2::onParentWorldColorChanged() {

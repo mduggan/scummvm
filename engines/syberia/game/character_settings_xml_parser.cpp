@@ -23,6 +23,144 @@
 
 namespace Syberia {
 
-// TODO: Add more functions here.
+bool CharacterSettingsXmlParser::parserCallback_ModelsSettings(ParserNode *node) {
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_Model(ParserNode *node) {
+	const Character::CharacterSettings emptySettings;
+	const Common::String &name = node->values["name"];
+	_characterSettings->setVal(name, emptySettings);
+	_curCharacter = &_characterSettings->getVal(name);
+	_curCharacter->_name = name;
+	assert(_characterSettings != nullptr);
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_modelFileName(ParserNode *node) {
+	_curTextTag = TagModelFileName;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_defaultScale(ParserNode *node) {
+	_curTextTag = TagDefaultScale;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_walk(ParserNode *node) {
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_animationFileName(ParserNode *node) {
+	_curTextTag = TagAnimationFileName;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_walkType(ParserNode *node) {
+	Common::String walkName = node->values["name"];
+	_curWalkSettings = &(_curCharacter->_walkSettings[walkName]);
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_start(ParserNode *node) {
+	return true;
+}
+
+Character::AnimSettings CharacterSettingsXmlParser::parseWalkAnimSettings(const ParserNode *node) const {
+	Character::AnimSettings settings;
+	const Common::StringMap &map = node->values;
+	settings._file = map["file"];
+	if (map.contains("stepRight"))
+		settings._stepRight = map["stepRight"].asUint64();
+
+	if (map.contains("stepLeft"))
+		settings._stepLeft = map["stepLeft"].asUint64();
+
+	return settings;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_loop(ParserNode *node) {
+	_curWalkSettings->_loop = parseWalkAnimSettings(node);
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_endD(ParserNode *node) {
+	_curWalkSettings->_endD = parseWalkAnimSettings(node);
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_endG(ParserNode *node) {
+	_curWalkSettings->_endG = parseWalkAnimSettings(node);
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_speed(ParserNode *node) {
+	_curTextTag = TagSpeed;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_cutSceneCurveDemi(ParserNode *node) {
+	// Handled in the "position" callback.
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_position(ParserNode *node) {
+	_curTextTag = TagPosition;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_face(ParserNode *node) {
+	// Handled in "face" and "eyes" callbacks.
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_eyes(ParserNode *node) {
+	_curTextTag = TagEyes;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_mouth(ParserNode *node) {
+	_curTextTag = TagMouth;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::parserCallback_body(ParserNode *node) {
+	if (node->values["name"] != "default")
+		error("CharacterSettingsXmlParser: Only default body supported.");
+	_curTextTag = TagBody;
+	return true;
+}
+
+bool CharacterSettingsXmlParser::textCallback(const Common::String &val) {
+	switch (_curTextTag) {
+	case TagModelFileName:
+		_curCharacter->_modelFileName = val;
+		break;
+	case TagDefaultScale:
+		_curCharacter->_defaultScale.parse(val);
+		break;
+	case TagAnimationFileName:
+		_curCharacter->_walkFileName = val;
+		break;
+	case TagEyes:
+		_curCharacter->_defaultEyes = val;
+		break;
+	case TagMouth:
+		_curCharacter->_defaultMouth = val;
+		break;
+	case TagSpeed:
+		_curCharacter->_walkSpeed = atof(val.c_str());
+		break;
+	case TagPosition:
+		_curCharacter->_cutSceneCurveDemiPosition.parse(val);
+		break;
+	case TagBody:
+		_curCharacter->_defaultBody = val;
+		break;
+	default:
+		break;
+	}
+	return true;
+}
 
 } // end namespace Syberia

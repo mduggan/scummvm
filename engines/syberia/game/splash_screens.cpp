@@ -19,8 +19,10 @@
  *
  */
 
+#include "common/config-manager.h"
 #include "common/file.h"
 #include "common/path.h"
+
 #include "syberia/syberia.h"
 #include "syberia/game/application.h"
 #include "syberia/game/splash_screens.h"
@@ -54,6 +56,11 @@ bool SplashScreens::onAlarm() {
 	TeLuaGUI::unload();
 	const Common::String scriptName = Common::String::format("menus/splashes/splash%d.lua", _splashNo);
 	_splashNo++;
+
+	if (ConfMan.get("skipsplash") == "true") {
+		onQuitSplash();
+		return true;
+	}
 
 	if (!Common::File::exists(scriptName)) {
 		onQuitSplash();

@@ -77,27 +77,45 @@ void InGameScene::reset() {
 }
 
 void InGameScene::freeSceneObjects() {
-	error("TODO: Implement me");
+	error("TODO: Implement InGameScene::freeSceneObjects");
 }
 
 void InGameScene::unloadSpriteLayouts() {
-	error("TODO: Implement me");
+	error("TODO: Implement InGameScene::unloadSpriteLayouts");
 }
 
 Character *InGameScene::character(const Common::String &name) {
-	error("TODO: Implement me");
+	error("TODO: Implement InGameScene::character");
 }
 
 bool InGameScene::loadCharacter(const Common::String &name) {
-	error("TODO: Implement me");
+	error("TODO: Implement InGameScene::loadCharacter");
 }
 
 bool InGameScene::loadPlayerCharacter(const Common::String &name) {
-	error("TODO: Implement me");
+	if (_character == nullptr) {
+		_character = new Character();
+		if (!_character->loadModel(name, true)) {
+			_playerCharacterModel.release();
+			return false;
+		}
+
+		_playerCharacterModel = _character->_model;
+
+		if (!findKate()) {
+			Common::Array<TeIntrusivePtr<TeModel>> &ms = models();
+			ms.push_back(_character->_model);
+			ms.push_back(_character->_shadowModel[0]);
+			ms.push_back(_character->_shadowModel[1]);
+		}
+	}
+
+	_character->_model->setVisible(true);
+	return true;
 }
 
 void InGameScene::unloadPlayerCharacter(const Common::String &name) {
-	error("TODO: Implement me");
+	error("TODO: Implement InGameScene::unloadPlayerCharacter");
 }
 
 void InGameScene::unloadCharacter(const Common::String &name) {

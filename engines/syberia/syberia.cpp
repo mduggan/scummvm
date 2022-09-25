@@ -61,6 +61,21 @@ SyberiaEngine::~SyberiaEngine() {
 	delete _inputMgr;
 }
 
+/*static*/
+Common::StringArray SyberiaEngine::splitString (const Common::String &text, char c) {
+	Common::StringArray values;
+
+	Common::String str = text;
+	size_t pos;
+	while ((pos = str.findFirstOf(c)) != Common::String::npos) {
+		values.push_back(Common::String(str.c_str(), pos));
+		str = Common::String(str.c_str() + pos + 1);
+	}
+
+	values.push_back(str);
+	return values;
+}
+
 Application *SyberiaEngine::getApplication() {
 	// created in run()
 	return _application;

@@ -23,14 +23,20 @@
 #define SYBERIA_GAME_OBJECT_SETTINGS_XML_PARSER_H
 
 #include "common/xmlparser.h"
+#include "syberia/game/object3d.h"
+#include "syberia/te/te_vector3f32.h"
 
 namespace Syberia {
 
 class ObjectSettingsXmlParser : public Common::XMLParser {
 public:
+	void setObjectSettings(Common::HashMap<Common::String, Object3D::ObjectSettings> *settings) {
+		_objectSettings = settings;
+	}
+
 	// Parser
 	CUSTOM_XML_PARSER(ObjectSettingsXmlParser) {
-		XML_KEY(ObjectSettings)
+		XML_KEY(ObjectsSettings)
 			XML_KEY(Object)
 				XML_PROP(name, true)
 				XML_KEY(modelFileName)
@@ -42,13 +48,21 @@ public:
 	} PARSER_END()
 
 	// Parser callback methods
-	bool parserCallback_ObjectSettings(ParserNode *node);
+	bool parserCallback_ObjectsSettings(ParserNode *node);
 	bool parserCallback_Object(ParserNode *node);
 	bool parserCallback_modelFileName(ParserNode *node);
 	bool parserCallback_defaultScale(ParserNode *node);
+	bool textCallback(const Common::String &val) override;
 
 private:
+	enum TextTagType {
+		TagModelFileName,
+		TagDefaultScale
+	};
 
+	TextTagType _textTagType;
+	Object3D::ObjectSettings _curObject;
+	Common::HashMap<Common::String, Object3D::ObjectSettings> *_objectSettings;
 };
 
 } // end namespace Syberia

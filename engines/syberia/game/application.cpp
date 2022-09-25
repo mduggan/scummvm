@@ -379,7 +379,7 @@ void Application::performRender() {
 	renderer->clearBuffer(GL_ACCUM);
 	
 	if (game->_running && _inGameScene._character && true /*some other ingamescene things*/) {
-		Common::SharedPtr<TeCamera> currentCamera = _inGameScene.currentCamera();
+		TeIntrusivePtr<TeCamera> currentCamera = _inGameScene.currentCamera();
 		if (currentCamera) {
 			currentCamera->apply();
 			renderer->shadowMode(TeRenderer::ShadowMode2);

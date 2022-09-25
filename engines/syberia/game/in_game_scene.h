@@ -75,6 +75,8 @@ public:
 
 	Character *_character;
 private:
+	
+	TeIntrusivePtr<TeModel> _playerCharacterModel;
 	Common::Array<Common::String> _blockingObjects;
 	TeLuaGUI _bgGui;
 	TeLuaGUI _gui2; // TODO: find a better name.

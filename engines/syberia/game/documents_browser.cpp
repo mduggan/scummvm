@@ -24,22 +24,27 @@
 namespace Syberia {
 
 DocumentsBrowser::DocumentsBrowser() {
+	_timer.alarmSignal().add(this, &DocumentsBrowser::onQuitDocumentDoubleClickTimer);
 }
 
 void DocumentsBrowser::enter() {
-	error("TODO: Implement me");
+	error("TODO: Implement DocumentsBrowser::enter");
 }
 
 void DocumentsBrowser::leave() {
-	error("TODO: Implement me");
+	error("TODO: Implement DocumentsBrowser::leave");
 }
 
 void DocumentsBrowser::load() {
-	error("TODO: Implement me");
+	error("TODO: Implement DocumentsBrowser::load");
 }
 
 void DocumentsBrowser::loadZoomed() {
-	error("TODO: Implement me");
+	error("TODO: Implement DocumentsBrowser::loadZoomed");
+}
+
+bool DocumentsBrowser::onQuitDocumentDoubleClickTimer() {
+	error("TODO: Implement DocumentsBrowser::onQuitDocumentDoubleClickTimer");
 }
 
 // TODO: Add more functions here.

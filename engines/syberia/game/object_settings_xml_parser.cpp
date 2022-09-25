@@ -23,19 +23,40 @@
 
 namespace Syberia {
 
-bool ObjectSettingsXmlParser::parserCallback_ObjectSettings(ParserNode *node) {
+bool ObjectSettingsXmlParser::parserCallback_ObjectsSettings(ParserNode *node) {
+	// Nothing to do, data handled in the child keys.
 	return true;
 }
 
 bool ObjectSettingsXmlParser::parserCallback_Object(ParserNode *node) {
+	const Common::String &objname = node->values["name"];
+	_curObject._name = objname;
+	_objectSettings->setVal(objname, _curObject);
+	_curObject.clear();
 	return true;
 }
 
 bool ObjectSettingsXmlParser::parserCallback_modelFileName(ParserNode *node) {
+	_textTagType = TagModelFileName;
 	return true;
 }
 
 bool ObjectSettingsXmlParser::parserCallback_defaultScale(ParserNode *node) {
+	_textTagType = TagDefaultScale;
+	return true;
+}
+
+bool ObjectSettingsXmlParser::textCallback(const Common::String &val) {
+	switch (_textTagType) {
+		case TagModelFileName:
+			_curObject._modelFileName = val;
+			break;
+		case TagDefaultScale:
+			_curObject._defaultScale.parse(val);
+			break;
+		default:
+			error("should only see text for model file name or scale");
+	}
 	return true;
 }
 

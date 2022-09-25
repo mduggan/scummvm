@@ -73,6 +73,9 @@ public:
 
 	const float *getData() const { return _data; }
 	float *getData() { return _data; }
+	
+	void deserialize(Common::ReadStream &stream);
+	void serialize(Common::WriteStream &stream) const;
 
 private:
 	float _data[16];

@@ -26,6 +26,7 @@
 #include "common/ptr.h"
 #include "common/stream.h"
 #include "syberia/te/te_timer.h"
+#include "syberia/te/te_trs.h"
 #include "syberia/te/te_mesh.h"
 #include "syberia/te/te_model_animation.h"
 #include "syberia/te/te_tiled_texture.h"
@@ -34,7 +35,7 @@ namespace Syberia {
 
 class TeModelAnimation;
 
-class TeModel : public Te3DObject2 {
+class TeModel : public Te3DObject2, public TeResource {
 public:
 	TeModel();
 
@@ -55,6 +56,16 @@ public:
 		float _amount;
 		TeTimer _timer;
 	};
+	
+	struct bone {
+		Common::String _name;
+		unsigned short _x;
+		TeTRS _trs;
+	};
+	struct weightElement {
+		float _w;
+		unsigned short _x;
+	};
 
 	void addMesh(const TeMesh &mesh) {
 		_meshes.push_back(mesh);
@@ -71,16 +82,28 @@ public:
 	/* Align the stream to the nearest 4 byte boudary*/
 	static void loadAlign(Common::SeekableReadStream &stream);
 	static void saveAlign(Common::SeekableWriteStream &stream);
+	
+	bool load(const Common::Path &path);
+	bool load(Common::SeekableReadStream &stream);
+	
+	bool loadWeights(Common::ReadStream &stream, Common::Array<weightElement> weights);
+	bool loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh);
 
 	void update();
 	void setVisibleByName(const Common::String &name, bool vis);
 
 	TeIntrusivePtr<TeTiledTexture> _tiledTexture;
 
+	Common::Path _texturePath;
+	bool _enableLights;
+	bool _skipBoneMatricies;
+
 protected:
 	Common::Array<TeMesh> _meshes;
 	Common::Array<MeshBlender *> _meshBlenders;
-	
+	Common::Array<bone> _bones;
+	Common::Array<TeMatrix4x4> _boneMatrices;
+	Common::Array<Common::Array<weightElement>> _weightElements;
 	// TODO add private members
 
 };

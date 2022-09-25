@@ -22,17 +22,24 @@
 #ifndef SYBERIA_TE_TE_TRS_H
 #define SYBERIA_TE_TE_TRS_H
 
+#include "common/stream.h"
+#include "syberia/te/te_quaternion.h"
+#include "syberia/te/te_vector3f32.h"
+
 namespace Syberia {
 
 class TeTRS {
 public:
 	TeTRS();
 
+	static void deserialize(Common::ReadStream &stream, TeTRS &dest);
+	static void serialize(Common::WriteStream &stream, const TeTRS &src);
 	// TODO add public members
 
 private:
-	// TODO add private members
-
+	TeVector3f32 _trans;
+	TeQuaternion _rot;
+	TeVector3f32 _scale;
 };
 
 } // end namespace Syberia

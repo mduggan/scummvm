@@ -19,10 +19,21 @@
  *
  */
 
+#include "syberia/syberia.h"
+#include "common/str-array.h"
 #include "syberia/te/te_vector3f32.h"
 
 namespace Syberia {
 
-// TODO: Add more functions here.
+bool TeVector3f32::parse(const Common::String &val) {
+	const Common::StringArray parts = SyberiaEngine::splitString(val, ',');
+	if (parts.size() != 3)
+		return false;
+	x() = atof(parts[0].c_str());
+	y() = atof(parts[1].c_str());
+	z() = atof(parts[2].c_str());
+	return true;
+}
+
 
 } // end namespace Syberia

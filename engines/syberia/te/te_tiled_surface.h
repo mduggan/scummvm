@@ -35,7 +35,7 @@
 
 namespace Syberia {
 
-class TeTiledSurface : public TeModel, public TeResource {
+class TeTiledSurface : public TeModel {
 public:
 	TeTiledSurface();
 

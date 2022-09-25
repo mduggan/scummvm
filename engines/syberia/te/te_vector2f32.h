@@ -41,6 +41,16 @@ public:
 		return Common::String::format("TeVector2f32(%.02f %.02f)", getX(), getY());
 	}
 
+	static void deserialize(Common::ReadStream &stream, TeVector2f32 &dest) {
+		dest.setX(stream.readFloatLE());
+		dest.setY(stream.readFloatLE());
+	}
+
+	static void serialize(Common::WriteStream &stream, const TeVector2f32 &src) {
+		stream.writeFloatLE(src.getX());
+		stream.writeFloatLE(src.getY());
+	}
+
 	/*
 	TODO: do we need anything that isn't already in Vector2d here?
 	TeVector2f32(const TeVector2f32 &other);

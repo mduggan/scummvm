@@ -63,8 +63,9 @@ public:
 		return _colorInheritance;
 	}
 
-	static void deserialize(Common::ReadStream *stream, Te3DObject2 *dest);
-	static void serialize(Common::WriteStream *stream, Te3DObject2 *src);
+	static void deserialize(Common::ReadStream &stream, Te3DObject2 &dest);
+	static void serialize(Common::WriteStream &stream, Te3DObject2 &src);
+	static Common::String deserializeString(Common::ReadStream &stream);
 
 	virtual void draw() = 0;
 	const Common::String &name() const {

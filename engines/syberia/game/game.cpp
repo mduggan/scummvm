@@ -50,27 +50,13 @@ Game::Game() : _objectsTakenVal(0), _score(0), _entered(false) {
 	"VPoupeeMammouth"
 };
 
-static Common::StringArray split(const Common::String &text, char c) {
-	Common::StringArray values;
-
-	Common::String str = text;
-	size_t pos;
-	while ((pos = str.findFirstOf(c)) != Common::String::npos) {
-		values.push_back(Common::String(str.c_str(), pos));
-		str = Common::String(str.c_str() + pos + 1);
-	}
-
-	values.push_back(str);
-	return values;
-}
-
 bool Game::addAnimToSet(const Common::String &anim) {
 	// Get path to lua script, eg scenes/ValVoralberg/14040/Set14040.lua
 	const Common::Path animPath(Common::String("scenes/") + anim + "/");
-	
+
 	bool retval = false;
 	if (Common::File::exists(animPath)) {
-		Common::StringArray parts = split(anim, '/');
+		Common::StringArray parts = SyberiaEngine::splitString(anim, '/');
 		assert(parts.size() >= 2);
 
 		Common::String layoutName = parts[1];
@@ -188,17 +174,17 @@ void Game::enter(bool newgame) {
 	Object3D::loadSettings("objects/ObjectsSettings.xml");
 	if (_scene._character) {
 		_scene._character->onFinished().remove(this, &Game::onDisplacementFinished);
-		warning("TODO: Who should we unload here?");
-		_scene.unloadCharacter("");
+		_scene.unloadCharacter(_scene._character->_model->name());
 	}
 	bool loaded = loadPlayerCharacter("Kate");
 	if (!loaded)
-		warning("[Game::enter] Can't load player character");
+		error("[Game::enter] Can't load player character");
 
+	_scene._character->_model->setVisible(true);
 	_running = true;
 	_luaContext.create();
 	GameAchievements::registerAchievements(_luaContext);
-	
+
 	_luaContext.setGlobal("BUTTON_VALID", 1);
 	_luaContext.setGlobal("BUTTON_CANCEL", 2);
 	_luaContext.setGlobal("BUTTON_EXTRA1", 4);
@@ -227,15 +213,15 @@ void Game::enter(bool newgame) {
 
 	_luaScript.attachToContext(&_luaContext);
 	warning("TODO: load Objectif");
-	
+
 	_question2.load();
 	_dialog2.load();
 	_documentsBrowser.load();
 	_documentsBrowser.loadZoomed();
 	_inventory.load();
-	
+
 	_cellphone.onCallNumber().add(this, &Game::onCallNumber);
-	
+
 	if (!newgame) {
 		loadBackup(_loadName);
 	} else {
@@ -308,13 +294,13 @@ void Game::initScene(bool param_1, const Common::String &scenePath) {
 void Game::initWarp(const Common::String &zone, const Common::String &scene, bool fadeFlag) {
 	_inventoryMenu.unload();
 	_gui4.unload();
-	
+
 	error("TODO: Implemet me");
 }
 
 bool Game::isDocumentOpened() {
 	TeLayout *layout = _documentsBrowser.layout("zoomed");
-	return layout->visible(); 
+	return layout->visible();
 }
 
 bool Game::isMoviePlaying() {

@@ -290,5 +290,17 @@ bool TeMatrix4x4::inverse() {
 	return true;
 }
 
+void TeMatrix4x4::deserialize(Common::ReadStream &stream) {
+	for (int i = 0; i < 16; i++) {
+		_data[i] = stream.readFloatLE();
+	}
+}
+
+void TeMatrix4x4::serialize(Common::WriteStream &stream) const {
+	for (int i = 0; i < 16; i++) {
+		stream.writeFloatLE(_data[i]);
+	}
+}
+
 
 } // end namespace Syberia

@@ -23,11 +23,17 @@
 #define SYBERIA_GAME_CHARACTER_SETTINGS_XML_PARSER_H
 
 #include "common/xmlparser.h"
+#include "syberia/game/character.h"
+#include "syberia/te/te_vector3f32.h"
 
 namespace Syberia {
 
 class CharacterSettingsXmlParser : public Common::XMLParser {
 public:
+	void setCharacterSettings(Common::HashMap<Common::String, Character::CharacterSettings> *settings) {
+		_characterSettings = settings;
+	};
+
 	// Parser
 	CUSTOM_XML_PARSER(CharacterSettingsXmlParser) {
 		XML_KEY(ModelsSettings)
@@ -67,12 +73,14 @@ public:
 					KEY_END()
 				KEY_END()
 				XML_KEY(face)
+					XML_PROP(name, true)
 					XML_KEY(eyes)
 					KEY_END()
 					XML_KEY(mouth)
 					KEY_END()
 				KEY_END()
 				XML_KEY(body)
+					XML_PROP(name, true)
 				KEY_END()
 			KEY_END()
 		KEY_END()
@@ -97,11 +105,27 @@ public:
 	bool parserCallback_eyes(ParserNode *node);
 	bool parserCallback_mouth(ParserNode *node);
 	bool parserCallback_body(ParserNode *node);
+	bool textCallback(const Common::String &val) override;
 
 private:
-	Common::String _curText;
-	// TODO add private members
+	Character::AnimSettings parseWalkAnimSettings(const ParserNode *node) const;
 
+	enum TextTagType {
+		TagModelFileName,
+		TagDefaultScale,
+		TagAnimationFileName,
+		TagEyes,
+		TagMouth,
+		TagSpeed,
+		TagPosition,
+		TagBody
+	};
+	
+	TextTagType _curTextTag;
+	// TODO add private members
+	Character::CharacterSettings *_curCharacter;
+	Character::WalkSettings *_curWalkSettings;
+	Common::HashMap<Common::String, Character::CharacterSettings> *_characterSettings;
 };
 
 } // end namespace Syberia

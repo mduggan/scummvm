@@ -22,6 +22,7 @@
 #ifndef SYBERIA_TE_TE_VECTOR3F32_H
 #define SYBERIA_TE_TE_VECTOR3F32_H
 
+#include "common/str.h"
 #include "math/vector2d.h"
 #include "syberia/te/te_vector2s32.h"
 
@@ -45,21 +46,24 @@ public:
 		set(vec2d._x, vec2d._y, 0.0);
 	}
 
-	static void deserialize(Common::ReadStream *stream, TeVector3f32 *dest) {
-		dest->x() = stream->readFloatLE();
-		dest->y() = stream->readFloatLE();
-		dest->z() = stream->readFloatLE();
+	static void deserialize(Common::ReadStream &stream, TeVector3f32 &dest) {
+		dest.x() = stream.readFloatLE();
+		dest.y() = stream.readFloatLE();
+		dest.z() = stream.readFloatLE();
 	}
 
-	static void serialize(Common::WriteStream *stream, const TeVector3f32 *src) {
-		stream->writeFloatLE(src->x());
-		stream->writeFloatLE(src->y());
-		stream->writeFloatLE(src->z());
+	static void serialize(Common::WriteStream &stream, const TeVector3f32 &src) {
+		stream.writeFloatLE(src.x());
+		stream.writeFloatLE(src.y());
+		stream.writeFloatLE(src.z());
 	}
 	
 	float squaredLength() const {
 		return (x() * x() + y() * y() + z() * z());
 	}
+	
+	/** Parse comma-separated values */
+	bool parse(const Common::String &val);
 
 	Common::String dump() const {
 		return Common::String::format("TeVector3f32(%.02f %.02f %.02f)", x(), y(), z());

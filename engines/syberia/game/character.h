@@ -42,7 +42,40 @@ public:
 	Character();
 	virtual ~Character() {}
 
-	class CharacterSettings {};
+	struct AnimSettings {
+		AnimSettings() : _stepLeft(0), _stepRight(0) {};
+		Common::String _file;
+		int _stepRight;
+		int _stepLeft;
+	};
+
+	struct WalkSettings {
+		AnimSettings _start;
+		AnimSettings _loop;
+		AnimSettings _endD;
+		AnimSettings _endG;
+
+		void clear();
+	};
+
+	struct CharacterSettings {
+		CharacterSettings() : _walkSpeed(0.0f) {}
+
+		Common::String _name;
+		Common::String _modelFileName;
+		TeVector3f32 _defaultScale;
+		Common::String _walkFileName;
+		Common::HashMap<Common::String, WalkSettings> _walkSettings; // keys are "Walk", "Jog", etc
+		float _walkSpeed;
+
+		TeVector3f32 _cutSceneCurveDemiPosition;
+		Common::String _defaultEyes;	// Note: Engine supports more, but in practice only one ever used.
+		Common::String _defaultMouth; 	// Note: Engine supports more, but in practice only one ever used.
+		Common::String _defaultBody; 	// Note: Engine supports more, but in practice only one ever used.
+
+		void clear();
+	};
+
 	class AnimCacheElement {};
 	enum WalkPart {
 		WalkPart0,
@@ -103,7 +136,8 @@ public:
 	void walkMode(const Common::String &mode);
 	void walkTo(float param_1, bool param_2);
 
-	Common::SharedPtr<TeModel> _model;
+	TeIntrusivePtr<TeModel> _model;
+	TeIntrusivePtr<TeModel> _shadowModel[2];
 	TeSignal1Param<const Common::String &> _characterAnimPlayerFinishedSignal;
 	TeSignal1Param<const Common::String &> _onCharacterAnimFinishedSignal;
 
@@ -114,10 +148,12 @@ private:
 	Common::String _stepSound1;
 	Common::String _stepSound2;
 	Common::String _walkModeStr; // Walk or Jog
+	
+	CharacterSettings _characterSettings;
 
 	static Common::Array<AnimCacheElement> _animCache;
 	static uint _animCacheSize;
-	static Common::Array<CharacterSettings> _characterSettings;
+	static Common::HashMap<Common::String, CharacterSettings> *_globalCharacterSettings;
 	
 };
 

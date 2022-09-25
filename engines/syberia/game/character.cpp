@@ -19,11 +19,36 @@
  *
  */
 
+#include "common/file.h"
+#include "common/debug.h"
 #include "syberia/game/character.h"
+#include "syberia/game/character_settings_xml_parser.h"
 
 namespace Syberia {
 
-Character::Character() {
+/*static*/ Common::HashMap<Common::String, Character::CharacterSettings> *Character::_globalCharacterSettings = nullptr;
+
+void Character::CharacterSettings::clear() {
+	_name.clear();
+	_modelFileName.clear();
+	_defaultScale = TeVector3f32();
+	_walkFileName.clear();
+	_walkSettings.clear();
+	_walkSpeed = 0.0f;
+	_cutSceneCurveDemiPosition = TeVector3f32();
+	_defaultEyes.clear();
+	_defaultMouth.clear();
+	_defaultBody.clear();
+}
+
+void Character::WalkSettings::clear() {
+	_start = AnimSettings();
+	_loop = AnimSettings();
+	_endD = AnimSettings();
+	_endG = AnimSettings();
+}
+
+Character::Character() : _curveOffset(0) {
 }
 
 void Character::addCallback(const Common::String &s1, const Common::String &s2, float f1, float f2) {
@@ -77,39 +102,99 @@ void Character::deleteCallback(const Common::String &str1, const Common::String 
 
 //static bool deserialize(TiXmlElement *param_1, Walk *param_2);
 void Character::endMove() {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::endMove.");
 }
 
 long Character::getCurrentWalkFiles() {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::getCurrentWalkFiles.");
 }
 
 bool Character::isFramePassed(uint frameno) {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::isFramePassed.");
 }
 
 bool Character::isWalkEnd() {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::isWalkEnd.");
 	return false;
 }
 
 bool Character::leftStepFrame(enum Character::WalkPart walkpart) {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::leftStepFrame.");
 	return false;
 }
 
 bool Character::rightStepFrame(enum Character::WalkPart walkpart) {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::rightStepFrame.");
 	return false;
 }
 
 bool Character::loadModel(const Common::String &name, bool param_2) {
-	error("TODO: Implement me.");
+	assert(_globalCharacterSettings);
+	if (_model) {
+		//_model->bonesUpdateSignal().remove(this, &Character::onBonesUpdate);
+	}
+	_model = new TeModel();
+	//_model->bonesUpdateSignal().add(this, &Character::onBonesUpdate);
+	
+	if (!_globalCharacterSettings->contains(name))
+		return false;
+	
+	_characterSettings = _globalCharacterSettings->getVal(name);
+	_model->_texturePath = Common::Path("models/Textures");
+	_model->_enableLights = true;
+	Common::Path modelPath("models");
+	modelPath.joinInPlace(_characterSettings._modelFileName);
+	if (!_model->load(modelPath))
+		return false;
+	
+	
+	error("TODO: Finish Character::loadModel.");
 	return false;
 }
 
 /*static*/ bool Character::loadSettings(const Common::String &path) {
-	error("TODO: Implement Character::loadSettings.");
+	CharacterSettingsXmlParser parser;
+	parser.setAllowText();
+	if (_globalCharacterSettings)
+		delete _globalCharacterSettings;
+	_globalCharacterSettings = new Common::HashMap<Common::String, CharacterSettings>();
+	parser.setCharacterSettings(_globalCharacterSettings);
+
+	// WORKAROUND: This file contains invalid comments
+	// eg, <!--------- and a comment-inside-a-comment.
+	// patch them before parsing.
+	Common::File xmlFile;
+	if (!xmlFile.open(path))
+		error("Character::loadSettings: Can't open %s", path.c_str());
+	const uint32 bufsize = xmlFile.size();
+	char *buf = new char[bufsize+1];
+	buf[bufsize] = '\0';
+	xmlFile.read(buf, bufsize);
+	Common::String fixedbuf(buf);
+	uint32 offset = fixedbuf.find("------------");
+	while (offset != Common::String::npos) {
+		fixedbuf.replace(offset, 12, "--");
+		offset = fixedbuf.find("------------");
+	}
+	
+	// Big HACK: Remove the embedded comment in this config.
+	offset = fixedbuf.find("<!--<walk>");
+	if (offset != Common::String::npos) {
+		uint32 endOffset = fixedbuf.find(" -->", offset);
+		if (endOffset != Common::String::npos) {
+			uint32 realEndOffset = fixedbuf.find("walk>-->", endOffset);
+			if (realEndOffset  != Common::String::npos && realEndOffset > endOffset) {
+				fixedbuf.replace(offset, endOffset - offset, "<!-- ");
+			}
+		}
+	}
+
+	if (!parser.loadBuffer((unsigned char *)fixedbuf.c_str(), bufsize))
+		error("Character::loadSettings: Can't open %s", path.c_str());
+
+	if (!parser.parse())
+		error("Character::loadSettings: Can't parse %s", path.c_str());
+
 	return false;
 }
 

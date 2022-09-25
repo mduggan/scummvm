@@ -26,6 +26,18 @@ namespace Syberia {
 TeTRS::TeTRS() {
 }
 
+/*static*/ void TeTRS::deserialize(Common::ReadStream &stream, TeTRS &dest) {
+	TeVector3f32::deserialize(stream, dest._trans);
+	TeQuaternion::deserialize(stream, dest._rot);
+	TeVector3f32::deserialize(stream, dest._scale);
+}
+
+/*static*/ void TeTRS::serialize(Common::WriteStream &stream, const TeTRS &src) {
+	TeVector3f32::serialize(stream, src._trans);
+	TeQuaternion::serialize(stream, src._rot);
+	TeVector3f32::serialize(stream, src._scale);
+}
+
 // TODO: Add more functions here.
 
 } // end namespace Syberia

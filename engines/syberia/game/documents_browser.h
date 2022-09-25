@@ -54,7 +54,7 @@ public:
 	void onDocumentSelected(Document *doc);
 	void onNextPage();
 	void onPreviousPage();
-	void onQuitDocumentDoubleClickTimer();
+	bool onQuitDocumentDoubleClickTimer();
 	bool onZoomedButton();
 	
 	// Sorry, this is how the original does it...
@@ -83,6 +83,7 @@ public:
 	void unload();
 
 private:
+	TeTimer _timer;
 	// TODO add private members
 	// TiXmlDocument _xmldoc;
 };

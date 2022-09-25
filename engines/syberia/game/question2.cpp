@@ -29,28 +29,100 @@ namespace Syberia {
 Question2::Question2() {
 }
 
+Question2::~Question2() {
+	// Should have been cleared in leave() but just in case..
+	for (Answer *answer : _answers) {
+		delete answer;
+	}
+}
+
 void Question2::enter() {
-	error("TODO: implement me");
+	TeButtonLayout *backgroundButton = _gui.buttonLayout("background");
+	if (backgroundButton)
+		backgroundButton->setVisible(true);
+	g_engine->getGame()->showMarkers(true);
 }
 
 void Question2::leave() {
-	error("TODO: implement me");
+	TeLayout *background = _gui.layout("background");
+	if (!background)
+		return;
+
+	background->setVisible(false);
+
+	TeSpriteLayout *calepinLayout = _gui.spriteLayout("Calepin");
+	if (!calepinLayout)
+		error("Question2::leave: can't find Calepin.");
+
+	for (Answer *answer : _answers) {
+		TeLayout *alayout = answer->layout();
+		if (alayout == nullptr)
+			continue;
+		calepinLayout->removeChild(alayout);
+		answer->unload();
+		// TODO: original uses TeObject::deleteLater here.. should we
+		// do the same? why defer it?
+		delete answer;
+	}
+	_answers.clear();
 }
 
 void Question2::load() {
-	error("TODO: implement me");
+	setName("dialog2");
+	setSizeType(RELATIVE_TO_PARENT);
+	const TeVector3f32 usersz = userSize();
+	setSize(TeVector3f32(1.0, 1.0, usersz.z()));
+	_gui.load("menus/answer.lua");
+
+	TeButtonLayout *backgroundButton = _gui.buttonLayout("background");
+	if (backgroundButton) {
+		addChild(backgroundButton);
+		backgroundButton->setVisible(false);
+	}
 }
 
 bool Question2::onAnswerValidated(Answer &answer) {
-	Game *game = g_engine->getGame();
-	error("TODO: TeSignal1Param<TeString_const&>::call here");
-	game->showMarkers(false);
+	_onAnswerSignal.call(answer._str);
+	g_engine->getGame()->showMarkers(false);
 	leave();
 	return false;
 }
 
 void Question2::pushAnswer(const Common::String &name, const Common::String &unk, const Common::String &path) {
-	error("TODO: implement me");
+	Answer *answer = new Answer();
+	answer->load(name, unk, path);
+	answer->_onButtonValidatedSignal.add(this, &Question2::onAnswerValidated);
+	TeLayout *alayout = answer->layout();
+	if (!alayout)
+		error("No Answer layout after loading %s!", path.c_str());
+	TeButtonLayout *blayout = dynamic_cast<TeButtonLayout *>(alayout);
+	if (!blayout)
+		error("No Answer button layout after loading %s!", path.c_str());
+
+	blayout->setState(TeButtonLayout::BUTTON_STATE_UP);
+	_answers.push_back(answer);
+
+	float xpos;
+	blayout->setPositionType(RELATIVE_TO_PARENT);
+	if (!path.contains("Cal_FIN.lua")) {
+		setSize(TeVector3f32(0.45f, 0.065f, 1.0f));
+		xpos = 0.3f;
+	} else {
+		setSize(TeVector3f32(0.15f, 0.065f, 1.0f));
+		xpos = 0.15f;
+	}
+	setPosition(TeVector3f32(xpos, _answers.size() * 0.08f + 0.06f, 1.0f));
+
+	blayout->_upLayout->setSizeType(RELATIVE_TO_PARENT);
+	blayout->_upLayout->setSize(TeVector3f32(1.0f, 1.0f, 1.0f));
+	blayout->_downLayout->setSizeType(RELATIVE_TO_PARENT);
+	blayout->_downLayout->setSize(TeVector3f32(1.0f, 1.0f, 1.0f));
+
+	TeSpriteLayout *calepinLayout = _gui.spriteLayout("Calepin");
+	if (calepinLayout)
+		calepinLayout->setParent(alayout);
+
+	enter();
 }
 
 void Question2::unload() {
@@ -58,7 +130,27 @@ void Question2::unload() {
 	_gui.unload();
 }
 
+TeLayout *Question2::Answer::layout() {
+	return _gui.layout("answer");
+}
 
-// TODO: Add more functions here.
+void Question2::Answer::load(const Common::String &name, const Common::String &unk, const Common::String &path) {
+	_str = name;
+	_gui.load(path);
+	TeButtonLayout *answerButton = _gui.buttonLayout("answer");
+	if (answerButton) {
+		answerButton->onMouseClickValidated().add(this, &Question2::Answer::onButtonValidated);
+		answerButton->_someClickFlag = false;
+	}
+}
+
+void Question2::Answer::unload() {
+	_gui.unload();
+}
+
+bool Question2::Answer::onButtonValidated() {
+	_onButtonValidatedSignal.call(*this);
+	return false;
+}
 
 } // end namespace Syberia

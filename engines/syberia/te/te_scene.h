@@ -39,10 +39,10 @@ public:
 
 	void close();
 
-	Common::SharedPtr<TeCamera> camera(const Common::String &name);
-	Common::SharedPtr<TeModel> model(const Common::String &name);
+	TeIntrusivePtr<TeCamera> camera(const Common::String &name);
+	TeIntrusivePtr<TeModel> model(const Common::String &name);
 
-	Common::SharedPtr<TeCamera> currentCamera();
+	TeIntrusivePtr<TeCamera> currentCamera();
 	int currentCameraIndex() const { return _currentCameraIndex; }
 	Common::String currentCameraName() const;
 
@@ -57,13 +57,13 @@ public:
 
 	void update();
 
-	Common::Array<Common::SharedPtr<TeCamera>> &cameras() { return _cameras; }
-	Common::Array<Common::SharedPtr<TeModel>> &models() { return _models; }
+	Common::Array<TeIntrusivePtr<TeCamera>> &cameras() { return _cameras; }
+	Common::Array<TeIntrusivePtr<TeModel>> &models() { return _models; }
 
 private:
 	uint _currentCameraIndex;
-	Common::Array<Common::SharedPtr<TeCamera>> _cameras;
-	Common::Array<Common::SharedPtr<TeModel>> _models;
+	Common::Array<TeIntrusivePtr<TeCamera>> _cameras;
+	Common::Array<TeIntrusivePtr<TeModel>> _models;
 
 };
 

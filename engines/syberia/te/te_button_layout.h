@@ -89,6 +89,10 @@ public:
 
 	TeSignal0Param &onMouseClickValidated() { return _onMouseClickValidatedSignal; };
 
+	bool _someClickFlag;
+	TeLayout *_upLayout;
+	TeLayout *_downLayout;
+
 private:
 	static bool _mousePositionChangedCatched;
 	bool _doubleValidationProtectionEnabled;
@@ -97,7 +101,6 @@ private:
 
 	State _currentState;
 	bool _clickPassThrough;
-	bool _someClickFlag;
 	Common::String _validationSound;
 	float _validationSoundVolume;
 
@@ -109,8 +112,6 @@ private:
 	TeICallback1ParamPtr<const Common::Point &> _onMouseLeftUpMaxPriorityCallback;
 	TeICallback1ParamPtr<const Common::Point &> _onMouseLeftUpCallback;
 	
-	TeLayout *_upLayout;
-	TeLayout *_downLayout;
 	TeLayout *_rolloverLayout;
 	TeLayout *_disabledLayout;
 	TeLayout *_hitZoneLayout;

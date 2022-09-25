@@ -31,25 +31,25 @@ void TeScene::close() {
 	_models.clear();
 }
 
-Common::SharedPtr<TeCamera> TeScene::camera(const Common::String &name) {
+TeIntrusivePtr<TeCamera> TeScene::camera(const Common::String &name) {
 	for (auto &c : _cameras) {
 		if (c->name() == name)
 			return c;
 	}
-	return Common::SharedPtr<TeCamera>();
+	return TeIntrusivePtr<TeCamera>();
 }
 
-Common::SharedPtr<TeModel> TeScene::model(const Common::String &name) {
+TeIntrusivePtr<TeModel> TeScene::model(const Common::String &name) {
 	for (auto &m : _models) {
 		if (m->name() == name)
 			return m;
 	}
-	return Common::SharedPtr<TeModel>();
+	return TeIntrusivePtr<TeModel>();
 }
 
-Common::SharedPtr<TeCamera> TeScene::currentCamera() {
+TeIntrusivePtr<TeCamera> TeScene::currentCamera() {
 	if (!_cameras.size() || _currentCameraIndex >= _cameras.size())
-		return Common::SharedPtr<TeCamera>();
+		return TeIntrusivePtr<TeCamera>();
 	return _cameras[_currentCameraIndex];
 }
 

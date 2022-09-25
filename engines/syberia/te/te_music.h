@@ -26,7 +26,9 @@
 #include "common/mutex.h"
 #include "common/path.h"
 #include "common/str.h"
+
 #include "syberia/te/te_resource.h"
+#include "syberia/te/te_signal.h"
 
 namespace Syberia {
 
@@ -61,6 +63,8 @@ public:
 	void volume(float vol);
 	float volume();
 
+	TeSignal0Param &onStopSignal() { return _onStopSignal; }
+
 private:
 	Common::String _rawPath; // Plain name of file requested
 	Common::Path _actualPath; // actual path after finding it
@@ -77,6 +81,7 @@ private:
 	bool _sndHandleValid;
 	
 	Common::Mutex _mutex;
+	TeSignal0Param _onStopSignal;
 };
 
 } // end namespace Syberia
