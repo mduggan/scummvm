@@ -94,6 +94,40 @@ public:
 };
 
 
+template<class S, class T> class TeICallback2Param {
+public:
+	virtual ~TeICallback2Param() {}
+	virtual bool operator()(S data1, T data2) = 0;
+	virtual bool call(S data1, T data2) = 0;
+	virtual float priority() const = 0;
+	virtual bool equals(const TeICallback2Param *other) const = 0;
+};
+
+
+template<class C, class S, typename T> class TeCallback2Param : public TeICallback2Param<S, T> {
+public:
+	typedef bool(C::*TMethod)(S, T);
+protected:
+	C *_object;
+	TMethod _method;
+	float _priority;
+public:
+	TeCallback2Param(C *object, TMethod method, float priority_ = 0.0f): _object(object), _method(method), _priority(priority_) {}
+	virtual ~TeCallback2Param() {}
+	bool operator()(S data1, T data2) override { return (_object->*_method)(data1, data2); }
+	bool call(S data1, T data2) override { return (_object->*_method)(data1, data2); }
+
+	virtual float priority() const override { return _priority; }
+
+	bool equals(const TeICallback2Param<S, T> *other) const override {
+		const TeCallback2Param<C, S, T> *o = dynamic_cast<const TeCallback2Param<C, S, T> *>(other);
+		return o && _object == o->_object && _method == o->_method;
+	}
+	//virtual void setPriority()
+};
+
+
+
 } // end namespace Syberia
 
 #endif // SYBERIA_TE_TE_CALLBACK_H

@@ -30,6 +30,7 @@
 #include "syberia/te/te_mesh.h"
 #include "syberia/te/te_model_animation.h"
 #include "syberia/te/te_tiled_texture.h"
+#include "syberia/te/te_intrusive_ptr.h"
 
 namespace Syberia {
 
@@ -56,7 +57,7 @@ public:
 		float _amount;
 		TeTimer _timer;
 	};
-	
+
 	struct bone {
 		Common::String _name;
 		unsigned short _x;
@@ -75,35 +76,44 @@ public:
 	void blendMesh(const Common::String &s1, const Common::String &s2, float amount);
 
 	int checkFileType(Common::SeekableReadStream &instream);
-	
+
 	void draw() override;
 	virtual void setColor(const TeColor &col) override;
 
 	/* Align the stream to the nearest 4 byte boudary*/
 	static void loadAlign(Common::SeekableReadStream &stream);
 	static void saveAlign(Common::SeekableWriteStream &stream);
-	
+
 	bool load(const Common::Path &path);
 	bool load(Common::SeekableReadStream &stream);
-	
+
 	bool loadWeights(Common::ReadStream &stream, Common::Array<weightElement> weights);
 	bool loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh);
 
 	void update();
 	void setVisibleByName(const Common::String &name, bool vis);
+	void setQuad(const TeIntrusivePtr<Te3DTexture> &tex, const Common::Array<TeVector3f32> &verts, const TeColor &col);
 
+	void setAnim(TeIntrusivePtr<TeModelAnimation> &anim, bool repeat);
+
+	static bool loadAndCheckString(Common::ReadStream &stream, const char *str);
+	static Common::SeekableReadStream *tryLoadZlibStream(Common::SeekableReadStream &instr);
 	TeIntrusivePtr<TeTiledTexture> _tiledTexture;
 
 	Common::Path _texturePath;
 	bool _enableLights;
 	bool _skipBoneMatricies;
 
-protected:
 	Common::Array<TeMesh> _meshes;
+
+protected:
 	Common::Array<MeshBlender *> _meshBlenders;
 	Common::Array<bone> _bones;
 	Common::Array<TeMatrix4x4> _boneMatrices;
 	Common::Array<Common::Array<weightElement>> _weightElements;
+	Common::Array<BonesBlender *> _boneBlenders;
+
+	TeIntrusivePtr<TeModelAnimation> _modelAnim;
 	// TODO add private members
 
 };

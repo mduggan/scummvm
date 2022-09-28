@@ -74,8 +74,10 @@ public:
 
 };
 
+/* Pointer to a callback with a single parameter of type T */
 template<class T> using TeICallback1ParamPtr = Common::SharedPtr<TeICallback1Param<T>>;
 
+/* Array of callbacks with a single parameter of type T */
 template<class T> class TeSignal1Param : public Common::SortedArray<TeICallback1ParamPtr<T>, const TeICallback1ParamPtr<T> &> {
 public:
 	TeSignal1Param() : Common::SortedArray<TeICallback1ParamPtr<T>, const TeICallback1ParamPtr<T> &>(_teCallbackSorter) {};
@@ -108,6 +110,44 @@ public:
 		this->remove(temp);
 	}
 };
+
+/* Pointer to a callback with 2 paramets parameter of type T and S */
+template<class S, class T> using TeICallback2ParamPtr = Common::SharedPtr<TeICallback2Param<S, T>>;
+
+/* Array of callbacks with a two parameters of type T */
+template<class S, class T> class TeSignal2Param : public Common::SortedArray<TeICallback2ParamPtr<S, T>, const TeICallback2ParamPtr<S, T> &> {
+public:
+	TeSignal2Param() : Common::SortedArray<TeICallback2ParamPtr<S, T>, const TeICallback2ParamPtr<S, T> &>(_teCallbackSorter) {};
+
+	void call(T t, S s) {
+		typename Common::Array<TeICallback2ParamPtr<S, T>>::iterator i = this->begin();
+		typename Common::Array<TeICallback2ParamPtr<S, T>>::iterator end_ = this->end();
+		for (; i < end_; i++) {
+			(*i)->call(s, t);
+		}
+	}
+
+	void remove(const TeICallback2ParamPtr<S, T> &item) {
+		typename Common::Array<TeICallback2ParamPtr<S, T>>::iterator i = this->begin();
+		typename Common::Array<TeICallback2ParamPtr<S, T>>::iterator end_ = this->end();
+		for (; i < end_; i++) {
+			if ((*i)->equals(item.get())) {
+				this->erase(i);
+				break;
+			}
+		}
+	}
+
+	template<class C> void add(C *obj, typename TeCallback2Param<C, S, T>::TMethod method) {
+		this->insert(TeICallback2ParamPtr<S, T>(new TeCallback2Param<C, S, T>(obj, method)));
+	}
+
+	template<class C> void remove(C *obj, typename TeCallback2Param<C, S, T>::TMethod method) {
+		TeICallback2ParamPtr<S, T> temp(new TeCallback2Param<C, S, T>(obj, method));
+		this->remove(temp);
+	}
+};
+
 } // end namespace Syberia
 
 #endif // SYBERIA_TE_TE_SIGNAL_H

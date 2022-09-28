@@ -19,10 +19,14 @@
  *
  */
 
+#include "common/hashmap.h"
+#include "common/path.h"
 #include "common/file.h"
 #include "common/debug.h"
+
 #include "syberia/game/character.h"
 #include "syberia/game/character_settings_xml_parser.h"
+#include "syberia/te/te_model_animation.h"
 
 namespace Syberia {
 
@@ -42,10 +46,9 @@ void Character::CharacterSettings::clear() {
 }
 
 void Character::WalkSettings::clear() {
-	_start = AnimSettings();
-	_loop = AnimSettings();
-	_endD = AnimSettings();
-	_endG = AnimSettings();
+	for (int i = 0; i < 4; i++) {
+		_walkParts[i] = AnimSettings();
+	}
 }
 
 Character::Character() : _curveOffset(0) {
@@ -63,9 +66,18 @@ void Character::addCallback(const Common::String &s1, const Common::String &s2, 
 	error("TODO: Implement me.");
 }
 
-/*static*/ TeModelAnimation *Character::animCacheLoad(const Common::String &path) {
-	// todo: return should be TeIntrusivePtr
-	error("TODO: Implement me.");
+/*static*/ TeIntrusivePtr<TeModelAnimation> Character::animCacheLoad(const Common::Path &path) {
+	static Common::HashMap<Common::String, TeIntrusivePtr<TeModelAnimation>> _cache;
+	
+	const Common::String pathStr = path.toString();
+	if (_cache.contains(pathStr))
+		return _cache.getVal(pathStr);
+	
+	TeIntrusivePtr<TeModelAnimation> modelAnim = new TeModelAnimation();
+	modelAnim->load(path);
+	
+	_cache.setVal(pathStr, modelAnim);
+	return modelAnim;
 }
 
 float Character::animLength(TeModelAnimation *modelanim, long bone, long lastframe) {
@@ -105,8 +117,12 @@ void Character::endMove() {
 	error("TODO: Implement Character::endMove.");
 }
 
-long Character::getCurrentWalkFiles() {
-	error("TODO: Implement Character::getCurrentWalkFiles.");
+const Character::WalkSettings *Character::getCurrentWalkFiles() {
+	for (const auto & walkSettings : _characterSettings._walkSettings) {
+		if (walkSettings._key == _walkModeStr)
+			return &walkSettings._value;
+	}
+	return nullptr;
 }
 
 bool Character::isFramePassed(uint frameno) {
@@ -135,10 +151,10 @@ bool Character::loadModel(const Common::String &name, bool param_2) {
 	}
 	_model = new TeModel();
 	//_model->bonesUpdateSignal().add(this, &Character::onBonesUpdate);
-	
+
 	if (!_globalCharacterSettings->contains(name))
 		return false;
-	
+
 	_characterSettings = _globalCharacterSettings->getVal(name);
 	_model->_texturePath = Common::Path("models/Textures");
 	_model->_enableLights = true;
@@ -146,10 +162,41 @@ bool Character::loadModel(const Common::String &name, bool param_2) {
 	modelPath.joinInPlace(_characterSettings._modelFileName);
 	if (!_model->load(modelPath))
 		return false;
-	
-	
-	error("TODO: Finish Character::loadModel.");
-	return false;
+
+	_model->setName(name);
+	_model->setScale(_characterSettings._defaultScale);
+
+	for (unsigned int i = 0; i < _model->_meshes.size(); i++)
+		_model->_meshes[i].setVisible(true);
+
+	_model->setVisibleByName("_B_", false);
+	_model->setVisibleByName("_Y_", false);
+
+	_model->setVisibleByName(_characterSettings._defaultEyes, true);
+	_model->setVisibleByName(_characterSettings._defaultMouth, true);
+
+	setAnimation(_characterSettings._walkFileName, true, false, false, -1, 9999);
+
+	_walkPart0AnimLen = animLengthFromFile(walkAnim(WalkPart_Start), &_walkPart0AnimFrameCount, 9999);
+	_walkPart3AnimLen = animLengthFromFile(walkAnim(WalkPart_EndG), &_walkPart3AnimFrameCount, 9999);
+	_walkPart1AnimLen = animLengthFromFile(walkAnim(WalkPart_Loop), &_walkPart1AnimFrameCount, 9999);
+
+	TeIntrusivePtr<Te3DTexture> shadow = new Te3DTexture();
+	shadow->load("models/Textures/simple_shadow_alpha.tga");
+
+	for (int i = 0; i < 2; i++) {
+		TeModel *pmodel = new TeModel();
+		_shadowModel[i] = pmodel;
+		pmodel->setName("Shadow");
+		Common::Array<TeVector3f32> arr;
+		arr.resize(4);
+		arr[0] = TeVector3f32(-60.0, 0.0, -60.0);
+		arr[1] = TeVector3f32(-60.0, 0.0, 60.0);
+		arr[2] = TeVector3f32(60.0, 0.0, -60.0);
+		arr[3] = TeVector3f32(60.0, 0.0, 60.0);
+		pmodel->setQuad(shadow, arr, TeColor(0xff,0xff,0xff,0x50));
+	}
+	return true;
 }
 
 /*static*/ bool Character::loadSettings(const Common::String &path) {
@@ -176,7 +223,7 @@ bool Character::loadModel(const Common::String &name, bool param_2) {
 		fixedbuf.replace(offset, 12, "--");
 		offset = fixedbuf.find("------------");
 	}
-	
+
 	// Big HACK: Remove the embedded comment in this config.
 	offset = fixedbuf.find("<!--<walk>");
 	if (offset != Common::String::npos) {
@@ -209,27 +256,48 @@ bool Character::onModelAnimationFinished() {
 }
 
 void Character::permanentUpdate() {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::permanentUpdate.");
 }
 
 void Character::placeOnCurve(const TeBezierCurve &curve) {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::placeOnCurve.");
 }
 
 void Character::removeAnim() {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::removeAnim.");
 }
 
 void Character::removeFromCurve() {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::removeFromCurve.");
 }
 
-bool Character::setAnimation(const Common::String &param_1, bool param_2, bool param_3, bool param_4, int param_5, int param_6)  {
-	error("TODO: Implement me.");
+bool Character::setAnimation(const Common::String &name, bool repeat, bool param_3, bool param_4, int startFrame, int endFrame)  {
+	if (name.empty())
+		return false;
+	
+	Common::Path animPath("models/Anims");
+	animPath.joinInPlace(name);
+	bool validAnim = (name.contains(_characterSettings._walkFileName) ||
+					  name.contains(walkAnim(WalkPart_Start)) ||
+					  name.contains(walkAnim(WalkPart_Loop)) ||
+					  name.contains(walkAnim(WalkPart_EndD)) ||
+					  name.contains(walkAnim(WalkPart_EndG)));
+
+	
+	if (_lastModelAnim) {
+		_lastModelAnim->onFinished().remove(this, &Character::onModelAnimationFinished);
+		_lastModelAnim->unbind();
+	}
+	
+	_lastModelAnim = animCacheLoad(animPath);
+	_lastModelAnim->bind(_model);
+	_lastModelAnim->setFrameLimits(startFrame, endFrame);
+	_model->setAnim(_lastModelAnim, repeat);
+	error("TODO: Finish Character::setAnimation.");
 }
 
 void Character::setAnimationSound(const Common::String &name, uint param_2)  {
-	error("TODO: Implement me.");
+	error("TODO: Implement Character::setAnimationSound.");
 }
 
 void Character::setCurveOffset(float offset) {
@@ -282,15 +350,19 @@ void Character::updatePosition(float curveOffset) {
 	error("TODO: Implement me.");
 }
 
-Character::WalkPart Character::walkAnim(uint offset)  {
-	error("TODO: Implement me.");
-	return WalkPart0;
+Common::String Character::walkAnim(Character::WalkPart part)  {
+	Common::String result;
+	const Character::WalkSettings *settings = getCurrentWalkFiles();
+	if (settings) {
+		return settings->_walkParts[(int)part]._file;
+	}
+	return result;
 }
 
 void Character::walkMode(const Common::String &mode) {
 	error("TODO: Implement me.");
 }
-	
+
 void Character::walkTo(float param_1, bool param_2) {
 	error("TODO: Implement me.");
 }

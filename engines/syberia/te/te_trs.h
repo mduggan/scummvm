@@ -34,7 +34,16 @@ public:
 
 	static void deserialize(Common::ReadStream &stream, TeTRS &dest);
 	static void serialize(Common::WriteStream &stream, const TeTRS &src);
-	// TODO add public members
+
+	void setRotation(const TeQuaternion &rot) {
+		_rot = rot;
+	}
+	void setScale(const TeVector3f32 &scale) {
+		_scale = scale;
+	}
+	void setTranslation(const TeVector3f32 &trans) {
+		_trans = trans;
+	}
 
 private:
 	TeVector3f32 _trans;

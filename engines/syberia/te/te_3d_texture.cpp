@@ -112,7 +112,7 @@ TeIntrusivePtr<Te3DTexture> Te3DTexture::load2(const Common::Path &path, uint si
 	TeResourceManager *resMgr = g_engine->getResourceManager();
 	if (!resMgr->exists(fullPath)) {
 		TeIntrusivePtr<Te3DTexture> retval(new Te3DTexture());
-		retval->load(fullPath);
+		retval->load(path);
 		retval->setAccessName(fullPath);
 		resMgr->addResource(retval.get());
 		return retval;

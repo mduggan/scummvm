@@ -26,6 +26,7 @@
 #include "syberia/syberia.h"
 #include "syberia/te/te_light.h"
 #include "syberia/te/te_model.h"
+#include "syberia/te/te_model_animation.h"
 #include "syberia/te/te_renderer.h"
 #include "syberia/te/te_trs.h"
 
@@ -53,7 +54,7 @@ void TeModel::blendMesh(const Common::String &s1, const Common::String &s2, floa
 
 void TeModel::draw() {
 	TeRenderer *renderer = g_engine->getRenderer();
-	
+
 	if (worldVisible()) {
 		const TeMatrix4x4 transform = transformationMatrix();
 		renderer->sendModelMatrix(transform);
@@ -106,10 +107,7 @@ _name(name), _amount(amount) {
 }
 
 bool TeModel::load(Common::SeekableReadStream &stream) {
-	char buf[5];
-	buf[4] = '\0';
-	stream.read(buf, 4);
-	if (strncmp(buf, "TEMD", 4)) {
+	if (!loadAndCheckString(stream, "TEMD")) {
 		error("[TeModel::load] Unknown format.");
 	}
 
@@ -128,8 +126,7 @@ bool TeModel::load(Common::SeekableReadStream &stream) {
 		_skipBoneMatricies = stream.readUint32LE();
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "SKEL", 4)) {
+	if (!loadAndCheckString(stream, "SKEL")) {
 		error("[TeModel::load] Unable to find skeleton.");
 	}
 
@@ -144,21 +141,18 @@ bool TeModel::load(Common::SeekableReadStream &stream) {
 	}
 
 	for (unsigned int m = 0; m < _meshes.size(); m++) {
-		// FIXME: Translation clearly wrong here.. what's the return condition?
 		if (!loadMesh(stream, _meshes[m])) {
 			error("[TeModel::load] Error on meshes loading.");
 		}
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "WEIG", 4)) {
+	if (!loadAndCheckString(stream, "WEIG")) {
 		error("[TeModel::load] Unable to load weight.");
 	}
-	for (unsigned int w = 0; w < _weightElements.size(); w++) {
-		for (unsigned int i = 0; i < _weightElements.size(); i++) {
-			loadWeights(stream, _weightElements[i]);
-		}
+	for (unsigned int i = 0; i < _weightElements.size(); i++) {
+		loadWeights(stream, _weightElements[i]);
 	}
+
 	//if (*(long *)(*(long *)&(_bones).field_0x8 + 0x68) != 0) {
 	//	return true;
 	//}
@@ -172,36 +166,41 @@ bool TeModel::load(const Common::Path &path) {
 		warning("[TeModel::load] Can't open file : %s.", path.toString().c_str());
 		return false;
 	}
-	char buf[5];
-	buf[4] = '\0';
-	modelFile.read(buf, 4);
-	if (!strncmp(buf, "TEZ0", 4)) {
-		byte version = modelFile.readByte();
-		if (version != 1) {
-			warning("[TeModel::load] invalid version number %d (expect 1)", version);
-			return false;
-		}
-		uint32 compressedSize = modelFile.readUint32LE();
-		if (compressedSize > modelFile.size()) {
-			warning("[TeModel::load] invalid size %d (file size %d)", compressedSize, (int)modelFile.size());
-			return false;
-		}
-		uint32 uncompressedSize = modelFile.readUint32LE();
-		Common::SeekableSubReadStream substream(&modelFile, modelFile.pos(), modelFile.size());
-		Common::SeekableReadStream *zlibStream = Common::wrapCompressedReadStream(&substream, uncompressedSize);
+
+	bool retval;
+	if (loadAndCheckString(modelFile, "TEZ0")) {
+		Common::SeekableReadStream *zlibStream = tryLoadZlibStream(modelFile);
 		if (!zlibStream)
 			return false;
-		load(*zlibStream);
+		retval = load(*zlibStream);
 		delete zlibStream;
 	} else {
 		modelFile.seek(0);
-		load(modelFile);
+		retval = load(modelFile);
 	}
-	return true;
+	return retval;
+}
+
+Common::SeekableReadStream *TeModel::tryLoadZlibStream(Common::SeekableReadStream &stream) {
+	byte version = stream.readByte();
+	if (version != 1) {
+		warning("[TeModel::load] invalid version number %d (expect 1)", version);
+		return nullptr;
+	}
+	uint32 compressedSize = stream.readUint32LE();
+	if (compressedSize > stream.size()) {
+		warning("[TeModel::load] invalid size %d (file size %d)", compressedSize, (int)stream.size());
+		return nullptr;
+	}
+	uint32 uncompressedSize = stream.readUint32LE();
+	Common::SeekableSubReadStream substream(&stream, stream.pos(), stream.size());
+	return Common::wrapCompressedReadStream(&substream, uncompressedSize);
 }
 
 bool TeModel::loadWeights(Common::ReadStream &stream, Common::Array<weightElement> weights) {
 	uint32 nweights = stream.readUint32LE();
+	if (nweights > 100000)
+		error("Improbable number of weights %d", (int)nweights);
 	weights.resize(nweights);
 	for (unsigned int i = 0; i < nweights; i++) {
 		weights[i]._w = stream.readFloatLE();
@@ -212,18 +211,15 @@ bool TeModel::loadWeights(Common::ReadStream &stream, Common::Array<weightElemen
 }
 
 bool TeModel::loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh) {
-	char buf[5];
-	buf[4] = '\0';
-	stream.read(buf, 4);
-	if (strncmp(buf, "MESH", 4))
+	if (!loadAndCheckString(stream, "MESH"))
 		return false;
-	
+
 	uint32 vertcount = stream.readUint32LE();
-	uint32 idxcount = stream.readUint32LE();
 	uint32 matcount = stream.readUint32LE();
 	uint32 matidxcount = stream.readUint32LE();
+	uint32 idxcount = stream.readUint32LE();
 	mesh.setConf(vertcount, idxcount, TeMesh::MeshMode_TriangleFan, matcount, matidxcount);
-	
+
 	uint32 flags = stream.readUint32LE();
 	if (flags & 1)
 		mesh.setColor(0, TeColor(0xff, 0xff, 0xff, 0xff));
@@ -233,10 +229,9 @@ bool TeModel::loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh) {
 	mesh.setName(Te3DObject2::deserializeString(stream));
 	loadAlign(stream);
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "MTRL", 4))
+	if (!loadAndCheckString(stream, "MTRL"))
 		return false;
-	
+
 	for (unsigned int i = 0; i < mesh.materials().size(); i++) {
 		TeMaterial mat;
 		TeMaterial::deserialize(stream, mat, _texturePath);
@@ -245,8 +240,7 @@ bool TeModel::loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh) {
 		mesh.attachMaterial(i, mat);
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "VERT", 4))
+	if (!loadAndCheckString(stream, "VERT"))
 		return false;
 
 	for (unsigned int i = 0; i < mesh.numVerticies(); i++) {
@@ -255,6 +249,8 @@ bool TeModel::loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh) {
 		mesh.setVertex(i, v);
 	}
 	if (mesh.hasUvs()) {
+		if (!loadAndCheckString(stream, "TUVS"))
+			return false;
 		for (unsigned int i = 0; i < mesh.numVerticies(); i++) {
 			TeVector2f32 v;
 			TeVector2f32::deserialize(stream, v);
@@ -262,8 +258,7 @@ bool TeModel::loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh) {
 		}
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "NORM", 4))
+	if (!loadAndCheckString(stream, "NORM"))
 		return false;
 
 	for (unsigned int i = 0; i < mesh.numVerticies(); i++) {
@@ -272,42 +267,73 @@ bool TeModel::loadMesh(Common::SeekableReadStream &stream, TeMesh &mesh) {
 		mesh.setNormal(i, v);
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "COLS", 4))
-		return false;
+	if (mesh.hasColor()) {
+		if (!loadAndCheckString(stream, "COLS"))
+			return false;
 
-	for (unsigned int i = 0; i < mesh.numVerticies(); i++) {
-		TeColor c;
-		c.deserialize(stream);
-		mesh.setColor(i, c);
+		for (unsigned int i = 0; i < mesh.numVerticies(); i++) {
+			TeColor c;
+			c.deserialize(stream);
+			mesh.setColor(i, c);
+		}
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "FCPM", 4))
+	if (!loadAndCheckString(stream, "FCPM"))
 		return false;
 
 	for (unsigned int i = 0; i < mesh.materials().size(); i++) {
 		mesh.facesPerMaterial(i, stream.readUint16LE());
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "MTXI", 4))
+	loadAlign(stream);
+	if (!loadAndCheckString(stream, "MTXI"))
 		return false;
 
 	for (unsigned int i = 0; i < mesh.numVerticies(); i++) {
 		mesh.matrixIndex(i, stream.readUint16LE());
 	}
 
-	stream.read(buf, 4);
-	if (strncmp(buf, "IDXS", 4))
+	loadAlign(stream);
+	if (!loadAndCheckString(stream, "IDXS"))
 		return false;
 
 	for (unsigned int i = 0; i < mesh.numIndexes(); i++) {
 		mesh.setIndex(i, stream.readUint16LE());
 	}
-	
+
 	loadAlign(stream);
 	return true;
+}
+
+void TeModel::setQuad(const TeIntrusivePtr<Te3DTexture> &tex, const Common::Array<TeVector3f32> &verts, const TeColor &col) {
+	TeMesh mesh;
+	mesh.setConf(4, 4, TeMesh::MeshMode_TriangleStrip, 0, 0);
+	mesh.defaultMaterial(tex);
+	error("Finish TeModel::setQuad");
+}
+
+void TeModel::setAnim(TeIntrusivePtr<TeModelAnimation> &anim, bool repeat) {
+	for (TeModel::BonesBlender *blender : _boneBlenders) {
+		delete blender;
+	}
+	_boneBlenders.clear();
+	anim->_repeatCount = repeat ? -1 : 1;
+	_modelAnim = anim;
+}
+
+void TeModel::setVisibleByName(const Common::String &name, bool vis) {
+	for (TeMesh &mesh : _meshes) {
+		if (mesh.name().contains(name)) {
+			mesh.setVisible(vis);
+		}
+	}
+}
+
+bool TeModel::loadAndCheckString(Common::ReadStream &stream, const char *str) {
+	char buf[5];
+	buf[4] = '\0';
+	stream.read(buf, 4);
+	return !strncmp(buf, str, 4);
 }
 
 } // end namespace Syberia

@@ -73,8 +73,10 @@ public:
 		path = core->findFile(path);
 		retval = new T();
 
-		if (retval.get())
+		if (retval.get()) {
+			retval->load(path);
 			addResource(retval.get());
+		}
 		return retval;
 	}
 

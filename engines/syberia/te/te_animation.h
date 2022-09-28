@@ -33,10 +33,10 @@ public:
 	TeAnimation();
 	virtual ~TeAnimation() {};
 
-	void cont();
-	void pause();
-	void stop();
-	void reset();
+	virtual void cont();
+	virtual void pause();
+	virtual void stop();
+	virtual void reset();
 	void play() {
 		cont();
 	}

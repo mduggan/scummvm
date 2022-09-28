@@ -329,7 +329,13 @@ TeVector3f32 TeMesh::vertex(uint idx) const {
 }
 
 void TeMesh::attachMaterial(uint idx, const TeMaterial &material) {
-	error("TODO: Implement TeMesh::attachMaterial");
+	TeMaterial &mat = _materials[idx];
+	mat._texture = material._texture;
+	mat._enableLights = material._enableLights;
+	mat._enableSomethingDefault0 = material._enableSomethingDefault0;
+	mat._emissionColor = material._emissionColor;
+	mat._diffuseColor = material._diffuseColor;
+	mat._mode = material._mode;
 }
 
 void TeMesh::facesPerMaterial(uint idx, unsigned short value) {

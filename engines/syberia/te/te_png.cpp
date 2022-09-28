@@ -27,27 +27,15 @@
 
 namespace Syberia {
 
-TePng::TePng() : _loadedSurface(nullptr) {
+TePng::TePng() {
 }
 
 TePng::~TePng() {
-	if (_loadedSurface)
-		delete _loadedSurface;
 }
 
 /*static*/
 bool TePng::matchExtension(const Common::String &extn) {
 	return extn == "png";
-}
-
-bool TePng::load(const Common::Path &path) {
-	Common::File file;
-	if (file.open(path) && load(file)) {
-		_path = path;
-		return true;
-	}
-	warning("Failed to load png %s", path.toString().c_str());
-	return false;
 }
 
 bool TePng::load(Common::SeekableReadStream &stream) {
@@ -67,18 +55,6 @@ bool TePng::load(Common::SeekableReadStream &stream) {
 	return true;
 }
 
-uint TePng::width() {
-	if (_loadedSurface)
-		return _loadedSurface->w;
-	return 0;
-}
-
-uint TePng::height() {
-	if (_loadedSurface)
-		return _loadedSurface->h;
-	return 0;
-}
-
 TeImage::Format TePng::imageFormat() {
 	if (_loadedSurface) {
 		if (_loadedSurface->format == Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24))
@@ -87,21 +63,6 @@ TeImage::Format TePng::imageFormat() {
 			return TeImage::RGB8;
 	}
 	return TeImage::INVALID;
-}
-
-bool TePng::update(unsigned long i, TeImage &imgout) {
-	if (!_loadedSurface)
-		return false;
-
-	if (!_path.empty())
-		imgout.setAccessName(_path);
-
-	if (imgout.w == _loadedSurface->w && imgout.h == _loadedSurface->h && imgout.format == _loadedSurface->format) {
-		imgout.copyFrom(*_loadedSurface);
-		return true;
-	}
-	
-	error("TODO: Implement TePng::update for different sizes");
 }
 
 } // end namespace Syberia

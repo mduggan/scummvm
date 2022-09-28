@@ -19,8 +19,12 @@
  *
  */
 
+#include "syberia/syberia.h"
+
 #include "common/rect.h"
+#include "syberia/te/te_core.h"
 #include "syberia/te/te_image.h"
+#include "syberia/te/te_i_codec.h"
 
 namespace Syberia {
 
@@ -85,8 +89,20 @@ bool TeImage::isExtensionSupported(const Common::Path &path)  {
 	error("TODO: TeImage: Implement me.");
 }
 
-bool TeImage::load(const Common::Path &path)  {
-	error("TODO: TeImage::load Implement me.");
+bool TeImage::load(const Common::Path &path) {
+	TeCore *core = g_engine->getCore();
+	TeICodec *codec = core->createVideoCodec(path);
+	if (!codec->load(path)) {
+		error("TeImage::load: Failed to load %s.", path.toString().c_str());
+	}
+
+	Common::SharedPtr<TePalette> nullpal;
+	create(codec->width(), codec->height(), nullpal, codec->imageFormat(), codec->width(), codec->height());
+
+	if (!codec->update(0, *this)) {
+		error("TeImage::load: Failed to update from %s.", path.toString().c_str());
+	}
+	return true;
 }
 
 bool TeImage::load(Common::ReadStream &stream, const Common::Path &path)  {

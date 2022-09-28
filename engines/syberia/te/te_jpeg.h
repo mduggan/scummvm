@@ -23,7 +23,7 @@
 #define SYBERIA_TE_TE_JPEG_H
 
 #include "common/str.h"
-#include "syberia/te/te_i_codec.h"
+#include "syberia/te/te_scummvm_codec.h"
 
 namespace Graphics {
 struct Surface;
@@ -31,27 +31,14 @@ struct Surface;
 
 namespace Syberia {
 
-class TeJpeg : public TeICodec {
+class TeJpeg : public TeScummvmCodec {
 public:
 	TeJpeg();
 	virtual ~TeJpeg();
 
-	virtual bool load(const Common::Path &path) override;
 	virtual bool load(Common::SeekableReadStream &stream) override;
-	virtual uint width() override;
-	virtual uint height() override;
 	virtual int nbFrames() override { return 1; }
-	virtual TeImage::Format imageFormat() override;
-	virtual void setLeftBorderSize(uint val) override;
-	virtual uint leftBorderSize() override;
-	virtual void setRightBorderSize(uint val) override;
-	virtual uint rightBorderSize() override;
-	virtual void setBottomBorderSize(uint val) override;
-	virtual uint bottomBorderSize() override;
-	virtual void setTopBorderSize(uint val) override;
-	virtual uint topBorderSize() override;
 	virtual float frameRate() override  { return 0.0; }
-	virtual bool update(unsigned long i, TeImage &imgout) override;
 	virtual bool isAtEnd() override  { return true; }
 	virtual void setColorKeyActivated(bool val) override { }
 	virtual void setColorKey(const TeColor &col) override { }
@@ -59,9 +46,6 @@ public:
 
 	static bool matchExtension(const Common::String &extn);
 
-private:
-	Graphics::Surface *_loadedSurface;
-	Common::Path _path;
 };
 
 } // end namespace Syberia

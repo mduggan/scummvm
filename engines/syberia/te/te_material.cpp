@@ -183,11 +183,7 @@ TeMaterial &TeMaterial::operator=(const TeMaterial &other) {
 }
 
 /*static*/ void TeMaterial::deserialize(Common::SeekableReadStream &stream, TeMaterial &material, const Common::Path &texPath) {
-	uint32 nameLen = stream.readUint32LE();
-	char *buf = (char *)malloc(nameLen + 1);
-	stream.read(buf, nameLen);
-	Common::String nameStr(buf, nameLen);
-	delete buf;
+	Common::String nameStr = Te3DObject2::deserializeString(stream);
 
 	TeModel::loadAlign(stream);
 	material._mode = static_cast<TeMaterial::Mode>(stream.readUint32LE());
@@ -200,7 +196,11 @@ TeMaterial &TeMaterial::operator=(const TeMaterial &other) {
 	material._ambientColor.deserialize(stream);
 	material._diffuseColor.deserialize(stream);
 	material._specularColor.deserialize(stream);
-	material._emissionColor.deserialize(stream);
+	// TODO: Confirm this - Surely this should be emission color,
+	// but the original doesn't assign the result
+	// to _emissionColor. It does read though.
+	TeColor c;
+	c.deserialize(stream);
 	material._shininess = stream.readFloatLE();
 }
 

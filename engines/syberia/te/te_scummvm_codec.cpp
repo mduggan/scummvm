@@ -19,39 +19,60 @@
  *
  */
 
-#include "syberia/te/te_jpeg.h"
-
 #include "common/file.h"
 #include "common/path.h"
 #include "graphics/surface.h"
-#include "image/jpeg.h"
+
+#include "syberia/te/te_scummvm_codec.h"
 
 namespace Syberia {
 
-TeJpeg::TeJpeg() {
+TeScummvmCodec::TeScummvmCodec() : _loadedSurface(nullptr) {
 }
 
-TeJpeg::~TeJpeg() {
-}
-
-/*static*/
-bool TeJpeg::matchExtension(const Common::String &extn) {
-	return extn == "jpg" || extn == "jpeg";
-}
-
-bool TeJpeg::load(Common::SeekableReadStream &stream) {
-	Image::JPEGDecoder jpg;
-
+TeScummvmCodec::~TeScummvmCodec() {
 	if (_loadedSurface)
 		delete _loadedSurface;
-	_loadedSurface = nullptr;
+}
 
-	jpg.setOutputPixelFormat(Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
-	if (!jpg.loadStream(stream))
+bool TeScummvmCodec::load(const Common::Path &path) {
+	Common::File file;
+	if (file.open(path) && load(static_cast<Common::SeekableReadStream&>(file))) {
+		_path = path;
+		return true;
+	}
+	return false;
+}
+
+uint TeScummvmCodec::width() {
+	if (_loadedSurface)
+		return _loadedSurface->w;
+	return 0;
+}
+
+uint TeScummvmCodec::height() {
+	if (_loadedSurface)
+		return _loadedSurface->h;
+	return 0;
+}
+
+TeImage::Format TeScummvmCodec::imageFormat() {
+	return TeImage::RGBA8;
+}
+
+bool TeScummvmCodec::update(unsigned long i, TeImage &imgout) {
+	if (!_loadedSurface)
 		return false;
 
-	_loadedSurface = jpg.getSurface()->convertTo(Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
-	return true;
+	if (!_path.empty())
+		imgout.setAccessName(_path);
+
+	if (imgout.w == _loadedSurface->w && imgout.h == _loadedSurface->h && imgout.format == _loadedSurface->format) {
+		imgout.copyFrom(*_loadedSurface);
+		return true;
+	}
+	
+	error("TODO: Implement TeScummvmCodec::update for different sizes");
 }
 
 } // end namespace Syberia

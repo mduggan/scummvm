@@ -19,6 +19,12 @@
  *
  */
 
+#include "common/file.h"
+#include "common/str.h"
+#include "common/stream.h"
+#include "common/path.h"
+#include "image/tga.h"
+
 #include "syberia/te/te_tga.h"
 
 namespace Syberia {
@@ -28,63 +34,21 @@ TeTga::TeTga() {
 
 /*static*/
 bool TeTga::matchExtension(const Common::String &extn) {
-	return extn == "png";
-}
-
-bool TeTga::load(const Common::Path &path) {
-	error("TODO: Implement load");
+	return extn == "tga";
 }
 
 bool TeTga::load(Common::SeekableReadStream &stream) {
-	error("TODO: Implement load");
-}
+	if (_loadedSurface)
+		delete _loadedSurface;
+	_loadedSurface = nullptr;
 
-uint TeTga::width() {
-	error("TODO: Implement width");
-}
+	Image::TGADecoder tga;
+	if (!tga.loadStream(stream))
+		return false;
+	
+	_loadedSurface = tga.getSurface()->convertTo(Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24));
 
-uint TeTga::height() {
-	error("TODO: Implement height");
-}
-
-TeImage::Format TeTga::imageFormat() {
-	error("TODO: Implement setLeftBorderSize");
-}
-
-void TeTga::setLeftBorderSize(uint val) {
-	error("TODO: Implement setLeftBorderSize");
-}
-
-uint TeTga::leftBorderSize() {
-	error("TODO: Implement leftBorderSize");
-}
-
-void TeTga::setRightBorderSize(uint val) {
-	error("TODO: Implement setRightBorderSize");
-}
-
-uint TeTga::rightBorderSize() {
-	error("TODO: Implement rightBorderSize");
-}
-
-void TeTga::setBottomBorderSize(uint val) {
-	error("TODO: Implement setBottomBorderSize");
-}
-
-uint TeTga::bottomBorderSize() {
-	error("TODO: Implement bottomBorderSize");
-}
-
-void TeTga::setTopBorderSize(uint val) {
-	error("TODO: Implement setTopBorderSize");
-}
-
-uint TeTga::topBorderSize() {
-	error("TODO: Implement topBorderSize");
-}
-
-bool TeTga::update(unsigned long i, TeImage &imgout) {
-	error("TODO: Implement update");
+	return true;
 }
 
 } // end namespace Syberia

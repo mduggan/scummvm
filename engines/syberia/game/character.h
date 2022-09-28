@@ -50,10 +50,7 @@ public:
 	};
 
 	struct WalkSettings {
-		AnimSettings _start;
-		AnimSettings _loop;
-		AnimSettings _endD;
-		AnimSettings _endG;
+		AnimSettings _walkParts[4];
 
 		void clear();
 	};
@@ -78,18 +75,18 @@ public:
 
 	class AnimCacheElement {};
 	enum WalkPart {
-		WalkPart0,
-		WalkPart1,
-		WalkPart2,
-		WalkPart3
+		WalkPart_Start,
+		WalkPart_Loop,
+		WalkPart_EndD,
+		WalkPart_EndG
 	};
-	
+
 	void addCallback(const Common::String &s1, const Common::String &s2, float f1, float f2);
 
 	static void animCacheFreeAll();
 	static void animCacheFreeOldest();
-	static TeModelAnimation *animCacheLoad(const Common::String &path); // todo: should be TeIntrusivePtr
-	
+	static TeIntrusivePtr<TeModelAnimation> animCacheLoad(const Common::Path &path);
+
 	float animLength(TeModelAnimation *modelanim, long bone, long lastframe);
 	float animLengthFromFile(const Common::String &animname, uint *param_2, uint lastframe);
 	bool blendAnimation(const Common::String &animname, float param_2, bool param_3, bool param_4);
@@ -100,15 +97,15 @@ public:
 	void deleteCallback(const Common::String &str1, const Common::String &str2, float f);
 	//static bool deserialize(TiXmlElement *param_1, Walk *param_2);
 	void endMove();
-	
-	long getCurrentWalkFiles();
+
+	const WalkSettings *getCurrentWalkFiles();
 	bool isFramePassed(uint frameno);
 	bool isWalkEnd();
 	bool leftStepFrame(enum WalkPart walkpart);
 	bool rightStepFrame(enum WalkPart walkpart);
 	bool loadModel(const Common::String &name, bool param_2);
 	static bool loadSettings(const Common::String &path);
-	
+
 	bool onBonesUpdate(const Common::String &param_1, const TeMatrix4x4 *param_2);
 	bool onModelAnimationFinished();
 	void permanentUpdate();
@@ -117,8 +114,8 @@ public:
 	void removeAnim();
 	void removeFromCurve();
 	static Common::String rootBone() { return "Pere"; }
-	
-	bool setAnimation(const Common::String &param_1, bool param_2, bool param_3, bool param_4, int param_5, int param_6);
+
+	bool setAnimation(const Common::String &name, bool repeat, bool param_3, bool param_4, int startFrame, int endFrame);
 	void setAnimationSound(const Common::String &name, uint param_2);
 	void setCurveOffset(float offset);
 	void setFreeMoveZone(const Common::SharedPtr<TeFreeMoveZone> &zone);
@@ -132,7 +129,7 @@ public:
 	void update(double percentval);
 	void updateAnimFrame();
 	void updatePosition(float curveOffset);
-	WalkPart walkAnim(uint offset);
+	Common::String walkAnim(WalkPart part);
 	void walkMode(const Common::String &mode);
 	void walkTo(float param_1, bool param_2);
 
@@ -149,12 +146,22 @@ private:
 	Common::String _stepSound2;
 	Common::String _walkModeStr; // Walk or Jog
 	
+	TeIntrusivePtr<TeModelAnimation> _lastModelAnim;
+
 	CharacterSettings _characterSettings;
+
+	int _walkPart0AnimLen;
+	int _walkPart1AnimLen;
+	int _walkPart3AnimLen;
+
+	uint32 _walkPart0AnimFrameCount;
+	uint32 _walkPart1AnimFrameCount;
+	uint32 _walkPart3AnimFrameCount;
 
 	static Common::Array<AnimCacheElement> _animCache;
 	static uint _animCacheSize;
 	static Common::HashMap<Common::String, CharacterSettings> *_globalCharacterSettings;
-	
+
 };
 
 } // end namespace Syberia

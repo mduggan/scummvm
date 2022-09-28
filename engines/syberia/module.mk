@@ -85,6 +85,7 @@ MODULE_OBJS := \
 	te/te_scene.o \
 	te/te_screen.o \
 	te/te_scrolling_layout.o \
+	te/te_scummvm_codec.o \
 	te/te_sfx.o \
 	te/te_sprite_layout.o \
 	te/te_text_base2.o \

@@ -62,10 +62,6 @@ bool CharacterSettingsXmlParser::parserCallback_walkType(ParserNode *node) {
 	return true;
 }
 
-bool CharacterSettingsXmlParser::parserCallback_start(ParserNode *node) {
-	return true;
-}
-
 Character::AnimSettings CharacterSettingsXmlParser::parseWalkAnimSettings(const ParserNode *node) const {
 	Character::AnimSettings settings;
 	const Common::StringMap &map = node->values;
@@ -79,18 +75,23 @@ Character::AnimSettings CharacterSettingsXmlParser::parseWalkAnimSettings(const 
 	return settings;
 }
 
+bool CharacterSettingsXmlParser::parserCallback_start(ParserNode *node) {
+	_curWalkSettings->_walkParts[0] = parseWalkAnimSettings(node);
+	return true;
+}
+
 bool CharacterSettingsXmlParser::parserCallback_loop(ParserNode *node) {
-	_curWalkSettings->_loop = parseWalkAnimSettings(node);
+	_curWalkSettings->_walkParts[1] = parseWalkAnimSettings(node);
 	return true;
 }
 
 bool CharacterSettingsXmlParser::parserCallback_endD(ParserNode *node) {
-	_curWalkSettings->_endD = parseWalkAnimSettings(node);
+	_curWalkSettings->_walkParts[2] = parseWalkAnimSettings(node);
 	return true;
 }
 
 bool CharacterSettingsXmlParser::parserCallback_endG(ParserNode *node) {
-	_curWalkSettings->_endG = parseWalkAnimSettings(node);
+	_curWalkSettings->_walkParts[3] = parseWalkAnimSettings(node);
 	return true;
 }
 
