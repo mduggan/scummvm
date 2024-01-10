@@ -99,7 +99,7 @@ TeLight *TeLight::makeInstance() {
 	Graphics::RendererType r = g_engine->preferredRendererType();
 
 #if defined(USE_OPENGL_GAME)
-	if (r == Graphics::kRendererTypeOpenGL)
+	if (r == Graphics::kRendererTypeOpenGL || r == Graphics::kRendererTypeOpenGLShaders)
 		return new TeLightOpenGL();
 #endif
 

@@ -114,7 +114,7 @@ Te3DTexture *Te3DTexture::makeInstance() {
 	Graphics::RendererType r = g_engine->preferredRendererType();
 
 #if defined(USE_OPENGL_GAME)
-	if (r == Graphics::kRendererTypeOpenGL)
+	if (r == Graphics::kRendererTypeOpenGL || r == Graphics::kRendererTypeOpenGLShaders)
 		return new Te3DTextureOpenGL();
 #endif
 
